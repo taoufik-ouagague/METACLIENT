@@ -17,8 +17,8 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   final AuthController _authController = Get.find<AuthController>();
-  final TextEditingController _loginCtrl = TextEditingController(text: 'client');
-  final TextEditingController _pwdCtrl = TextEditingController(text: '123456');
+  final TextEditingController _loginCtrl = TextEditingController();
+  final TextEditingController _pwdCtrl = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   bool _obscurePwd = true;
@@ -121,7 +121,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
                       // Login Field Title & Input
                       const Text(
-                        'Identifiant / Code client',
+                        'Identifiant',
                         style: TextStyle(
                           color: AppTheme.primaryIcons,
                           fontSize: 12.5,
