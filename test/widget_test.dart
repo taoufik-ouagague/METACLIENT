@@ -16,7 +16,7 @@ void main() {
     // Pump frames to let splash screen timer complete
     await tester.pump(const Duration(milliseconds: 500));
     await tester.pump(const Duration(seconds: 3));
-    await tester.pumpAndSettle();
+    await tester.pump(const Duration(milliseconds: 300));
 
     expect(find.byType(MetaClientApp), findsOneWidget);
   });

@@ -4,6 +4,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import '../controllers/auth_controller.dart';
 import '../controllers/config_controller.dart';
 import '../theme/app_theme.dart';
+import '../widgets/animated_gradient_border_box.dart';
 import '../widgets/glass_button.dart';
 import '../widgets/glass_container.dart';
 import '../widgets/glass_scaffold.dart';
@@ -49,7 +50,7 @@ class _LoginScreenState extends State<LoginScreen> {
             children: [
               const SizedBox(height: 12),
 
-              // Logo & App Name Header (with dynamic client logo beside app logo)
+              // Logo & App Name Header (with animated moving linear gradient border and transparent glass)
               Obx(() {
                 final configCtrl = Get.isRegistered<ConfigController>()
                     ? Get.find<ConfigController>()
@@ -57,22 +58,27 @@ class _LoginScreenState extends State<LoginScreen> {
                 final clientLogoUrl = configCtrl?.logoUrl;
                 final hasClientLogo = clientLogoUrl != null && clientLogoUrl.trim().isNotEmpty;
 
+                final movingBorderColors = [
+                  configCtrl?.optionalColor ?? const Color(0xFFFDEB03), // Yellow
+                  configCtrl?.secondaryColor ?? const Color(0xFF109B48), // Green
+                  configCtrl?.primaryColor ?? const Color(0xFF2B3C99),   // Blue
+                  configCtrl?.optionalColor ?? const Color(0xFFFDEB03), // Yellow
+                ];
+
                 if (hasClientLogo) {
                   return Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      // App Logo (Homogeneous clean frosted glass card)
-                      GlassContainer(
+                      // App Logo (Transparent glass with moving linear gradient border)
+                      AnimatedGradientBorderBox(
                         width: 86,
                         height: 86,
                         borderRadius: 24,
+                        borderWidth: 1.8,
                         padding: const EdgeInsets.all(13),
-                        color: Colors.white.withOpacity(0.92),
-                        border: Border.all(
-                          color: Colors.white.withOpacity(0.85),
-                          width: 1.2,
-                        ),
+                        colors: movingBorderColors,
+                        backgroundColor: Colors.white.withOpacity(0.08),
                         child: Image.asset(
                           'assets/img/logo.png',
                           fit: BoxFit.contain,
@@ -106,17 +112,15 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ),
 
-                      // Client Logo from API (Matching homogeneous clean frosted glass card)
-                      GlassContainer(
+                      // Client Logo from API (Transparent glass with moving linear gradient border)
+                      AnimatedGradientBorderBox(
                         width: 86,
                         height: 86,
                         borderRadius: 24,
+                        borderWidth: 1.8,
                         padding: const EdgeInsets.all(11),
-                        color: Colors.white.withOpacity(0.92),
-                        border: Border.all(
-                          color: Colors.white.withOpacity(0.85),
-                          width: 1.2,
-                        ),
+                        colors: movingBorderColors,
+                        backgroundColor: Colors.white.withOpacity(0.08),
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(16),
                           child: Image.network(
@@ -149,17 +153,15 @@ class _LoginScreenState extends State<LoginScreen> {
                   );
                 }
 
-                // Fallback: Single centered app logo
-                return GlassContainer(
+                // Fallback: Single centered app logo with moving linear gradient border
+                return AnimatedGradientBorderBox(
                   width: 96,
                   height: 96,
                   borderRadius: 26,
+                  borderWidth: 1.8,
                   padding: const EdgeInsets.all(16),
-                  color: Colors.white.withOpacity(0.92),
-                  border: Border.all(
-                    color: Colors.white.withOpacity(0.85),
-                    width: 1.2,
-                  ),
+                  colors: movingBorderColors,
+                  backgroundColor: Colors.white.withOpacity(0.08),
                   child: Image.asset(
                     'assets/img/logo.png',
                     fit: BoxFit.contain,
