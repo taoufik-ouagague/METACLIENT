@@ -26,7 +26,16 @@ class _HomeScreenState extends State<HomeScreen> {
   final TextEditingController _rechercheMenu = TextEditingController();
   String _filtreMenu = '';
   int _index = 0;
+  int _previousIndex = 0;
   final AuthController _authController = Get.find<AuthController>();
+
+  void _changerOnglet(int nouvelIndex) {
+    if (nouvelIndex == _index) return;
+    setState(() {
+      _previousIndex = _index;
+      _index = nouvelIndex;
+    });
+  }
 
   @override
   void dispose() {
@@ -43,7 +52,7 @@ class _HomeScreenState extends State<HomeScreen> {
         icone: LucideIcons.home,
         label: 'Accueil',
         page: DashboardTab(
-          onNavigateTab: (target) => setState(() => _index = target),
+          onNavigateTab: (target) => _changerOnglet(target),
         ),
         barre: true,
       ),
@@ -100,7 +109,7 @@ class _HomeScreenState extends State<HomeScreen> {
           SafeArea(
             bottom: false,
             child: AnimatedSwitcher(
-              duration: const Duration(milliseconds: 350),
+              duration: const Duration(milliseconds: 380),
               switchInCurve: Curves.easeOutCubic,
               switchOutCurve: Curves.easeInCubic,
               layoutBuilder: (currentChild, previousChildren) {
@@ -113,8 +122,16 @@ class _HomeScreenState extends State<HomeScreen> {
                 );
               },
               transitionBuilder: (child, animation) {
-                final slide = Tween<Offset>(
-                  begin: const Offset(0, 0.035),
+                final isIncoming = (child.key is ValueKey<int>) &&
+                    (child.key as ValueKey<int>).value == _index;
+
+                final isForward = _index >= _previousIndex;
+                final double startX = isIncoming
+                    ? (isForward ? 0.08 : -0.08)
+                    : (isForward ? -0.08 : 0.08);
+
+                final slideAnim = Tween<Offset>(
+                  begin: Offset(startX, 0.012),
                   end: Offset.zero,
                 ).animate(
                   CurvedAnimation(
@@ -122,12 +139,45 @@ class _HomeScreenState extends State<HomeScreen> {
                     curve: Curves.easeOutCubic,
                   ),
                 );
-                return FadeTransition(
-                  opacity: animation,
-                  child: SlideTransition(
-                    position: slide,
-                    child: child,
+
+                final scaleAnim = Tween<double>(
+                  begin: 0.94,
+                  end: 1.0,
+                ).animate(
+                  CurvedAnimation(
+                    parent: animation,
+                    curve: Curves.easeOutCubic,
                   ),
+                );
+
+                final fadeAnim = CurvedAnimation(
+                  parent: animation,
+                  curve: const Interval(0.0, 0.85, curve: Curves.easeOut),
+                );
+
+                return AnimatedBuilder(
+                  animation: animation,
+                  builder: (context, _) {
+                    final sigma = (1.0 - animation.value).clamp(0.0, 1.0) * 3.5;
+                    return FadeTransition(
+                      opacity: fadeAnim,
+                      child: SlideTransition(
+                        position: slideAnim,
+                        child: ScaleTransition(
+                          scale: scaleAnim,
+                          child: sigma > 0.1
+                              ? ImageFiltered(
+                                  imageFilter: ImageFilter.blur(
+                                    sigmaX: sigma,
+                                    sigmaY: sigma,
+                                  ),
+                                  child: child,
+                                )
+                              : child,
+                        ),
+                      ),
+                    );
+                  },
                 );
               },
               child: KeyedSubtree(
@@ -224,7 +274,7 @@ class _HomeScreenState extends State<HomeScreen> {
         // Bouton Recherche rapide
         _appBarGlassButton(
           icon: LucideIcons.search,
-          onTap: () => setState(() => _index = 1),
+          onTap: () => _changerOnglet(1),
         ),
         const SizedBox(width: 8),
         // Bouton Rafraîchir
@@ -252,7 +302,7 @@ class _HomeScreenState extends State<HomeScreen> {
           : (user?.libelle ?? 'C');
       final lettre = nom.isNotEmpty ? nom[0].toUpperCase() : 'C';
 
-      void ouvrir() => setState(() => _index = 5);
+      void ouvrir() => _changerOnglet(5);
 
       final isProfileActive = _index == 5;
 
@@ -422,34 +472,39 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _navItem(int idx, IconData icon, String label) {
     final active = _index == idx;
     return GestureDetector(
-      onTap: () => setState(() => _index = idx),
+      onTap: () => _changerOnglet(idx),
       behavior: HitTestBehavior.opaque,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 4),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            AnimatedContainer(
-              duration: const Duration(milliseconds: 220),
-              width: active ? 36 : 26,
-              height: active ? 36 : 26,
-              decoration: active
-                  ? BoxDecoration(
-                      gradient: AppTheme.primaryGradient,
-                      borderRadius: BorderRadius.circular(12),
-                      boxShadow: [
-                        BoxShadow(
-                          color: AppTheme.primary.withOpacity(0.35),
-                          blurRadius: 8,
-                          offset: const Offset(0, 3),
-                        ),
-                      ],
-                    )
-                  : null,
-              child: Icon(
-                icon,
-                color: active ? Colors.white : const Color(0xFF64748B),
-                size: active ? 18 : 19,
+            AnimatedScale(
+              scale: active ? 1.08 : 1.0,
+              duration: const Duration(milliseconds: 240),
+              curve: Curves.easeOutBack,
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 220),
+                width: active ? 36 : 26,
+                height: active ? 36 : 26,
+                decoration: active
+                    ? BoxDecoration(
+                        gradient: AppTheme.primaryGradient,
+                        borderRadius: BorderRadius.circular(12),
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppTheme.primary.withOpacity(0.35),
+                            blurRadius: 8,
+                            offset: const Offset(0, 3),
+                          ),
+                        ],
+                      )
+                    : null,
+                child: Icon(
+                  icon,
+                  color: active ? Colors.white : const Color(0xFF64748B),
+                  size: active ? 18 : 19,
+                ),
               ),
             ),
             const SizedBox(height: 3),
@@ -506,7 +561,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       label: onglets[i].label,
                       actif: _index == i,
                       onTap: () {
-                        setState(() => _index = i);
+                        _changerOnglet(i);
                         Navigator.of(context).pop();
                       },
                     ),

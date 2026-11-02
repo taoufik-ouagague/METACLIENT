@@ -245,8 +245,8 @@ class FacturesScreen extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       onTap: () => Get.to(
         () => FactureDetailScreen(facture: item),
-        transition: Transition.rightToLeftWithFade,
-        duration: const Duration(milliseconds: 320),
+        transition: Transition.cupertino,
+        duration: const Duration(milliseconds: 360),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

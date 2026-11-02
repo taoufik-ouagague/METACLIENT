@@ -350,8 +350,8 @@ class ExpeditionsScreen extends StatelessWidget {
         if (item.idExpedition != null) {
           Get.to(
             () => ExpeditionDetailScreen(idExpedition: item.idExpedition!),
-            transition: Transition.rightToLeftWithFade,
-            duration: const Duration(milliseconds: 320),
+            transition: Transition.cupertino,
+            duration: const Duration(milliseconds: 360),
           );
         }
       },
