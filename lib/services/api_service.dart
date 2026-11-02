@@ -53,6 +53,21 @@ class ApiService {
     return headers;
   }
 
+  // ─── CONFIGURATION DU CLIENT ────────────────────────────────────────────────
+  // API GET : /api/clientmobile/getConfig
+  static Future<Map<String, dynamic>> getConfig() async {
+    final url = Uri.parse('$baseUrl/api/clientmobile/getConfig');
+    _logger.i('GET $url');
+    final response = await http.get(
+      url,
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
+    );
+    return _handleResponse(response);
+  }
+
   // ─── AUTHENTIFICATION ────────────────────────────────────────────────────────
   // API Post: /api/AuthentificationClient
   static Future<Map<String, dynamic>> login(String login, String pwd) async {

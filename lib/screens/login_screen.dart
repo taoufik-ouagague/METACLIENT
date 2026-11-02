@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../controllers/auth_controller.dart';
+import '../controllers/config_controller.dart';
 import '../theme/app_theme.dart';
 import '../widgets/glass_button.dart';
 import '../widgets/glass_container.dart';
@@ -48,24 +49,127 @@ class _LoginScreenState extends State<LoginScreen> {
             children: [
               const SizedBox(height: 12),
 
-              // Logo & App Name Header
-              GlassContainer(
-                width: 96,
-                height: 96,
-                borderRadius: 26,
-                padding: const EdgeInsets.all(16),
-                color: Colors.white.withOpacity(0.08),
-                border: Border.all(color: AppTheme.primaryIcons.withOpacity(0.4), width: 1.2),
-                child: Image.asset(
-                  'assets/img/logo.png',
-                  fit: BoxFit.contain,
-                  errorBuilder: (_, __, ___) => const Icon(
-                    LucideIcons.truck,
-                    size: 40,
-                    color: AppTheme.primaryIcons,
+              // Logo & App Name Header (with dynamic client logo beside app logo)
+              Obx(() {
+                final configCtrl = Get.isRegistered<ConfigController>()
+                    ? Get.find<ConfigController>()
+                    : null;
+                final clientLogoUrl = configCtrl?.logoUrl;
+                final hasClientLogo = clientLogoUrl != null && clientLogoUrl.trim().isNotEmpty;
+
+                if (hasClientLogo) {
+                  return Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      // App Logo
+                      GlassContainer(
+                        width: 86,
+                        height: 86,
+                        borderRadius: 24,
+                        padding: const EdgeInsets.all(14),
+                        color: Colors.white.withOpacity(0.08),
+                        border: Border.all(
+                          color: AppTheme.primaryIcons.withOpacity(0.4),
+                          width: 1.2,
+                        ),
+                        child: Image.asset(
+                          'assets/img/logo.png',
+                          fit: BoxFit.contain,
+                          errorBuilder: (_, __, ___) => const Icon(
+                            LucideIcons.truck,
+                            size: 38,
+                            color: AppTheme.primaryIcons,
+                          ),
+                        ),
+                      ),
+
+                      // Stylish Divider between logos
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 14),
+                        child: Container(
+                          width: 1.5,
+                          height: 44,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(2),
+                            gradient: LinearGradient(
+                              begin: Alignment.topCenter,
+                              end: Alignment.bottomCenter,
+                              colors: [
+                                Colors.white.withOpacity(0.05),
+                                Colors.white.withOpacity(0.4),
+                                Colors.white.withOpacity(0.05),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+
+                      // Client Logo from API (Clean frosted white card for maximum brand clarity)
+                      GlassContainer(
+                        width: 86,
+                        height: 86,
+                        borderRadius: 24,
+                        padding: const EdgeInsets.all(10),
+                        color: Colors.white.withOpacity(0.94),
+                        border: Border.all(
+                          color: Colors.white.withOpacity(0.85),
+                          width: 1.2,
+                        ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(16),
+                          child: Image.network(
+                            clientLogoUrl,
+                            fit: BoxFit.contain,
+                            loadingBuilder: (context, child, progress) {
+                              if (progress == null) return child;
+                              return const Center(
+                                child: SizedBox(
+                                  width: 22,
+                                  height: 22,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    valueColor: AlwaysStoppedAnimation<Color>(
+                                      AppTheme.primary,
+                                    ),
+                                  ),
+                                ),
+                              );
+                            },
+                            errorBuilder: (_, __, ___) => const Icon(
+                              LucideIcons.building,
+                              size: 32,
+                              color: Color(0xFF64748B),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  );
+                }
+
+                // Fallback: Single centered app logo
+                return GlassContainer(
+                  width: 96,
+                  height: 96,
+                  borderRadius: 26,
+                  padding: const EdgeInsets.all(16),
+                  color: Colors.white.withOpacity(0.08),
+                  border: Border.all(
+                    color: AppTheme.primaryIcons.withOpacity(0.4),
+                    width: 1.2,
                   ),
-                ),
-              ),
+                  child: Image.asset(
+                    'assets/img/logo.png',
+                    fit: BoxFit.contain,
+                    errorBuilder: (_, __, ___) => const Icon(
+                      LucideIcons.truck,
+                      size: 40,
+                      color: AppTheme.primaryIcons,
+                    ),
+                  ),
+                );
+              }),
               const SizedBox(height: 20),
 
               ShaderMask(

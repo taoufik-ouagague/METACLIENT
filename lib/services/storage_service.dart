@@ -7,6 +7,7 @@ class StorageService {
   static const String keyLogin = 'user_login';
   static const String keyServerUrl = 'server_base_url';
   static const String keyProfilePhoto = 'user_profile_photo';
+  static const String keyClientConfig = 'client_config';
 
   static SharedPreferences? _prefs;
 
@@ -39,6 +40,9 @@ class StorageService {
   static String? getProfilePhoto() => prefs.getString(keyProfilePhoto);
   static Future<bool> setProfilePhoto(String photo) => prefs.setString(keyProfilePhoto, photo);
 
+  static String? getClientConfigRaw() => prefs.getString(keyClientConfig);
+  static Future<bool> setClientConfigRaw(String jsonStr) => prefs.setString(keyClientConfig, jsonStr);
+
   static bool hasToken() {
     final t = getToken();
     return t != null && t.trim().isNotEmpty;
@@ -46,9 +50,13 @@ class StorageService {
 
   static Future<void> clearAll() async {
     final savedServer = getServerUrl();
+    final savedConfig = getClientConfigRaw();
     await prefs.clear();
     if (savedServer != null) {
       await setServerUrl(savedServer);
+    }
+    if (savedConfig != null) {
+      await setClientConfigRaw(savedConfig);
     }
   }
 }

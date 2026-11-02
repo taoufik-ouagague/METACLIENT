@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'controllers/auth_controller.dart';
+import 'controllers/config_controller.dart';
 import 'controllers/crbt_controller.dart';
 import 'controllers/dashboard_controller.dart';
 import 'controllers/expedition_controller.dart';
@@ -29,6 +30,7 @@ class MetaClientApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Permanent controllers injection (same architecture as Meta Fleet)
+    Get.put(ConfigController(), permanent: true);
     Get.put(AuthController(), permanent: true);
     Get.put(DashboardController(), permanent: true);
     Get.put(ExpeditionController(), permanent: true);
