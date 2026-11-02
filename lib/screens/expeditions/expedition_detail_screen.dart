@@ -204,6 +204,14 @@ class _ExpeditionDetailScreenState extends State<ExpeditionDetailScreen> {
                         children: [
                           Column(
                             children: [
+                              if (idx > 0)
+                                Container(
+                                  width: 2,
+                                  height: 8,
+                                  color: AppTheme.primary.withOpacity(0.25),
+                                )
+                              else
+                                const SizedBox(height: 8),
                               Container(
                                 width: 28,
                                 height: 28,
@@ -231,7 +239,9 @@ class _ExpeditionDetailScreenState extends State<ExpeditionDetailScreen> {
                                     width: 2,
                                     color: AppTheme.primary.withOpacity(0.25),
                                   ),
-                                ),
+                                )
+                              else
+                                const Spacer(),
                             ],
                           ),
                           const SizedBox(width: 14),
@@ -240,11 +250,12 @@ class _ExpeditionDetailScreenState extends State<ExpeditionDetailScreen> {
                               padding: const EdgeInsets.only(bottom: 18.0),
                               child: GlassContainer(
                                 borderRadius: 16,
-                                padding: const EdgeInsets.all(14),
+                                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Row(
+                                      crossAxisAlignment: CrossAxisAlignment.center,
                                       children: [
                                         Expanded(
                                           child: Text(
