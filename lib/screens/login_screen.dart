@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../controllers/auth_controller.dart';
 import '../controllers/config_controller.dart';
+import '../services/storage_service.dart';
 import '../theme/app_theme.dart';
 import '../widgets/glass_button.dart';
 import '../widgets/glass_container.dart';
@@ -23,10 +24,40 @@ class _LoginScreenState extends State<LoginScreen> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   bool _obscurePwd = true;
+  bool _seSouvenir = false;
 
-  void _onLogin() {
-    if (_formKey.currentState?.validate() ?? false) {
-      _authController.login(_loginCtrl.text, _pwdCtrl.text);
+  @override
+  void initState() {
+    super.initState();
+    _chargerIdentifiantsMemorises();
+  }
+
+  Future<void> _chargerIdentifiantsMemorises() async {
+    if (!StorageService.getRememberMe()) return;
+    final motDePasse = await StorageService.getRememberedPassword();
+    if (!mounted) return;
+    setState(() {
+      _seSouvenir = true;
+      _loginCtrl.text = StorageService.getRememberedLogin() ?? '';
+      _pwdCtrl.text = motDePasse ?? '';
+    });
+  }
+
+  Future<void> _onLogin() async {
+    if (!(_formKey.currentState?.validate() ?? false)) return;
+
+    final login = _loginCtrl.text.trim();
+    final motDePasse = _pwdCtrl.text;
+
+    // On n'enregistre qu'apres coup : des identifiants refuses n'ont rien a
+    // faire dans la Keychain.
+    final connecte = await _authController.login(login, motDePasse);
+    if (!connecte) return;
+
+    if (_seSouvenir) {
+      await StorageService.saveCredentials(login, motDePasse);
+    } else {
+      await StorageService.forgetCredentials();
     }
   }
 
@@ -55,7 +86,8 @@ class _LoginScreenState extends State<LoginScreen> {
                     ? Get.find<ConfigController>()
                     : null;
                 final clientLogoUrl = configCtrl?.logoUrl;
-                final hasClientLogo = clientLogoUrl != null && clientLogoUrl.trim().isNotEmpty;
+                final hasClientLogo =
+                    clientLogoUrl != null && clientLogoUrl.trim().isNotEmpty;
 
                 if (hasClientLogo) {
                   return Row(
@@ -119,7 +151,9 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: AppTheme.primaryIcons.withValues(alpha: 0.22),
+                            color: AppTheme.primaryIcons.withValues(
+                              alpha: 0.22,
+                            ),
                             blurRadius: 18,
                             offset: const Offset(0, 8),
                           ),
@@ -138,7 +172,8 @@ class _LoginScreenState extends State<LoginScreen> {
                                   child: CircularProgressIndicator(
                                     strokeWidth: 2,
                                     valueColor: AlwaysStoppedAnimation<Color>(
-                                      configCtrl?.primaryColor ?? AppTheme.primary,
+                                      configCtrl?.primaryColor ??
+                                          AppTheme.primary,
                                     ),
                                   ),
                                 ),
@@ -185,7 +220,8 @@ class _LoginScreenState extends State<LoginScreen> {
                 final configCtrl = Get.isRegistered<ConfigController>()
                     ? Get.find<ConfigController>()
                     : null;
-                final textGradient = configCtrl?.brandGradient ?? AppTheme.iconGradient;
+                final textGradient =
+                    configCtrl?.brandGradient ?? AppTheme.iconGradient;
                 return ShaderMask(
                   shaderCallback: (bounds) => textGradient.createShader(bounds),
                   child: const Text(
@@ -215,7 +251,10 @@ class _LoginScreenState extends State<LoginScreen> {
               // Login Frosted Glass Card
               GlassContainer(
                 borderRadius: 28,
-                padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 28),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 22,
+                  vertical: 28,
+                ),
                 child: Form(
                   key: _formKey,
                   child: Column(
@@ -236,7 +275,8 @@ class _LoginScreenState extends State<LoginScreen> {
                         final configCtrl = Get.isRegistered<ConfigController>()
                             ? Get.find<ConfigController>()
                             : null;
-                        final labelColor = configCtrl?.secondaryColor ?? AppTheme.primaryIcons;
+                        final labelColor =
+                            configCtrl?.secondaryColor ?? AppTheme.primaryIcons;
                         return Text(
                           'Identifiant',
                           style: TextStyle(
@@ -251,8 +291,9 @@ class _LoginScreenState extends State<LoginScreen> {
                         controller: _loginCtrl,
                         hintText: 'Saisissez votre identifiant',
                         prefixIcon: LucideIcons.user,
-                        validator: (v) =>
-                            (v == null || v.trim().isEmpty) ? 'Veuillez saisir votre identifiant' : null,
+                        validator: (v) => (v == null || v.trim().isEmpty)
+                            ? 'Veuillez saisir votre identifiant'
+                            : null,
                       ),
                       const SizedBox(height: 18),
 
@@ -261,7 +302,8 @@ class _LoginScreenState extends State<LoginScreen> {
                         final configCtrl = Get.isRegistered<ConfigController>()
                             ? Get.find<ConfigController>()
                             : null;
-                        final labelColor = configCtrl?.secondaryColor ?? AppTheme.primaryIcons;
+                        final labelColor =
+                            configCtrl?.secondaryColor ?? AppTheme.primaryIcons;
                         return Text(
                           'Mot de passe',
                           style: TextStyle(
@@ -283,12 +325,93 @@ class _LoginScreenState extends State<LoginScreen> {
                             color: Colors.white.withValues(alpha: 0.6),
                             size: 18,
                           ),
-                          onPressed: () => setState(() => _obscurePwd = !_obscurePwd),
+                          onPressed: () =>
+                              setState(() => _obscurePwd = !_obscurePwd),
                         ),
-                        validator: (v) =>
-                            (v == null || v.trim().isEmpty) ? 'Veuillez saisir votre mot de passe' : null,
+                        validator: (v) => (v == null || v.trim().isEmpty)
+                            ? 'Veuillez saisir votre mot de passe'
+                            : null,
                       ),
-                      const SizedBox(height: 28),
+                      const SizedBox(height: 4),
+
+                      // Se souvenir de moi
+                      Obx(() {
+                        final configCtrl = Get.isRegistered<ConfigController>()
+                            ? Get.find<ConfigController>()
+                            : null;
+                        final accent =
+                            configCtrl?.secondaryColor ?? AppTheme.primaryIcons;
+
+                        return InkWell(
+                          borderRadius: BorderRadius.circular(8),
+                          onTap: () =>
+                              setState(() => _seSouvenir = !_seSouvenir),
+                          child: Padding(
+                            padding: const EdgeInsets.fromLTRB(5, 4, 0, 4),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                AnimatedContainer(
+                                  duration: const Duration(milliseconds: 180),
+                                  curve: Curves.easeOut,
+                                  width: 21,
+                                  height: 21,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(7),
+                                    color: _seSouvenir
+                                        ? accent
+                                        : Colors.white.withValues(alpha: 0.06),
+                                    border: Border.all(
+                                      color: _seSouvenir
+                                          ? accent
+                                          : Colors.white.withValues(
+                                              alpha: 0.28,
+                                            ),
+                                      width: 1.4,
+                                    ),
+                                    boxShadow: _seSouvenir
+                                        ? [
+                                            BoxShadow(
+                                              color: accent.withValues(
+                                                alpha: 0.35,
+                                              ),
+                                              blurRadius: 6,
+                                              offset: const Offset(0, 2),
+                                            ),
+                                          ]
+                                        : null,
+                                  ),
+                                  child: AnimatedScale(
+                                    duration: const Duration(milliseconds: 180),
+                                    curve: Curves.easeOutBack,
+                                    scale: _seSouvenir ? 1 : 0,
+                                    child: const Icon(
+                                      LucideIcons.check,
+                                      size: 14,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 10),
+                                AnimatedDefaultTextStyle(
+                                  duration: const Duration(milliseconds: 180),
+                                  style: TextStyle(
+                                    color: Colors.white.withValues(
+                                      alpha: _seSouvenir ? 0.95 : 0.7,
+                                    ),
+                                    fontSize: 13,
+                                    fontWeight: _seSouvenir
+                                        ? FontWeight.w600
+                                        : FontWeight.w500,
+                                  ),
+                                  child: const Text('Se souvenir de moi'),
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      }),
+                      const SizedBox(height: 22),
 
                       // Submit Button
                       Obx(

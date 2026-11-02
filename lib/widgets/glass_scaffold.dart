@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import '../controllers/config_controller.dart';
 import '../theme/app_theme.dart';
@@ -37,7 +38,9 @@ class GlassScaffold extends StatelessWidget {
           // Base Background Gradient
           Container(
             decoration: BoxDecoration(
-              gradient: isLight ? AppTheme.lightBackgroundGradient : AppTheme.backgroundGradient,
+              gradient: isLight
+                  ? AppTheme.lightBackgroundGradient
+                  : AppTheme.backgroundGradient,
             ),
           ),
 
@@ -50,8 +53,10 @@ class GlassScaffold extends StatelessWidget {
 
               Widget buildOrbs() {
                 final pColor = configCtrl?.primaryColor ?? AppTheme.primary;
-                final sColor = configCtrl?.secondaryColor ?? AppTheme.primaryIcons;
-                final oColor = configCtrl?.optionalColor ?? const Color(0xFFFDEB03);
+                final sColor =
+                    configCtrl?.secondaryColor ?? AppTheme.primaryIcons;
+                final oColor =
+                    configCtrl?.optionalColor ?? const Color(0xFFFDEB03);
                 final hasCustom = configCtrl?.hasCustomColors ?? false;
 
                 if (isLight) {
@@ -68,8 +73,10 @@ class GlassScaffold extends StatelessWidget {
                             shape: BoxShape.circle,
                             gradient: RadialGradient(
                               colors: [
-                                (hasCustom ? oColor : AppTheme.primaryIcons).withValues(alpha: 0.16),
-                                (hasCustom ? oColor : AppTheme.primaryIcons).withValues(alpha: 0.04),
+                                (hasCustom ? oColor : AppTheme.primaryIcons)
+                                    .withValues(alpha: 0.16),
+                                (hasCustom ? oColor : AppTheme.primaryIcons)
+                                    .withValues(alpha: 0.04),
                                 Colors.transparent,
                               ],
                               stops: const [0.0, 0.50, 1.0],
@@ -88,8 +95,10 @@ class GlassScaffold extends StatelessWidget {
                             shape: BoxShape.circle,
                             gradient: RadialGradient(
                               colors: [
-                                (hasCustom ? sColor : AppTheme.primary).withValues(alpha: 0.14),
-                                (hasCustom ? sColor : AppTheme.primary).withValues(alpha: 0.03),
+                                (hasCustom ? sColor : AppTheme.primary)
+                                    .withValues(alpha: 0.14),
+                                (hasCustom ? sColor : AppTheme.primary)
+                                    .withValues(alpha: 0.03),
                                 Colors.transparent,
                               ],
                               stops: const [0.0, 0.50, 1.0],
@@ -108,7 +117,8 @@ class GlassScaffold extends StatelessWidget {
                             shape: BoxShape.circle,
                             gradient: RadialGradient(
                               colors: [
-                                (hasCustom ? pColor : const Color(0xFF38BDF8)).withValues(alpha: 0.12),
+                                (hasCustom ? pColor : const Color(0xFF38BDF8))
+                                    .withValues(alpha: 0.12),
                                 Colors.transparent,
                               ],
                               stops: const [0.0, 0.60],
@@ -132,8 +142,10 @@ class GlassScaffold extends StatelessWidget {
                             shape: BoxShape.circle,
                             gradient: RadialGradient(
                               colors: [
-                                (hasCustom ? oColor : AppTheme.primary).withValues(alpha: 0.20),
-                                (hasCustom ? oColor : AppTheme.primary).withValues(alpha: 0.04),
+                                (hasCustom ? oColor : AppTheme.primary)
+                                    .withValues(alpha: 0.20),
+                                (hasCustom ? oColor : AppTheme.primary)
+                                    .withValues(alpha: 0.04),
                                 Colors.transparent,
                               ],
                               stops: const [0.0, 0.50, 1.0],
@@ -152,8 +164,10 @@ class GlassScaffold extends StatelessWidget {
                             shape: BoxShape.circle,
                             gradient: RadialGradient(
                               colors: [
-                                (hasCustom ? sColor : AppTheme.primaryIcons).withValues(alpha: 0.20),
-                                (hasCustom ? sColor : AppTheme.primaryIcons).withValues(alpha: 0.05),
+                                (hasCustom ? sColor : AppTheme.primaryIcons)
+                                    .withValues(alpha: 0.20),
+                                (hasCustom ? sColor : AppTheme.primaryIcons)
+                                    .withValues(alpha: 0.05),
                                 Colors.transparent,
                               ],
                               stops: const [0.0, 0.50, 1.0],
@@ -172,8 +186,10 @@ class GlassScaffold extends StatelessWidget {
                             shape: BoxShape.circle,
                             gradient: RadialGradient(
                               colors: [
-                                (hasCustom ? pColor : AppTheme.primary).withValues(alpha: 0.28),
-                                (hasCustom ? pColor : AppTheme.primary).withValues(alpha: 0.08),
+                                (hasCustom ? pColor : AppTheme.primary)
+                                    .withValues(alpha: 0.28),
+                                (hasCustom ? pColor : AppTheme.primary)
+                                    .withValues(alpha: 0.08),
                                 Colors.transparent,
                               ],
                               stops: const [0.0, 0.55, 1.0],
@@ -194,16 +210,26 @@ class GlassScaffold extends StatelessWidget {
           ),
 
           // Page Content
-          SafeArea(
-            child: body,
-          ),
+          SafeArea(child: body),
         ],
       ),
     );
 
-    return Theme(
-      data: isLight ? AppTheme.lightTheme : AppTheme.darkTheme,
-      child: scaffold,
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      // La barre d'etat se pose sur le fond de l'ecran : ses icones doivent
+      // contraster avec lui. Sans ca, l'heure et le wifi restent sombres sur
+      // le fond sombre de la connexion.
+      value: SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
+        // iOS decrit le FOND derriere la barre...
+        statusBarBrightness: isLight ? Brightness.light : Brightness.dark,
+        // ...Android decrit les ICONES. Les deux sont donc inverses.
+        statusBarIconBrightness: isLight ? Brightness.dark : Brightness.light,
+      ),
+      child: Theme(
+        data: isLight ? AppTheme.lightTheme : AppTheme.darkTheme,
+        child: scaffold,
+      ),
     );
   }
 }

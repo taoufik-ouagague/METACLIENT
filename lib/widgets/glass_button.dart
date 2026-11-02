@@ -27,7 +27,10 @@ class GlassButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Widget buildContent(LinearGradient effectiveGradient, Color effectiveShadowColor) {
+    Widget buildContent(
+      LinearGradient effectiveGradient,
+      Color effectiveShadowColor,
+    ) {
       return Container(
         width: width ?? double.infinity,
         height: height,
@@ -61,7 +64,11 @@ class GlassButton extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         if (icon != null) ...[
-                          Icon(icon, color: textColor ?? Colors.white, size: 20),
+                          Icon(
+                            icon,
+                            color: textColor ?? Colors.white,
+                            size: 20,
+                          ),
                           const SizedBox(width: 8),
                         ],
                         Text(
@@ -83,7 +90,10 @@ class GlassButton extends StatelessWidget {
 
     // 1. Explicit gradient passed as parameter
     if (gradient != null) {
-      return buildContent(gradient!, gradient!.colors.first.withValues(alpha: 0.35));
+      return buildContent(
+        gradient!,
+        gradient!.colors.first.withValues(alpha: 0.35),
+      );
     }
 
     // 2. Dynamic config from API (if available) with fallback to normal color
@@ -97,6 +107,9 @@ class GlassButton extends StatelessWidget {
     }
 
     // 3. Fallback normal theme
-    return buildContent(AppTheme.primaryGradient, AppTheme.primary.withValues(alpha: 0.35));
+    return buildContent(
+      AppTheme.primaryGradient,
+      AppTheme.primary.withValues(alpha: 0.35),
+    );
   }
 }

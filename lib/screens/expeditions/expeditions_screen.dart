@@ -8,6 +8,8 @@ import '../../theme/app_theme.dart';
 import '../../widgets/glass_container.dart';
 import '../../widgets/status_badge.dart';
 import 'expedition_detail_screen.dart';
+import '../../widgets/scroll_reveal.dart';
+import '../../widgets/info_rows_card.dart';
 
 class ExpeditionsScreen extends StatelessWidget {
   const ExpeditionsScreen({super.key});
@@ -34,14 +36,22 @@ class ExpeditionsScreen extends StatelessWidget {
             children: [
               const Row(
                 children: [
-                  Icon(LucideIcons.slidersHorizontal, color: AppTheme.primary, size: 20),
+                  Icon(
+                    LucideIcons.slidersHorizontal,
+                    color: AppTheme.primary,
+                    size: 20,
+                  ),
                   SizedBox(width: 10),
                   Expanded(
                     child: Text(
                       'Filtrer les expéditions',
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: TextStyle(color: Color(0xFF0F172A), fontSize: 16.5, fontWeight: FontWeight.w700),
+                      style: TextStyle(
+                        color: Color(0xFF0F172A),
+                        fontSize: 16.5,
+                        fontWeight: FontWeight.w700,
+                      ),
                     ),
                   ),
                 ],
@@ -49,10 +59,16 @@ class ExpeditionsScreen extends StatelessWidget {
               const SizedBox(height: 18),
               TextField(
                 controller: duCtrl,
-                style: const TextStyle(color: Color(0xFF0F172A), fontSize: 13.5),
+                style: const TextStyle(
+                  color: Color(0xFF0F172A),
+                  fontSize: 13.5,
+                ),
                 decoration: InputDecoration(
                   labelText: 'Date début (JJ/MM/AAAA)',
-                  labelStyle: const TextStyle(color: AppTheme.primary, fontSize: 12),
+                  labelStyle: const TextStyle(
+                    color: AppTheme.primary,
+                    fontSize: 12,
+                  ),
                   hintText: '01/01/2026',
                   hintStyle: const TextStyle(color: Color(0xFF94A3B8)),
                   enabledBorder: OutlineInputBorder(
@@ -61,17 +77,26 @@ class ExpeditionsScreen extends StatelessWidget {
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(14),
-                    borderSide: const BorderSide(color: AppTheme.primary, width: 1.5),
+                    borderSide: const BorderSide(
+                      color: AppTheme.primary,
+                      width: 1.5,
+                    ),
                   ),
                 ),
               ),
               const SizedBox(height: 12),
               TextField(
                 controller: auCtrl,
-                style: const TextStyle(color: Color(0xFF0F172A), fontSize: 13.5),
+                style: const TextStyle(
+                  color: Color(0xFF0F172A),
+                  fontSize: 13.5,
+                ),
                 decoration: InputDecoration(
                   labelText: 'Date fin (JJ/MM/AAAA)',
-                  labelStyle: const TextStyle(color: AppTheme.primary, fontSize: 12),
+                  labelStyle: const TextStyle(
+                    color: AppTheme.primary,
+                    fontSize: 12,
+                  ),
                   hintText: '31/12/2026',
                   hintStyle: const TextStyle(color: Color(0xFF94A3B8)),
                   enabledBorder: OutlineInputBorder(
@@ -80,7 +105,10 @@ class ExpeditionsScreen extends StatelessWidget {
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(14),
-                    borderSide: const BorderSide(color: AppTheme.primary, width: 1.5),
+                    borderSide: const BorderSide(
+                      color: AppTheme.primary,
+                      width: 1.5,
+                    ),
                   ),
                 ),
               ),
@@ -95,13 +123,18 @@ class ExpeditionsScreen extends StatelessWidget {
                       ctrl.fetchAllExpeditions(resetPage: true);
                       Get.back();
                     },
-                    child: const Text('Réinitialiser', style: TextStyle(color: Color(0xFF64748B))),
+                    child: const Text(
+                      'Réinitialiser',
+                      style: TextStyle(color: Color(0xFF64748B)),
+                    ),
                   ),
                   const SizedBox(width: 8),
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppTheme.primary,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                     ),
                     onPressed: () {
                       ctrl.filterDu.value = duCtrl.text.trim();
@@ -109,7 +142,10 @@ class ExpeditionsScreen extends StatelessWidget {
                       ctrl.fetchAllExpeditions(resetPage: true);
                       Get.back();
                     },
-                    child: const Text('Appliquer', style: TextStyle(color: Colors.white)),
+                    child: const Text(
+                      'Appliquer',
+                      style: TextStyle(color: Colors.white),
+                    ),
                   ),
                 ],
               ),
@@ -176,18 +212,31 @@ class ExpeditionsScreen extends StatelessWidget {
               Expanded(
                 child: GlassContainer(
                   borderRadius: 16,
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 2,
+                  ),
                   child: Row(
                     children: [
-                      const Icon(LucideIcons.search, color: AppTheme.primaryIcons, size: 18),
+                      const Icon(
+                        LucideIcons.search,
+                        color: AppTheme.primaryIcons,
+                        size: 18,
+                      ),
                       const SizedBox(width: 8),
                       Expanded(
                         child: TextField(
                           controller: searchCtrl,
-                          style: const TextStyle(color: Color(0xFF0F172A), fontSize: 13),
+                          style: const TextStyle(
+                            color: Color(0xFF0F172A),
+                            fontSize: 13,
+                          ),
                           decoration: const InputDecoration(
                             hintText: 'N° déclaration...',
-                            hintStyle: TextStyle(color: Color(0xFF94A3B8), fontSize: 12.5),
+                            hintStyle: TextStyle(
+                              color: Color(0xFF94A3B8),
+                              fontSize: 12.5,
+                            ),
                             border: InputBorder.none,
                           ),
                           onSubmitted: (v) {
@@ -198,7 +247,11 @@ class ExpeditionsScreen extends StatelessWidget {
                       ),
                       if (expCtrl.searchQuery.value.isNotEmpty)
                         IconButton(
-                          icon: const Icon(LucideIcons.x, color: Color(0xFF94A3B8), size: 16),
+                          icon: const Icon(
+                            LucideIcons.x,
+                            color: Color(0xFF94A3B8),
+                            size: 16,
+                          ),
                           onPressed: () {
                             searchCtrl.clear();
                             expCtrl.searchQuery.value = '';
@@ -220,7 +273,11 @@ class ExpeditionsScreen extends StatelessWidget {
                   shadowColor: const Color(0xFF0F172A).withValues(alpha: 0.06),
                   elevation: 2,
                 ),
-                icon: const Icon(LucideIcons.slidersHorizontal, color: AppTheme.primary, size: 18),
+                icon: const Icon(
+                  LucideIcons.slidersHorizontal,
+                  color: AppTheme.primary,
+                  size: 18,
+                ),
                 onPressed: () => _showFilterDialog(context, expCtrl),
               ),
             ],
@@ -233,7 +290,9 @@ class ExpeditionsScreen extends StatelessWidget {
         Expanded(
           child: Obx(() {
             if (expCtrl.isLoading.value) {
-              return const Center(child: CircularProgressIndicator(color: AppTheme.primary));
+              return const Center(
+                child: CircularProgressIndicator(color: AppTheme.primary),
+              );
             }
 
             final list = expCtrl.activeTab.value == 0
@@ -245,7 +304,11 @@ class ExpeditionsScreen extends StatelessWidget {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(LucideIcons.packageOpen, color: Color(0xFFCBD5E1), size: 48),
+                    Icon(
+                      LucideIcons.packageOpen,
+                      color: Color(0xFFCBD5E1),
+                      size: 48,
+                    ),
                     SizedBox(height: 12),
                     Text(
                       'Aucune expédition trouvée',
@@ -267,12 +330,18 @@ class ExpeditionsScreen extends StatelessWidget {
                 }
               },
               child: ListView.separated(
-                padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 18,
+                  vertical: 8,
+                ),
                 itemCount: list.length,
                 separatorBuilder: (_, _) => const SizedBox(height: 10),
                 itemBuilder: (context, index) {
                   final item = list[index];
-                  return _buildExpeditionCard(item);
+                  return ScrollReveal(
+                    index: index,
+                    child: _buildExpeditionCard(item),
+                  );
                 },
               ),
             );
@@ -286,22 +355,39 @@ class ExpeditionsScreen extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
               child: GlassContainer(
                 borderRadius: 16,
-                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 8,
+                ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     IconButton(
-                      icon: const Icon(LucideIcons.chevronLeft, color: AppTheme.primary),
-                      onPressed: expCtrl.currentPage.value > 1 ? expCtrl.previousPage : null,
+                      icon: const Icon(
+                        LucideIcons.chevronLeft,
+                        color: AppTheme.primary,
+                      ),
+                      onPressed: expCtrl.currentPage.value > 1
+                          ? expCtrl.previousPage
+                          : null,
                     ),
                     Text(
                       'Page ${expCtrl.currentPage.value} / ${expCtrl.totalPages.value}',
-                      style: const TextStyle(color: Color(0xFF0F172A), fontSize: 13, fontWeight: FontWeight.w600),
+                      style: const TextStyle(
+                        color: Color(0xFF0F172A),
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                     IconButton(
-                      icon: const Icon(LucideIcons.chevronRight, color: AppTheme.primary),
+                      icon: const Icon(
+                        LucideIcons.chevronRight,
+                        color: AppTheme.primary,
+                      ),
                       onPressed:
-                          expCtrl.currentPage.value < expCtrl.totalPages.value ? expCtrl.nextPage : null,
+                          expCtrl.currentPage.value < expCtrl.totalPages.value
+                          ? expCtrl.nextPage
+                          : null,
                     ),
                   ],
                 ),
@@ -366,7 +452,11 @@ class ExpeditionsScreen extends StatelessWidget {
                   color: AppTheme.primary.withValues(alpha: 0.10),
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: const Icon(LucideIcons.package, color: AppTheme.primary, size: 18),
+                child: const Icon(
+                  LucideIcons.package,
+                  color: AppTheme.primary,
+                  size: 18,
+                ),
               ),
               const SizedBox(width: 10),
               Expanded(
@@ -382,7 +472,9 @@ class ExpeditionsScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 8),
-              StatusBadge(status: item.statut ?? (item.isLivree ? 'Livré' : 'En cours')),
+              StatusBadge(
+                status: item.statut ?? (item.isLivree ? 'Livré' : 'En cours'),
+              ),
             ],
           ),
           const SizedBox(height: 12),
@@ -390,7 +482,11 @@ class ExpeditionsScreen extends StatelessWidget {
           // Route: Origine -> Destination
           Row(
             children: [
-              const Icon(LucideIcons.mapPin, size: 13, color: AppTheme.primaryIcons),
+              const Icon(
+                LucideIcons.mapPin,
+                size: 13,
+                color: AppTheme.primaryIcons,
+              ),
               const SizedBox(width: 4),
               Expanded(
                 child: Text(
@@ -442,6 +538,32 @@ class ExpeditionsScreen extends StatelessWidget {
               ),
             ],
           ),
+
+          if (valeurRenseignee(item.processus) ||
+              valeurRenseignee(item.dateLivraison) ||
+              valeurRenseignee(item.dateLivPh) ||
+              (item.valeurDeclaree ?? 0) > 0) ...[
+            const SizedBox(height: 6),
+            Text(
+              [
+                if (valeurRenseignee(item.processus)) item.processus,
+                if (valeurRenseignee(item.dateLivraison))
+                  'Livré le ${item.dateLivraison}',
+                if (valeurRenseignee(item.dateLivPh))
+                  'Prévu le ${item.dateLivPh}',
+                if ((item.notificationLivraison ?? '0') != '0')
+                  'Notifié',
+                if ((item.valeurDeclaree ?? 0) > 0)
+                  'Val. déclarée ${_formatCurrency(item.valeurDeclaree)}',
+              ].join(' • '),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(
+                color: Color(0xFF94A3B8),
+                fontSize: 11,
+              ),
+            ),
+          ],
         ],
       ),
     );

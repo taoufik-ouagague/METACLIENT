@@ -1,3 +1,4 @@
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class StorageService {
@@ -8,6 +9,18 @@ class StorageService {
   static const String keyServerUrl = 'server_base_url';
   static const String keyProfilePhoto = 'user_profile_photo';
   static const String keyClientConfig = 'client_config';
+  static const String keyRememberMe = 'remember_me';
+  static const String keyRememberedLogin = 'remembered_login';
+
+  /// Le mot de passe memorise ne passe pas par SharedPreferences : la
+  /// Keychain (iOS) et EncryptedSharedPreferences (Android) le chiffrent et le
+  /// tiennent hors des sauvegardes en clair.
+  static const String keyRememberedPassword = 'remembered_password';
+
+  static const FlutterSecureStorage _coffre = FlutterSecureStorage(
+    aOptions: AndroidOptions(encryptedSharedPreferences: true),
+    iOptions: IOSOptions(accessibility: KeychainAccessibility.first_unlock),
+  );
 
   static SharedPreferences? _prefs;
 
@@ -48,10 +61,38 @@ class StorageService {
     return t != null && t.trim().isNotEmpty;
   }
 
+  // ── « Se souvenir de moi » ──────────────────────────────────────────────
+  static bool getRememberMe() => prefs.getBool(keyRememberMe) ?? false;
+
+  static String? getRememberedLogin() => prefs.getString(keyRememberedLogin);
+
+  static Future<String?> getRememberedPassword() =>
+      _coffre.read(key: keyRememberedPassword);
+
+  static Future<void> saveCredentials(String login, String password) async {
+    await prefs.setBool(keyRememberMe, true);
+    await prefs.setString(keyRememberedLogin, login);
+    await _coffre.write(key: keyRememberedPassword, value: password);
+  }
+
+  static Future<void> forgetCredentials() async {
+    await prefs.setBool(keyRememberMe, false);
+    await prefs.remove(keyRememberedLogin);
+    await _coffre.delete(key: keyRememberedPassword);
+  }
+
   static Future<void> clearAll() async {
     final savedServer = getServerUrl();
     final savedConfig = getClientConfigRaw();
+    final seSouvenir = getRememberMe();
+    final loginMemorise = getRememberedLogin();
     await prefs.clear();
+    if (seSouvenir) {
+      await prefs.setBool(keyRememberMe, true);
+      if (loginMemorise != null) {
+        await prefs.setString(keyRememberedLogin, loginMemorise);
+      }
+    }
     if (savedServer != null) {
       await setServerUrl(savedServer);
     }

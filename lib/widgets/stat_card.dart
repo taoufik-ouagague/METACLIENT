@@ -50,7 +50,10 @@ class StatCard extends StatelessWidget {
               ),
               if (subtitle != null)
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 6,
+                    vertical: 2,
+                  ),
                   decoration: BoxDecoration(
                     color: accentColor.withValues(alpha: 0.08),
                     borderRadius: BorderRadius.circular(6),
@@ -88,7 +91,9 @@ class StatCard extends StatelessWidget {
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: TextStyle(
-              color: isLight ? const Color(0xFF64748B) : Colors.white.withValues(alpha: 0.7),
+              color: isLight
+                  ? const Color(0xFF64748B)
+                  : Colors.white.withValues(alpha: 0.7),
               fontSize: 11.5,
               fontWeight: FontWeight.w500,
             ),

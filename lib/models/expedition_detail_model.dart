@@ -94,6 +94,17 @@ class ExpeditionDetailModel {
   final List<Map<String, dynamic>> retourCcCt;
   final List<Map<String, dynamic>> retourBlFacture;
   final List<Map<String, dynamic>> chequeCr;
+  final String? sens;
+  final String? activite;
+  final String? blFact;
+  final num? valeurDeclaree;
+  final String? dateLivMobile;
+  final String? dateEncaissement;
+  final String? expediteurCode;
+  final String? expediteurTel;
+  final String? destinataireCode;
+  final String? destinataireAdresse;
+  final String? destinataireTel;
 
   ExpeditionDetailModel({
     this.idExpedition,
@@ -119,6 +130,17 @@ class ExpeditionDetailModel {
     required this.retourCcCt,
     required this.retourBlFacture,
     required this.chequeCr,
+    this.sens,
+    this.activite,
+    this.blFact,
+    this.valeurDeclaree,
+    this.dateLivMobile,
+    this.dateEncaissement,
+    this.expediteurCode,
+    this.expediteurTel,
+    this.destinataireCode,
+    this.destinataireAdresse,
+    this.destinataireTel,
   });
 
   factory ExpeditionDetailModel.fromJson(Map<String, dynamic> json) {
@@ -153,6 +175,17 @@ class ExpeditionDetailModel {
       retourCcCt: rawCcCt.map((e) => Map<String, dynamic>.from(e)).toList(),
       retourBlFacture: rawBl.map((e) => Map<String, dynamic>.from(e)).toList(),
       chequeCr: rawCheque.map((e) => Map<String, dynamic>.from(e)).toList(),
+      sens: json['sens']?.toString(),
+      activite: json['activite']?.toString(),
+      blFact: json['bl_fact']?.toString(),
+      valeurDeclaree: json['valeur_declaree'] as num?,
+      dateLivMobile: json['date_liv_mobile']?.toString(),
+      dateEncaissement: json['date_encaissement']?.toString(),
+      expediteurCode: json['expediteur_code']?.toString(),
+      expediteurTel: json['expediteur_tel']?.toString(),
+      destinataireCode: json['destinataire_code']?.toString(),
+      destinataireAdresse: json['destinataire_adresse']?.toString(),
+      destinataireTel: json['destinataire_tel']?.toString(),
     );
   }
 }

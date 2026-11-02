@@ -27,7 +27,8 @@ class AnimatedGradientBorderBox extends StatefulWidget {
   });
 
   @override
-  State<AnimatedGradientBorderBox> createState() => _AnimatedGradientBorderBoxState();
+  State<AnimatedGradientBorderBox> createState() =>
+      _AnimatedGradientBorderBoxState();
 }
 
 class _AnimatedGradientBorderBoxState extends State<AnimatedGradientBorderBox>
@@ -74,7 +75,9 @@ class _AnimatedGradientBorderBoxState extends State<AnimatedGradientBorderBox>
                 height: widget.height,
                 padding: widget.padding,
                 decoration: BoxDecoration(
-                  color: widget.backgroundColor ?? Colors.white.withValues(alpha: 0.08),
+                  color:
+                      widget.backgroundColor ??
+                      Colors.white.withValues(alpha: 0.08),
                   borderRadius: BorderRadius.circular(widget.borderRadius),
                   boxShadow: [
                     BoxShadow(

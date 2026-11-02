@@ -10,6 +10,7 @@ import '../../widgets/glass_container.dart';
 import '../../widgets/stat_card.dart';
 import '../../widgets/status_badge.dart';
 import '../expeditions/expedition_detail_screen.dart';
+import '../../widgets/scroll_reveal.dart';
 
 class DashboardTab extends StatelessWidget {
   final Function(int)? onNavigateTab;
@@ -48,15 +49,25 @@ class DashboardTab extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
               child: Row(
                 children: [
-                  const Icon(LucideIcons.search, color: AppTheme.primaryIcons, size: 20),
+                  const Icon(
+                    LucideIcons.search,
+                    color: AppTheme.primaryIcons,
+                    size: 20,
+                  ),
                   const SizedBox(width: 10),
                   Expanded(
                     child: TextField(
                       controller: searchCtrl,
-                      style: const TextStyle(color: Color(0xFF0F172A), fontSize: 13.5),
+                      style: const TextStyle(
+                        color: Color(0xFF0F172A),
+                        fontSize: 13.5,
+                      ),
                       decoration: const InputDecoration(
                         hintText: 'Rechercher N° déclaration (ex: F644759)...',
-                        hintStyle: TextStyle(color: Color(0xFF94A3B8), fontSize: 13),
+                        hintStyle: TextStyle(
+                          color: Color(0xFF94A3B8),
+                          fontSize: 13,
+                        ),
                         border: InputBorder.none,
                       ),
                       onSubmitted: (query) {
@@ -69,7 +80,11 @@ class DashboardTab extends StatelessWidget {
                     ),
                   ),
                   IconButton(
-                    icon: const Icon(LucideIcons.arrowRightCircle, color: AppTheme.primaryIcons, size: 22),
+                    icon: const Icon(
+                      LucideIcons.arrowRightCircle,
+                      color: AppTheme.primaryIcons,
+                      size: 22,
+                    ),
                     onPressed: () {
                       if (searchCtrl.text.trim().isNotEmpty) {
                         expCtrl.searchQuery.value = searchCtrl.text.trim();
@@ -85,61 +100,63 @@ class DashboardTab extends StatelessWidget {
             const SizedBox(height: 20),
 
             // ─── 3. STATS KPI GRID ───────────────────────────────────────────
-            Obx(() => Column(
-                  children: [
-                    Row(
-                      children: [
-                        Expanded(
-                          child: StatCard(
-                            title: 'En cours de livraison',
-                            value: '${dashCtrl.expeditionsEncoursCount.value}',
-                            icon: LucideIcons.truck,
-                            subtitle: 'En temps réel',
-                            color: const Color(0xFF0284C7),
-                            onTap: () => onNavigateTab?.call(1),
-                          ),
+            Obx(
+              () => Column(
+                children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        child: StatCard(
+                          title: 'En cours de livraison',
+                          value: '${dashCtrl.expeditionsEncoursCount.value}',
+                          icon: LucideIcons.truck,
+                          subtitle: 'En temps réel',
+                          color: const Color(0xFF0284C7),
+                          onTap: () => onNavigateTab?.call(1),
                         ),
-                        const SizedBox(width: 10),
-                        Expanded(
-                          child: StatCard(
-                            title: 'Total Expéditions',
-                            value: '${dashCtrl.totalExpeditionsCount.value}',
-                            icon: LucideIcons.packageCheck,
-                            subtitle: 'Historique',
-                            color: const Color(0xFF6366F1),
-                            onTap: () => onNavigateTab?.call(1),
-                          ),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: StatCard(
+                          title: 'Total Expéditions',
+                          value: '${dashCtrl.totalExpeditionsCount.value}',
+                          icon: LucideIcons.packageCheck,
+                          subtitle: 'Historique',
+                          color: const Color(0xFF6366F1),
+                          onTap: () => onNavigateTab?.call(1),
                         ),
-                      ],
-                    ),
-                    const SizedBox(height: 10),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: StatCard(
-                            title: 'Factures en instances',
-                            value: '${dashCtrl.facturesInstancesCount.value}',
-                            icon: LucideIcons.fileWarning,
-                            subtitle: 'À régler',
-                            color: const Color(0xFFD97706),
-                            onTap: () => onNavigateTab?.call(2),
-                          ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: StatCard(
+                          title: 'Factures en instances',
+                          value: '${dashCtrl.facturesInstancesCount.value}',
+                          icon: LucideIcons.fileWarning,
+                          subtitle: 'À régler',
+                          color: const Color(0xFFD97706),
+                          onTap: () => onNavigateTab?.call(2),
                         ),
-                        const SizedBox(width: 10),
-                        Expanded(
-                          child: StatCard(
-                            title: 'Solde dû total',
-                            value: _formatCurrency(dashCtrl.totalSoldeDu.value),
-                            icon: LucideIcons.wallet,
-                            subtitle: 'Impayé',
-                            color: const Color(0xFFE11D48),
-                            onTap: () => onNavigateTab?.call(2),
-                          ),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: StatCard(
+                          title: 'Solde dû total',
+                          value: _formatCurrency(dashCtrl.totalSoldeDu.value),
+                          icon: LucideIcons.wallet,
+                          subtitle: 'Impayé',
+                          color: const Color(0xFFE11D48),
+                          onTap: () => onNavigateTab?.call(2),
                         ),
-                      ],
-                    ),
-                  ],
-                )),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
 
             const SizedBox(height: 24),
 
@@ -149,7 +166,11 @@ class DashboardTab extends StatelessWidget {
               children: [
                 const Row(
                   children: [
-                    Icon(LucideIcons.activity, color: AppTheme.primaryIcons, size: 19),
+                    Icon(
+                      LucideIcons.activity,
+                      color: AppTheme.primaryIcons,
+                      size: 19,
+                    ),
                     SizedBox(width: 8),
                     Text(
                       'Dernières Expéditions',
@@ -165,9 +186,20 @@ class DashboardTab extends StatelessWidget {
                   onPressed: () => onNavigateTab?.call(1),
                   child: const Row(
                     children: [
-                      Text('Voir tout', style: TextStyle(color: AppTheme.primary, fontSize: 13, fontWeight: FontWeight.w600)),
+                      Text(
+                        'Voir tout',
+                        style: TextStyle(
+                          color: AppTheme.primary,
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
                       SizedBox(width: 4),
-                      Icon(LucideIcons.chevronRight, color: AppTheme.primary, size: 16),
+                      Icon(
+                        LucideIcons.chevronRight,
+                        color: AppTheme.primary,
+                        size: 16,
+                      ),
                     ],
                   ),
                 ),
@@ -176,7 +208,8 @@ class DashboardTab extends StatelessWidget {
             const SizedBox(height: 8),
 
             Obx(() {
-              if (dashCtrl.isLoading.value && dashCtrl.recentExpeditions.isEmpty) {
+              if (dashCtrl.isLoading.value &&
+                  dashCtrl.recentExpeditions.isEmpty) {
                 return const Center(
                   child: Padding(
                     padding: EdgeInsets.all(24.0),
@@ -205,82 +238,106 @@ class DashboardTab extends StatelessWidget {
                 separatorBuilder: (_, _) => const SizedBox(height: 10),
                 itemBuilder: (context, index) {
                   final item = dashCtrl.recentExpeditions[index];
-                  return GlassContainer(
-                    borderRadius: 18,
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                    onTap: () {
-                      if (item.idExpedition != null) {
-                        Get.to(
-                          () => ExpeditionDetailScreen(idExpedition: item.idExpedition!),
-                          transition: Transition.cupertino,
-                          duration: const Duration(milliseconds: 360),
-                        );
-                      }
-                    },
-                    child: Row(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.all(10),
-                          decoration: BoxDecoration(
-                            color: AppTheme.primaryIcons.withValues(alpha: 0.12),
-                            borderRadius: BorderRadius.circular(12),
+                  return ScrollReveal(
+                    index: index,
+                    child: GlassContainer(
+                      borderRadius: 18,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 14,
+                      ),
+                      onTap: () {
+                        if (item.idExpedition != null) {
+                          Get.to(
+                            () => ExpeditionDetailScreen(
+                              idExpedition: item.idExpedition!,
+                            ),
+                            transition: Transition.cupertino,
+                            duration: const Duration(milliseconds: 360),
+                          );
+                        }
+                      },
+                      child: Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              color: AppTheme.primaryIcons.withValues(
+                                alpha: 0.12,
+                              ),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: const Icon(
+                              LucideIcons.package,
+                              color: AppTheme.primary,
+                              size: 22,
+                            ),
                           ),
-                          child: const Icon(LucideIcons.package, color: AppTheme.primary, size: 22),
-                        ),
-                        const SizedBox(width: 14),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: Text(
-                                      item.numDeclaration,
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
+                          const SizedBox(width: 14),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: Text(
+                                        item.numDeclaration,
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: const TextStyle(
+                                          color: Color(0xFF0F172A),
+                                          fontSize: 14.5,
+                                          fontWeight: FontWeight.w700,
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    StatusBadge(
+                                      status:
+                                          item.statut ??
+                                          (item.isLivree
+                                              ? 'Livré'
+                                              : 'En cours'),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 6),
+                                Row(
+                                  children: [
+                                    const Icon(
+                                      LucideIcons.mapPin,
+                                      size: 12,
+                                      color: Color(0xFF94A3B8),
+                                    ),
+                                    const SizedBox(width: 4),
+                                    Expanded(
+                                      child: Text(
+                                        '${item.origine ?? "—"} → ${item.destination ?? "—"}',
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: const TextStyle(
+                                          color: Color(0xFF64748B),
+                                          fontSize: 12.5,
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Text(
+                                      _formatCurrency(item.mntTtc),
                                       style: const TextStyle(
-                                        color: Color(0xFF0F172A),
-                                        fontSize: 14.5,
+                                        color: AppTheme.primary,
+                                        fontSize: 13,
                                         fontWeight: FontWeight.w700,
                                       ),
                                     ),
-                                  ),
-                                  const SizedBox(width: 8),
-                                  StatusBadge(status: item.statut ?? (item.isLivree ? 'Livré' : 'En cours')),
-                                ],
-                              ),
-                              const SizedBox(height: 6),
-                              Row(
-                                children: [
-                                  const Icon(LucideIcons.mapPin, size: 12, color: Color(0xFF94A3B8)),
-                                  const SizedBox(width: 4),
-                                  Expanded(
-                                    child: Text(
-                                      '${item.origine ?? "—"} → ${item.destination ?? "—"}',
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: const TextStyle(
-                                        color: Color(0xFF64748B),
-                                        fontSize: 12.5,
-                                      ),
-                                    ),
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Text(
-                                    _formatCurrency(item.mntTtc),
-                                    style: const TextStyle(
-                                      color: AppTheme.primary,
-                                      fontSize: 13,
-                                      fontWeight: FontWeight.w700,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
+                                  ],
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   );
                 },

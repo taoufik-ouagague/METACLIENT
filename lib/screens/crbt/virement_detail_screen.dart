@@ -5,9 +5,11 @@ import 'package:lucide_icons/lucide_icons.dart';
 import '../../controllers/crbt_controller.dart';
 import '../../models/crbt_model.dart';
 import '../../theme/app_theme.dart';
+import '../../widgets/info_rows_card.dart';
 import '../../widgets/glass_container.dart';
 import '../../widgets/glass_scaffold.dart';
 import '../../widgets/status_badge.dart';
+import '../../widgets/scroll_reveal.dart';
 
 class VirementDetailScreen extends StatefulWidget {
   final VirementCrbtModel virement;
@@ -70,7 +72,9 @@ class _VirementDetailScreenState extends State<VirementDetailScreen> {
                           color: AppTheme.statusSuccess.withValues(alpha: 0.12),
                           borderRadius: BorderRadius.circular(12),
                           border: Border.all(
-                            color: AppTheme.statusSuccess.withValues(alpha: 0.25),
+                            color: AppTheme.statusSuccess.withValues(
+                              alpha: 0.25,
+                            ),
                           ),
                         ),
                         child: const Icon(
@@ -178,7 +182,11 @@ class _VirementDetailScreenState extends State<VirementDetailScreen> {
               children: [
                 const Row(
                   children: [
-                    Icon(LucideIcons.packageCheck, color: AppTheme.primaryIcons, size: 19),
+                    Icon(
+                      LucideIcons.packageCheck,
+                      color: AppTheme.primaryIcons,
+                      size: 19,
+                    ),
                     SizedBox(width: 8),
                     Text(
                       'Expéditions créditées',
@@ -190,24 +198,29 @@ class _VirementDetailScreenState extends State<VirementDetailScreen> {
                     ),
                   ],
                 ),
-                Obx(() => Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3.5),
-                      decoration: BoxDecoration(
-                        color: AppTheme.primary.withValues(alpha: 0.09),
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                          color: AppTheme.primary.withValues(alpha: 0.2),
-                        ),
+                Obx(
+                  () => Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 3.5,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppTheme.primary.withValues(alpha: 0.09),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: AppTheme.primary.withValues(alpha: 0.2),
                       ),
-                      child: Text(
-                        '${_controller.selectedVirementDetails.length} colis',
-                        style: const TextStyle(
-                          color: AppTheme.primary,
-                          fontSize: 12,
-                          fontWeight: FontWeight.w700,
-                        ),
+                    ),
+                    child: Text(
+                      '${_controller.selectedVirementDetails.length} colis',
+                      style: const TextStyle(
+                        color: AppTheme.primary,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w700,
                       ),
-                    )),
+                    ),
+                  ),
+                ),
               ],
             ),
 
@@ -228,15 +241,25 @@ class _VirementDetailScreenState extends State<VirementDetailScreen> {
               if (details.isEmpty) {
                 return GlassContainer(
                   borderRadius: 18,
-                  padding: const EdgeInsets.symmetric(vertical: 36, horizontal: 20),
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 36,
+                    horizontal: 20,
+                  ),
                   child: const Center(
                     child: Column(
                       children: [
-                        Icon(LucideIcons.inbox, size: 40, color: Color(0xFF94A3B8)),
+                        Icon(
+                          LucideIcons.inbox,
+                          size: 40,
+                          color: Color(0xFF94A3B8),
+                        ),
                         SizedBox(height: 10),
                         Text(
                           'Aucune expédition rattachée à ce virement',
-                          style: TextStyle(color: Color(0xFF64748B), fontSize: 13.5),
+                          style: TextStyle(
+                            color: Color(0xFF64748B),
+                            fontSize: 13.5,
+                          ),
                         ),
                       ],
                     ),
@@ -251,83 +274,128 @@ class _VirementDetailScreenState extends State<VirementDetailScreen> {
                 separatorBuilder: (_, _) => const SizedBox(height: 10),
                 itemBuilder: (context, idx) {
                   final item = details[idx];
-                  return GlassContainer(
-                    borderRadius: 16,
-                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-                    child: Row(
-                      children: [
-                        Container(
-                          width: 38,
-                          height: 38,
-                          decoration: BoxDecoration(
-                            gradient: AppTheme.iconGradient,
-                            borderRadius: BorderRadius.circular(11),
+                  return ScrollReveal(
+                    index: idx,
+                    child: GlassContainer(
+                      borderRadius: 16,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 14,
+                        vertical: 12,
+                      ),
+                      child: Row(
+                        children: [
+                          Container(
+                            width: 38,
+                            height: 38,
+                            decoration: BoxDecoration(
+                              gradient: AppTheme.iconGradient,
+                              borderRadius: BorderRadius.circular(11),
+                            ),
+                            child: const Icon(
+                              LucideIcons.package,
+                              color: Colors.white,
+                              size: 19,
+                            ),
                           ),
-                          child: const Icon(
-                            LucideIcons.package,
-                            color: Colors.white,
-                            size: 19,
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Décl: ${item.numDeclaration}',
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: const TextStyle(
-                                  color: Color(0xFF0F172A),
-                                  fontWeight: FontWeight.w700,
-                                  fontSize: 13.5,
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Décl: ${item.numDeclaration}',
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(
+                                    color: Color(0xFF0F172A),
+                                    fontWeight: FontWeight.w700,
+                                    fontSize: 13.5,
+                                  ),
                                 ),
-                              ),
-                              const SizedBox(height: 2),
-                              Text(
-                                'Dest: ${item.destinataire ?? "—"}',
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: const TextStyle(
-                                  color: Color(0xFF64748B),
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w500,
+                                const SizedBox(height: 2),
+                                Text(
+                                  'Dest: ${item.destinataire ?? "—"}',
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(
+                                    color: Color(0xFF64748B),
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w500,
+                                  ),
                                 ),
-                              ),
-                              if (item.destination != null && item.destination!.isNotEmpty) ...[
-                                const SizedBox(height: 1),
-                                Row(
-                                  children: [
-                                    const Icon(LucideIcons.mapPin, size: 11, color: Color(0xFF94A3B8)),
-                                    const SizedBox(width: 3),
-                                    Expanded(
-                                      child: Text(
-                                        item.destination!,
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                        style: const TextStyle(
-                                          color: Color(0xFF94A3B8),
-                                          fontSize: 11,
+                                if (valeurRenseignee(item.modeReglement) ||
+                                    valeurRenseignee(item.refReglement)) ...[
+                                  const SizedBox(height: 1),
+                                  Text(
+                                    [
+                                      item.modeReglement,
+                                      item.refReglement,
+                                    ].where(valeurRenseignee).join(' • '),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: const TextStyle(
+                                      color: Color(0xFF64748B),
+                                      fontSize: 11.5,
+                                    ),
+                                  ),
+                                ],
+                                if (valeurRenseignee(item.dateEmission) ||
+                                    valeurRenseignee(item.dateValidation)) ...[
+                                  const SizedBox(height: 1),
+                                  Text(
+                                    [
+                                      if (valeurRenseignee(item.dateEmission))
+                                        'Émis le ${item.dateEmission}',
+                                      if (valeurRenseignee(item.dateValidation))
+                                        'Validé le ${item.dateValidation}',
+                                    ].join(' • '),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: const TextStyle(
+                                      color: Color(0xFF94A3B8),
+                                      fontSize: 11,
+                                    ),
+                                  ),
+                                ],
+                                if (item.destination != null &&
+                                    item.destination!.isNotEmpty) ...[
+                                  const SizedBox(height: 1),
+                                  Row(
+                                    children: [
+                                      const Icon(
+                                        LucideIcons.mapPin,
+                                        size: 11,
+                                        color: Color(0xFF94A3B8),
+                                      ),
+                                      const SizedBox(width: 3),
+                                      Expanded(
+                                        child: Text(
+                                          item.destination!,
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: const TextStyle(
+                                            color: Color(0xFF94A3B8),
+                                            fontSize: 11,
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                  ],
-                                ),
+                                    ],
+                                  ),
+                                ],
                               ],
-                            ],
+                            ),
                           ),
-                        ),
-                        const SizedBox(width: 10),
-                        Text(
-                          _formatCurrency(item.montant),
-                          style: const TextStyle(
-                            color: AppTheme.statusSuccess,
-                            fontWeight: FontWeight.w700,
-                            fontSize: 14,
+                          const SizedBox(width: 10),
+                          Text(
+                            _formatCurrency(item.montant),
+                            style: const TextStyle(
+                              color: AppTheme.statusSuccess,
+                              fontWeight: FontWeight.w700,
+                              fontSize: 14,
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   );
                 },

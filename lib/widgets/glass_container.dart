@@ -36,15 +36,18 @@ class GlassContainer extends StatelessWidget {
   Widget build(BuildContext context) {
     final light = isLight ?? (Theme.of(context).brightness == Brightness.light);
 
-    final effectiveColor = color ??
+    final effectiveColor =
+        color ??
         (light ? Colors.white.withValues(alpha: 0.85) : AppTheme.glassBg);
 
-    final effectiveBorder = border ??
+    final effectiveBorder =
+        border ??
         (light
             ? Border.all(color: Colors.white, width: 1.5)
             : Border.all(color: AppTheme.glassBorder, width: 1.2));
 
-    final effectiveShadow = boxShadow ??
+    final effectiveShadow =
+        boxShadow ??
         (light
             ? [
                 BoxShadow(

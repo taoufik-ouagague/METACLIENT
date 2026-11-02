@@ -39,7 +39,7 @@ class MetaClientApp extends StatelessWidget {
     Get.put(CrbtController(), permanent: true);
 
     return GetMaterialApp(
-      title: 'METACLIENT',
+      title: 'Meta Client',
       debugShowCheckedModeBanner: false,
       defaultTransition: Transition.cupertino,
       transitionDuration: const Duration(milliseconds: 360),

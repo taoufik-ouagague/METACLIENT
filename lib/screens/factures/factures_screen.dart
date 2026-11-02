@@ -8,6 +8,7 @@ import '../../theme/app_theme.dart';
 import '../../widgets/glass_container.dart';
 import '../../widgets/status_badge.dart';
 import 'facture_detail_screen.dart';
+import '../../widgets/scroll_reveal.dart';
 
 class FacturesScreen extends StatelessWidget {
   const FacturesScreen({super.key});
@@ -47,7 +48,8 @@ class FacturesScreen extends StatelessWidget {
                 children: [
                   Expanded(
                     child: _buildSegmentButton(
-                      title: 'En instances (${factureCtrl.facturesInstances.length})',
+                      title:
+                          'En instances (${factureCtrl.facturesInstances.length})',
                       isSelected: factureCtrl.activeTab.value == 0,
                       onTap: () => factureCtrl.activeTab.value = 0,
                     ),
@@ -74,7 +76,11 @@ class FacturesScreen extends StatelessWidget {
                 children: [
                   _buildFilterChip('Tous', 'tous', factureCtrl),
                   const SizedBox(width: 8),
-                  _buildFilterChip('Payées / Clôturées', 'cloture', factureCtrl),
+                  _buildFilterChip(
+                    'Payées / Clôturées',
+                    'cloture',
+                    factureCtrl,
+                  ),
                   const SizedBox(width: 8),
                   _buildFilterChip('En cours', 'en cours', factureCtrl),
                 ],
@@ -90,7 +96,9 @@ class FacturesScreen extends StatelessWidget {
         Expanded(
           child: Obx(() {
             if (factureCtrl.isLoading.value) {
-              return const Center(child: CircularProgressIndicator(color: AppTheme.primary));
+              return const Center(
+                child: CircularProgressIndicator(color: AppTheme.primary),
+              );
             }
 
             final list = factureCtrl.activeTab.value == 0
@@ -102,13 +110,20 @@ class FacturesScreen extends StatelessWidget {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(LucideIcons.fileCheck, color: Color(0xFFCBD5E1), size: 48),
+                    const Icon(
+                      LucideIcons.fileCheck,
+                      color: Color(0xFFCBD5E1),
+                      size: 48,
+                    ),
                     const SizedBox(height: 12),
                     Text(
                       factureCtrl.activeTab.value == 0
                           ? 'Toutes les factures sont à jour (aucun impayé) !'
                           : 'Aucune facture trouvée',
-                      style: const TextStyle(color: Color(0xFF64748B), fontSize: 14),
+                      style: const TextStyle(
+                        color: Color(0xFF64748B),
+                        fontSize: 14,
+                      ),
                     ),
                   ],
                 ),
@@ -126,12 +141,18 @@ class FacturesScreen extends StatelessWidget {
                 }
               },
               child: ListView.separated(
-                padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 18,
+                  vertical: 8,
+                ),
                 itemCount: list.length,
                 separatorBuilder: (_, _) => const SizedBox(height: 10),
                 itemBuilder: (context, index) {
                   final item = list[index];
-                  return _buildFactureCard(item);
+                  return ScrollReveal(
+                    index: index,
+                    child: _buildFactureCard(item),
+                  );
                 },
               ),
             );
@@ -140,29 +161,46 @@ class FacturesScreen extends StatelessWidget {
 
         // ─── PAGINATION BAR FOR ALL FACTURES ───────────────────────────────
         Obx(() {
-          if (factureCtrl.activeTab.value == 1 && factureCtrl.totalPages.value > 1) {
+          if (factureCtrl.activeTab.value == 1 &&
+              factureCtrl.totalPages.value > 1) {
             return Padding(
               padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
               child: GlassContainer(
                 borderRadius: 16,
-                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 8,
+                ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     IconButton(
-                      icon: const Icon(LucideIcons.chevronLeft, color: AppTheme.primary),
-                      onPressed: factureCtrl.currentPage.value > 1 ? factureCtrl.previousPage : null,
+                      icon: const Icon(
+                        LucideIcons.chevronLeft,
+                        color: AppTheme.primary,
+                      ),
+                      onPressed: factureCtrl.currentPage.value > 1
+                          ? factureCtrl.previousPage
+                          : null,
                     ),
                     Text(
                       'Page ${factureCtrl.currentPage.value} / ${factureCtrl.totalPages.value}',
-                      style: const TextStyle(color: Color(0xFF0F172A), fontSize: 13, fontWeight: FontWeight.w600),
+                      style: const TextStyle(
+                        color: Color(0xFF0F172A),
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                     IconButton(
-                      icon: const Icon(LucideIcons.chevronRight, color: AppTheme.primary),
+                      icon: const Icon(
+                        LucideIcons.chevronRight,
+                        color: AppTheme.primary,
+                      ),
                       onPressed:
-                          factureCtrl.currentPage.value < factureCtrl.totalPages.value
-                              ? factureCtrl.nextPage
-                              : null,
+                          factureCtrl.currentPage.value <
+                              factureCtrl.totalPages.value
+                          ? factureCtrl.nextPage
+                          : null,
                     ),
                   ],
                 ),
@@ -213,7 +251,9 @@ class FacturesScreen extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
         decoration: BoxDecoration(
-          color: isSel ? AppTheme.primary.withValues(alpha: 0.12) : Colors.white,
+          color: isSel
+              ? AppTheme.primary.withValues(alpha: 0.12)
+              : Colors.white,
           borderRadius: BorderRadius.circular(10),
           border: Border.all(
             color: isSel ? AppTheme.primary : const Color(0xFFE2E8F0),
@@ -263,7 +303,9 @@ class FacturesScreen extends StatelessWidget {
                 ),
                 child: Icon(
                   hasSolde ? LucideIcons.fileWarning : LucideIcons.fileCheck2,
-                  color: hasSolde ? AppTheme.statusDanger : AppTheme.statusSuccess,
+                  color: hasSolde
+                      ? AppTheme.statusDanger
+                      : AppTheme.statusSuccess,
                   size: 20,
                 ),
               ),
@@ -287,13 +329,18 @@ class FacturesScreen extends StatelessWidget {
                       item.dateFacture ?? '—',
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(color: Color(0xFF64748B), fontSize: 12),
+                      style: const TextStyle(
+                        color: Color(0xFF64748B),
+                        fontSize: 12,
+                      ),
                     ),
                   ],
                 ),
               ),
               const SizedBox(width: 8),
-              StatusBadge(status: item.statut ?? (hasSolde ? 'En instance' : 'Payée')),
+              StatusBadge(
+                status: item.statut ?? (hasSolde ? 'En instance' : 'Payée'),
+              ),
             ],
           ),
           const SizedBox(height: 12),
@@ -330,9 +377,13 @@ class FacturesScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    _formatCurrency(item.solde ?? (item.isPayee ? 0 : item.mntTtc)),
+                    _formatCurrency(
+                      item.solde ?? (item.isPayee ? 0 : item.mntTtc),
+                    ),
                     style: TextStyle(
-                      color: hasSolde ? AppTheme.statusDanger : AppTheme.statusSuccess,
+                      color: hasSolde
+                          ? AppTheme.statusDanger
+                          : AppTheme.statusSuccess,
                       fontSize: 15,
                       fontWeight: FontWeight.w800,
                     ),

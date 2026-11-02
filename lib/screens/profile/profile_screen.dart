@@ -34,7 +34,11 @@ class ProfileScreen extends StatefulWidget {
                   SizedBox(width: 10),
                   Text(
                     'Configuration API',
-                    style: TextStyle(color: Color(0xFF0F172A), fontSize: 16.5, fontWeight: FontWeight.w700),
+                    style: TextStyle(
+                      color: Color(0xFF0F172A),
+                      fontSize: 16.5,
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
                 ],
               ),
@@ -46,7 +50,8 @@ class ProfileScreen extends StatefulWidget {
               const SizedBox(height: 12),
               GlassTextField(
                 controller: urlCtrl,
-                hintText: 'https://metaphore.kaytechnology.com:6799/CLIENTMOBILE',
+                hintText:
+                    'https://metaphore.kaytechnology.com:6799/CLIENTMOBILE',
                 prefixIcon: LucideIcons.link,
               ),
               const SizedBox(height: 20),
@@ -55,13 +60,18 @@ class ProfileScreen extends StatefulWidget {
                 children: [
                   TextButton(
                     onPressed: () => Get.back(),
-                    child: const Text('Annuler', style: TextStyle(color: Color(0xFF64748B))),
+                    child: const Text(
+                      'Annuler',
+                      style: TextStyle(color: Color(0xFF64748B)),
+                    ),
                   ),
                   const SizedBox(width: 8),
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppTheme.primary,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                     ),
                     onPressed: () async {
                       if (urlCtrl.text.trim().isNotEmpty) {
@@ -71,12 +81,17 @@ class ProfileScreen extends StatefulWidget {
                           'Serveur mis à jour',
                           ApiService.baseUrl,
                           snackPosition: SnackPosition.BOTTOM,
-                          backgroundColor: AppTheme.statusSuccess.withValues(alpha: 0.85),
+                          backgroundColor: AppTheme.statusSuccess.withValues(
+                            alpha: 0.85,
+                          ),
                           colorText: Colors.white,
                         );
                       }
                     },
-                    child: const Text('Enregistrer', style: TextStyle(color: Colors.white)),
+                    child: const Text(
+                      'Enregistrer',
+                      style: TextStyle(color: Colors.white),
+                    ),
                   ),
                 ],
               ),
@@ -151,10 +166,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               const SizedBox(height: 6),
               const Text(
                 'Sélectionnez une photo pour votre profil',
-                style: TextStyle(
-                  fontSize: 12,
-                  color: Color(0xFF64748B),
-                ),
+                style: TextStyle(fontSize: 12, color: Color(0xFF64748B)),
               ),
               const SizedBox(height: 18),
               ListTile(
@@ -180,10 +192,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
                 subtitle: const Text(
                   'Utiliser l\'appareil photo',
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Color(0xFF64748B),
-                  ),
+                  style: TextStyle(fontSize: 12, color: Color(0xFF64748B)),
                 ),
                 trailing: const Icon(
                   Icons.chevron_right,
@@ -215,10 +224,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
                 subtitle: const Text(
                   'Sélectionner une image existante',
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Color(0xFF64748B),
-                  ),
+                  style: TextStyle(fontSize: 12, color: Color(0xFF64748B)),
                 ),
                 trailing: const Icon(
                   Icons.chevron_right,
@@ -331,7 +337,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               ],
                             ),
                             border: Border.all(
-                              color: const Color(0xFFFCA5A5).withValues(alpha: 0.5),
+                              color: const Color(
+                                0xFFFCA5A5,
+                              ).withValues(alpha: 0.5),
                               width: 1,
                             ),
                           ),
@@ -374,10 +382,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   child: Container(
                                     height: 48,
                                     decoration: BoxDecoration(
-                                      color: const Color(0xFFF1F5F9).withValues(alpha: 0.7),
+                                      color: const Color(
+                                        0xFFF1F5F9,
+                                      ).withValues(alpha: 0.7),
                                       borderRadius: BorderRadius.circular(14),
                                       border: Border.all(
-                                        color: const Color(0xFFE2E8F0).withValues(alpha: 0.8),
+                                        color: const Color(
+                                          0xFFE2E8F0,
+                                        ).withValues(alpha: 0.8),
                                         width: 1.2,
                                       ),
                                     ),
@@ -418,7 +430,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                       ),
                                       boxShadow: [
                                         BoxShadow(
-                                          color: const Color(0xFFDC2626).withValues(alpha: 0.30),
+                                          color: const Color(
+                                            0xFFDC2626,
+                                          ).withValues(alpha: 0.30),
                                           blurRadius: 12,
                                           offset: const Offset(0, 4),
                                         ),
@@ -426,7 +440,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     ),
                                     alignment: Alignment.center,
                                     child: const Row(
-                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
                                       children: [
                                         Icon(
                                           LucideIcons.logOut,
@@ -500,7 +515,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             border: Border.all(color: Colors.white, width: 3.5),
                             boxShadow: [
                               BoxShadow(
-                                color: AppTheme.primaryIcons.withValues(alpha: 0.20),
+                                color: AppTheme.primaryIcons.withValues(
+                                  alpha: 0.20,
+                                ),
                                 blurRadius: 18,
                                 offset: const Offset(0, 6),
                               ),
@@ -530,7 +547,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           bottom: 0,
                           right: 0,
                           child: GestureDetector(
-                            onTap: _isUpdatingPhoto ? null : _pickAndUploadPhoto,
+                            onTap: _isUpdatingPhoto
+                                ? null
+                                : _pickAndUploadPhoto,
                             child: Container(
                               width: 34,
                               height: 34,
@@ -554,7 +573,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                       padding: EdgeInsets.all(8),
                                       child: CircularProgressIndicator(
                                         strokeWidth: 2,
-                                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                        valueColor:
+                                            AlwaysStoppedAnimation<Color>(
+                                              Colors.white,
+                                            ),
                                       ),
                                     )
                                   : const Icon(
@@ -579,7 +601,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                     const SizedBox(height: 10),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 5,
+                      ),
                       decoration: BoxDecoration(
                         color: const Color(0xFFEFF6FF),
                         borderRadius: BorderRadius.circular(10),
@@ -653,7 +678,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ),
                       ),
                       style: OutlinedButton.styleFrom(
-                        backgroundColor: const Color(0xFFFEF2F2).withValues(alpha: 0.85),
+                        backgroundColor: const Color(
+                          0xFFFEF2F2,
+                        ).withValues(alpha: 0.85),
                         side: const BorderSide(
                           color: Color(0xFFFECACA),
                           width: 1.5,
@@ -680,12 +707,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
       _DetailItem(
         icon: LucideIcons.mapPin,
         label: 'Adresse',
-        value: client?.adresse?.trim().isNotEmpty == true ? client!.adresse! : '—',
+        value: client?.adresse?.trim().isNotEmpty == true
+            ? client!.adresse!
+            : '—',
       ),
       _DetailItem(
         icon: LucideIcons.phone,
         label: 'Téléphone',
-        value: client?.telephone?.trim().isNotEmpty == true ? client!.telephone! : '—',
+        value: client?.telephone?.trim().isNotEmpty == true
+            ? client!.telephone!
+            : '—',
       ),
       _DetailItem(
         icon: LucideIcons.mail,
@@ -695,7 +726,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
       _DetailItem(
         icon: LucideIcons.compass,
         label: 'Secteur d\'affectation',
-        value: client?.secteurAffectation?.trim().isNotEmpty == true ? client!.secteurAffectation! : '—',
+        value: client?.secteurAffectation?.trim().isNotEmpty == true
+            ? client!.secteurAffectation!
+            : '—',
       ),
     ];
 
@@ -703,22 +736,30 @@ class _ProfileScreenState extends State<ProfileScreen> {
       _DetailItem(
         icon: LucideIcons.building,
         label: 'Agence d\'affectation',
-        value: client?.agenceAffectation?.trim().isNotEmpty == true ? client!.agenceAffectation! : '—',
+        value: client?.agenceAffectation?.trim().isNotEmpty == true
+            ? client!.agenceAffectation!
+            : '—',
       ),
       _DetailItem(
         icon: LucideIcons.userCheck,
         label: 'Commercial dédié',
-        value: client?.commercialLibelle?.trim().isNotEmpty == true ? client!.commercialLibelle! : '—',
+        value: client?.commercialLibelle?.trim().isNotEmpty == true
+            ? client!.commercialLibelle!
+            : '—',
       ),
       _DetailItem(
         icon: LucideIcons.phoneCall,
         label: 'Tél. Commercial',
-        value: client?.commercialTelephone?.trim().isNotEmpty == true ? client!.commercialTelephone! : '—',
+        value: client?.commercialTelephone?.trim().isNotEmpty == true
+            ? client!.commercialTelephone!
+            : '—',
       ),
       _DetailItem(
         icon: LucideIcons.atSign,
         label: 'Email Commercial',
-        value: client?.commercialEmail?.trim().isNotEmpty == true ? client!.commercialEmail! : '—',
+        value: client?.commercialEmail?.trim().isNotEmpty == true
+            ? client!.commercialEmail!
+            : '—',
       ),
     ];
 
@@ -757,7 +798,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     duration: const Duration(milliseconds: 250),
                     padding: const EdgeInsets.symmetric(vertical: 9),
                     decoration: BoxDecoration(
-                      color: _profileCurrentPage == 0 ? Colors.white : Colors.transparent,
+                      color: _profileCurrentPage == 0
+                          ? Colors.white
+                          : Colors.transparent,
                       borderRadius: BorderRadius.circular(12),
                       boxShadow: _profileCurrentPage == 0
                           ? [
@@ -810,7 +853,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     duration: const Duration(milliseconds: 250),
                     padding: const EdgeInsets.symmetric(vertical: 9),
                     decoration: BoxDecoration(
-                      color: _profileCurrentPage == 1 ? Colors.white : Colors.transparent,
+                      color: _profileCurrentPage == 1
+                          ? Colors.white
+                          : Colors.transparent,
                       borderRadius: BorderRadius.circular(12),
                       boxShadow: _profileCurrentPage == 1
                           ? [
@@ -1100,9 +1145,5 @@ class _DetailItem {
   final String label;
   final String value;
 
-  _DetailItem({
-    required this.icon,
-    required this.label,
-    required this.value,
-  });
+  _DetailItem({required this.icon, required this.label, required this.value});
 }

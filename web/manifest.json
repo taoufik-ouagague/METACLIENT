@@ -1,6 +1,6 @@
 {
-    "name": "metaclient",
-    "short_name": "metaclient",
+    "name": "Meta Client",
+    "short_name": "Meta Client",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

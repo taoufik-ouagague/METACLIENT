@@ -19,6 +19,12 @@ class ExpeditionModel {
   final String? sens;
   final String? activite;
   final String? blFact;
+  final num? valeurDeclaree;
+  final String? dateLivPh;
+  final String? processus;
+
+  /// Present uniquement sur /expeditionsEncours.
+  final String? notificationLivraison;
 
   ExpeditionModel({
     this.idExpedition,
@@ -41,6 +47,10 @@ class ExpeditionModel {
     this.sens,
     this.activite,
     this.blFact,
+    this.valeurDeclaree,
+    this.dateLivPh,
+    this.processus,
+    this.notificationLivraison,
   });
 
   factory ExpeditionModel.fromJson(Map<String, dynamic> json) {
@@ -65,6 +75,10 @@ class ExpeditionModel {
       sens: json['sens']?.toString(),
       activite: json['activite']?.toString(),
       blFact: json['bl_fact']?.toString(),
+      valeurDeclaree: json['valeur_declaree'] as num?,
+      dateLivPh: json['date_liv_ph']?.toString(),
+      processus: json['processus']?.toString(),
+      notificationLivraison: json['notification_livraison']?.toString(),
     );
   }
 

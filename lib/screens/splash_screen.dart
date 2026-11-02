@@ -12,7 +12,8 @@ class SplashScreen extends StatefulWidget {
   State<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderStateMixin {
+class _SplashScreenState extends State<SplashScreen>
+    with SingleTickerProviderStateMixin {
   late AnimationController _animController;
   late Animation<double> _scaleAnimation;
   late Animation<double> _fadeAnimation;
@@ -29,9 +30,10 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
       CurvedAnimation(parent: _animController, curve: Curves.easeOutBack),
     );
 
-    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _animController, curve: Curves.easeIn),
-    );
+    _fadeAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _animController, curve: Curves.easeIn));
 
     _animController.forward();
     _checkNavigation();
@@ -90,7 +92,8 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
 
                 // App Title with Gradient Text
                 ShaderMask(
-                  shaderCallback: (bounds) => AppTheme.iconGradient.createShader(bounds),
+                  shaderCallback: (bounds) =>
+                      AppTheme.iconGradient.createShader(bounds),
                   child: const Text(
                     'METACLIENT',
                     style: TextStyle(
@@ -119,7 +122,9 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                   height: 28,
                   child: CircularProgressIndicator(
                     strokeWidth: 2.8,
-                    valueColor: const AlwaysStoppedAnimation<Color>(AppTheme.primaryIcons),
+                    valueColor: const AlwaysStoppedAnimation<Color>(
+                      AppTheme.primaryIcons,
+                    ),
                     backgroundColor: Colors.white.withValues(alpha: 0.1),
                   ),
                 ),

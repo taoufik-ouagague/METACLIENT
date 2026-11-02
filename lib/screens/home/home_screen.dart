@@ -48,14 +48,13 @@ class _HomeScreenState extends State<HomeScreen> {
   bool _correspond(String label) =>
       _filtreMenu.isEmpty || label.toLowerCase().contains(_filtreMenu);
 
-  List<({IconData icone, String label, Widget page, bool barre})> _getOnglets() {
+  List<({IconData icone, String label, Widget page, bool barre})>
+  _getOnglets() {
     return [
       (
         icone: LucideIcons.home,
         label: 'Accueil',
-        page: DashboardTab(
-          onNavigateTab: (target) => _changerOnglet(target),
-        ),
+        page: DashboardTab(onNavigateTab: (target) => _changerOnglet(target)),
         barre: true,
       ),
       (
@@ -111,75 +110,42 @@ class _HomeScreenState extends State<HomeScreen> {
           SafeArea(
             bottom: false,
             child: AnimatedSwitcher(
-              duration: const Duration(milliseconds: 380),
-              switchInCurve: Curves.easeOutCubic,
-              switchOutCurve: Curves.easeInCubic,
+              duration: const Duration(milliseconds: 340),
+              // Les courbes sont appliquees une seule fois, dans le builder.
+              switchInCurve: Curves.linear,
+              switchOutCurve: Curves.linear,
               layoutBuilder: (currentChild, previousChildren) {
                 return Stack(
                   fit: StackFit.expand,
-                  children: <Widget>[
-                    ...previousChildren,
-                    ?currentChild,
-                  ],
+                  children: <Widget>[...previousChildren, ?currentChild],
                 );
               },
               transitionBuilder: (child, animation) {
-                final isIncoming = (child.key is ValueKey<int>) &&
+                final isIncoming =
+                    (child.key is ValueKey<int>) &&
                     (child.key as ValueKey<int>).value == _index;
 
                 final isForward = _index >= _previousIndex;
-                final double startX = isIncoming
-                    ? (isForward ? 0.08 : -0.08)
-                    : (isForward ? -0.08 : 0.08);
 
-                final slideAnim = Tween<Offset>(
-                  begin: Offset(startX, 0.012),
-                  end: Offset.zero,
-                ).animate(
-                  CurvedAnimation(
-                    parent: animation,
-                    curve: Curves.easeOutCubic,
-                  ),
-                );
+                // Glissement pleine largeur : la page sortante quitte d'un
+                // cote, l'entrante arrive de l'autre. Pas de fondu ni de flou :
+                // les deux pages resteraient visibles l'une sur l'autre.
+                final double departX = isIncoming
+                    ? (isForward ? 1.0 : -1.0)
+                    : (isForward ? -1.0 : 1.0);
 
-                final scaleAnim = Tween<double>(
-                  begin: 0.94,
-                  end: 1.0,
-                ).animate(
-                  CurvedAnimation(
-                    parent: animation,
-                    curve: Curves.easeOutCubic,
-                  ),
-                );
-
-                final fadeAnim = CurvedAnimation(
-                  parent: animation,
-                  curve: const Interval(0.0, 0.85, curve: Curves.easeOut),
-                );
-
-                return AnimatedBuilder(
-                  animation: animation,
-                  builder: (context, _) {
-                    final sigma = (1.0 - animation.value).clamp(0.0, 1.0) * 3.5;
-                    return FadeTransition(
-                      opacity: fadeAnim,
-                      child: SlideTransition(
-                        position: slideAnim,
-                        child: ScaleTransition(
-                          scale: scaleAnim,
-                          child: sigma > 0.1
-                              ? ImageFiltered(
-                                  imageFilter: ImageFilter.blur(
-                                    sigmaX: sigma,
-                                    sigmaY: sigma,
-                                  ),
-                                  child: child,
-                                )
-                              : child,
+                return SlideTransition(
+                  position:
+                      Tween<Offset>(
+                        begin: Offset(departX, 0),
+                        end: Offset.zero,
+                      ).animate(
+                        CurvedAnimation(
+                          parent: animation,
+                          curve: Curves.easeInOutCubic,
                         ),
                       ),
-                    );
-                  },
+                  child: child,
                 );
               },
               child: KeyedSubtree(
@@ -233,7 +199,8 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           const SizedBox(width: 2),
           ShaderMask(
-            shaderCallback: (bounds) => AppTheme.logoGradient.createShader(bounds),
+            shaderCallback: (bounds) =>
+                AppTheme.logoGradient.createShader(bounds),
             child: Text(
               'METACLIENT',
               style: GoogleFonts.poppins(
@@ -323,7 +290,9 @@ class _HomeScreenState extends State<HomeScreen> {
                       style: GoogleFonts.poppins(
                         fontSize: 15,
                         fontWeight: FontWeight.w700,
-                        color: isProfileActive ? Colors.white : AppTheme.primary,
+                        color: isProfileActive
+                            ? Colors.white
+                            : AppTheme.primary,
                       ),
                     ),
                   ),
@@ -479,11 +448,15 @@ class _HomeScreenState extends State<HomeScreen> {
                 height: active ? 36 : 26,
                 decoration: active
                     ? BoxDecoration(
-                        gradient: configCtrl?.buttonGradient ?? AppTheme.primaryGradient,
+                        gradient:
+                            configCtrl?.buttonGradient ??
+                            AppTheme.primaryGradient,
                         borderRadius: BorderRadius.circular(12),
                         boxShadow: [
                           BoxShadow(
-                            color: (configCtrl?.primaryColor ?? AppTheme.primary).withValues(alpha: 0.35),
+                            color:
+                                (configCtrl?.primaryColor ?? AppTheme.primary)
+                                    .withValues(alpha: 0.35),
                             blurRadius: 8,
                             offset: const Offset(0, 3),
                           ),
@@ -583,7 +556,9 @@ class _HomeScreenState extends State<HomeScreen> {
       final nom = client?.raisonSociale.isNotEmpty == true
           ? client!.raisonSociale
           : (user?.libelle ?? 'Client');
-      final code = client?.code.isNotEmpty == true ? client!.code : (user?.code ?? '');
+      final code = client?.code.isNotEmpty == true
+          ? client!.code
+          : (user?.code ?? '');
       final agence = client?.agenceAffectation ?? 'Réseau National';
       final lettre = nom.isNotEmpty ? nom[0].toUpperCase() : 'C';
 
@@ -627,10 +602,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         ? Get.find<ConfigController>().buttonGradient
                         : AppTheme.primaryGradient),
                     shape: BoxShape.circle,
-                    border: Border.all(
-                      color: Colors.white,
-                      width: 1.5,
-                    ),
+                    border: Border.all(color: Colors.white, width: 1.5),
                   ),
                   alignment: Alignment.center,
                   child: Text(
