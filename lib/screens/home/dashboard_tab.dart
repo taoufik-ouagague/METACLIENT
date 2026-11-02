@@ -322,15 +322,19 @@ class DashboardTab extends StatelessWidget {
                             children: [
                               Row(
                                 children: [
-                                  Text(
-                                    item.numDeclaration,
-                                    style: const TextStyle(
-                                      color: Color(0xFF0F172A),
-                                      fontSize: 14.5,
-                                      fontWeight: FontWeight.w700,
+                                  Expanded(
+                                    child: Text(
+                                      item.numDeclaration,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: const TextStyle(
+                                        color: Color(0xFF0F172A),
+                                        fontSize: 14.5,
+                                        fontWeight: FontWeight.w700,
+                                      ),
                                     ),
                                   ),
-                                  const Spacer(),
+                                  const SizedBox(width: 8),
                                   StatusBadge(status: item.statut ?? (item.isLivree ? 'Livré' : 'En cours')),
                                 ],
                               ),
@@ -339,14 +343,18 @@ class DashboardTab extends StatelessWidget {
                                 children: [
                                   const Icon(LucideIcons.mapPin, size: 12, color: Color(0xFF94A3B8)),
                                   const SizedBox(width: 4),
-                                  Text(
-                                    '${item.origine ?? "—"} → ${item.destination ?? "—"}',
-                                    style: const TextStyle(
-                                      color: Color(0xFF64748B),
-                                      fontSize: 12.5,
+                                  Expanded(
+                                    child: Text(
+                                      '${item.origine ?? "—"} → ${item.destination ?? "—"}',
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: const TextStyle(
+                                        color: Color(0xFF64748B),
+                                        fontSize: 12.5,
+                                      ),
                                     ),
                                   ),
-                                  const Spacer(),
+                                  const SizedBox(width: 8),
                                   Text(
                                     _formatCurrency(item.mntTtc),
                                     style: const TextStyle(

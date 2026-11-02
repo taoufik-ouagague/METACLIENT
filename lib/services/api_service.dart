@@ -91,12 +91,13 @@ class ApiService {
     String? numeroClient,
   }) async {
     final url = Uri.parse('$baseUrl/api/clientmobile/expeditions?page=$page&pageSize=$pageSize');
+    final currentYear = DateTime.now().year;
     final body = jsonEncode({
-      'du': du,
-      'au': au,
-      'numDeclaration': numDeclaration,
-      'numeroClient': numeroClient,
-      'livre': livre,
+      'du': (du != null && du.trim().isNotEmpty) ? du.trim() : '01/01/$currentYear',
+      'au': (au != null && au.trim().isNotEmpty) ? au.trim() : '31/12/$currentYear',
+      'numDeclaration': (numDeclaration != null && numDeclaration.trim().isNotEmpty) ? numDeclaration.trim() : null,
+      'numeroClient': (numeroClient != null && numeroClient.trim().isNotEmpty) ? numeroClient.trim() : null,
+      'livre': (livre != null && livre.trim().isNotEmpty) ? livre.trim() : null,
       'colis': null,
       'mntFond': null,
     });
@@ -166,13 +167,14 @@ class ApiService {
     String? remis,
   }) async {
     final url = Uri.parse('$baseUrl/api/clientmobile/retourFondCCCT?page=$page&pageSize=$pageSize');
+    final currentYear = DateTime.now().year;
     final body = jsonEncode({
-      'du': du,
-      'au': au,
-      'numDeclaration': numDeclaration,
-      'numPiece': numPiece,
-      'libelleClient': libelleClient,
-      'remis': remis,
+      'du': (du != null && du.trim().isNotEmpty) ? du.trim() : '01/01/$currentYear',
+      'au': (au != null && au.trim().isNotEmpty) ? au.trim() : '31/12/$currentYear',
+      'numDeclaration': (numDeclaration != null && numDeclaration.trim().isNotEmpty) ? numDeclaration.trim() : null,
+      'numPiece': (numPiece != null && numPiece.trim().isNotEmpty) ? numPiece.trim() : null,
+      'libelleClient': (libelleClient != null && libelleClient.trim().isNotEmpty) ? libelleClient.trim() : null,
+      'remis': (remis != null && remis.trim().isNotEmpty) ? remis.trim() : null,
     });
     final response = await http.post(url, headers: _buildHeaders(), body: body);
     return _handleResponse(response);
@@ -191,13 +193,14 @@ class ApiService {
     String? remis,
   }) async {
     final url = Uri.parse('$baseUrl/api/clientmobile/retourFondBL?page=$page&pageSize=$pageSize');
+    final currentYear = DateTime.now().year;
     final body = jsonEncode({
-      'du': du,
-      'au': au,
-      'numDeclaration': numDeclaration,
-      'numPiece': numPiece,
-      'libelleClient': libelleClient,
-      'remis': remis,
+      'du': (du != null && du.trim().isNotEmpty) ? du.trim() : '01/01/$currentYear',
+      'au': (au != null && au.trim().isNotEmpty) ? au.trim() : '31/12/$currentYear',
+      'numDeclaration': (numDeclaration != null && numDeclaration.trim().isNotEmpty) ? numDeclaration.trim() : null,
+      'numPiece': (numPiece != null && numPiece.trim().isNotEmpty) ? numPiece.trim() : null,
+      'libelleClient': (libelleClient != null && libelleClient.trim().isNotEmpty) ? libelleClient.trim() : null,
+      'remis': (remis != null && remis.trim().isNotEmpty) ? remis.trim() : null,
     });
     final response = await http.post(url, headers: _buildHeaders(), body: body);
     return _handleResponse(response);
@@ -216,9 +219,10 @@ class ApiService {
     String? remis,
   }) async {
     final url = Uri.parse('$baseUrl/api/clientmobile/expeditionsCrbt?page=$page&pageSize=$pageSize');
+    final currentYear = DateTime.now().year;
     final body = jsonEncode({
-      'du': du ?? '',
-      'au': au ?? '',
+      'du': (du != null && du.trim().isNotEmpty) ? du.trim() : '01/01/2020',
+      'au': (au != null && au.trim().isNotEmpty) ? au.trim() : '31/12/$currentYear',
       'num_declaration': numDeclaration ?? '',
       'num_piece': numPiece ?? '',
       'libelle_client': libelleClient ?? '',
@@ -241,9 +245,10 @@ class ApiService {
     String? remis,
   }) async {
     final url = Uri.parse('$baseUrl/api/clientmobile/chequesCrbt?page=$page&pageSize=$pageSize');
+    final currentYear = DateTime.now().year;
     final body = jsonEncode({
-      'du': du ?? '01/01/2000',
-      'au': au ?? '31/12/2099',
+      'du': (du != null && du.trim().isNotEmpty) ? du.trim() : '01/01/2000',
+      'au': (au != null && au.trim().isNotEmpty) ? au.trim() : '31/12/$currentYear',
       'num_declaration': numDeclaration ?? '',
       'num_piece': numPiece ?? '',
       'libelle_client': libelleClient ?? '',
@@ -266,9 +271,16 @@ class ApiService {
   static Future<Map<String, dynamic>> getVirementCrbt({
     int page = 1,
     int pageSize = 20,
+    String? du,
+    String? au,
   }) async {
     final url = Uri.parse('$baseUrl/api/clientmobile/virementCrbt?page=$page&pageSize=$pageSize');
-    final response = await http.post(url, headers: _buildHeaders(), body: jsonEncode({}));
+    final currentYear = DateTime.now().year;
+    final body = jsonEncode({
+      'du': (du != null && du.trim().isNotEmpty) ? du.trim() : '01/01/2000',
+      'au': (au != null && au.trim().isNotEmpty) ? au.trim() : '31/12/$currentYear',
+    });
+    final response = await http.post(url, headers: _buildHeaders(), body: body);
     return _handleResponse(response);
   }
 

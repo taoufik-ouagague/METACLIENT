@@ -57,13 +57,7 @@ class RetourFondController extends GetxController {
       retoursCCCT.value = list;
       totalPagesCCCT.value = (res['totalPages'] as num?)?.toInt() ?? 1;
     } catch (e) {
-      Get.snackbar(
-        'Erreur de chargement',
-        e.toString().replaceAll('ApiException', '').trim(),
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: const Color(0xFFEF4444).withOpacity(0.8),
-        colorText: Colors.white,
-      );
+      debugPrint('RetourFond CCCT error: $e');
     } finally {
       isLoading.value = false;
     }
@@ -93,13 +87,7 @@ class RetourFondController extends GetxController {
       retoursBL.value = list;
       totalPagesBL.value = (res['totalPages'] as num?)?.toInt() ?? 1;
     } catch (e) {
-      Get.snackbar(
-        'Erreur de chargement',
-        e.toString().replaceAll('ApiException', '').trim(),
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: const Color(0xFFEF4444).withOpacity(0.8),
-        colorText: Colors.white,
-      );
+      debugPrint('RetourFond BL error: $e');
     } finally {
       isLoading.value = false;
     }
