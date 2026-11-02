@@ -8,6 +8,9 @@ import '../../theme/app_theme.dart';
 import '../../widgets/glass_container.dart';
 import '../../widgets/status_badge.dart';
 
+import 'cheque_detail_screen.dart';
+import 'virement_detail_screen.dart';
+
 class CrbtScreen extends StatelessWidget {
   const CrbtScreen({super.key});
 
@@ -17,219 +20,19 @@ class CrbtScreen extends StatelessWidget {
     return '${formatter.format(amount)} DH';
   }
 
-  void _showChequeDetailDialog(BuildContext context, ChequeCrbtModel cheque, CrbtController ctrl) {
-    ctrl.fetchChequeDetail(cheque.idCheque);
-
-    Get.bottomSheet(
-      GlassContainer(
-        borderRadius: 28,
-        padding: const EdgeInsets.all(22),
-        color: Colors.white.withOpacity(0.96),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Chèque N° ${cheque.numCheque}',
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(color: Color(0xFF0F172A), fontSize: 18, fontWeight: FontWeight.w800),
-                      ),
-                      Text(
-                        'Banque: ${cheque.banque ?? "—"} • ${_formatCurrency(cheque.montant)}',
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(color: AppTheme.primary, fontSize: 13, fontWeight: FontWeight.w600),
-                      ),
-                    ],
-                  ),
-                ),
-                IconButton(
-                  icon: const Icon(LucideIcons.x, color: Color(0xFF64748B)),
-                  onPressed: () => Get.back(),
-                ),
-              ],
-            ),
-            const SizedBox(height: 14),
-            const Divider(color: Color(0xFFE2E8F0), height: 1),
-            const SizedBox(height: 14),
-
-            const Text(
-              'Expéditions couvertes par ce chèque :',
-              style: TextStyle(color: Color(0xFF475569), fontSize: 13, fontWeight: FontWeight.w600),
-            ),
-            const SizedBox(height: 10),
-
-            Obx(() {
-              if (ctrl.isLoadingDetail.value) {
-                return const Center(child: Padding(padding: EdgeInsets.all(20), child: CircularProgressIndicator(color: AppTheme.primary)));
-              }
-
-              if (ctrl.selectedChequeDetails.isEmpty) {
-                return const Padding(
-                  padding: EdgeInsets.all(16.0),
-                  child: Center(child: Text('Aucune expédition rattachée', style: TextStyle(color: Color(0xFF64748B)))),
-                );
-              }
-
-              return Flexible(
-                child: ListView.separated(
-                  shrinkWrap: true,
-                  itemCount: ctrl.selectedChequeDetails.length,
-                  separatorBuilder: (_, __) => const SizedBox(height: 8),
-                  itemBuilder: (context, idx) {
-                    final item = ctrl.selectedChequeDetails[idx];
-                    return GlassContainer(
-                      borderRadius: 14,
-                      padding: const EdgeInsets.all(12),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'Décl: ${item.numDeclaration}',
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: const TextStyle(color: Color(0xFF0F172A), fontWeight: FontWeight.w700, fontSize: 13),
-                                ),
-                                Text(
-                                  'Dest: ${item.destinataire ?? "—"} (${item.destination ?? "—"})',
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: const TextStyle(color: Color(0xFF64748B), fontSize: 11.5),
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          Text(_formatCurrency(item.montant), style: const TextStyle(color: AppTheme.primary, fontWeight: FontWeight.w700, fontSize: 13.5)),
-                        ],
-                      ),
-                    );
-                  },
-                ),
-              );
-            }),
-          ],
-        ),
-      ),
-      isScrollControlled: true,
+  void _openChequeDetail(BuildContext context, ChequeCrbtModel cheque) {
+    Get.to(
+      () => ChequeDetailScreen(cheque: cheque),
+      transition: Transition.cupertino,
+      duration: const Duration(milliseconds: 360),
     );
   }
 
-  void _showVirementDetailDialog(BuildContext context, VirementCrbtModel virement, CrbtController ctrl) {
-    ctrl.fetchVirementDetail(virement.idVirement);
-
-    Get.bottomSheet(
-      GlassContainer(
-        borderRadius: 28,
-        padding: const EdgeInsets.all(22),
-        color: Colors.white.withOpacity(0.96),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Ordre de Virement ${virement.numOv}',
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(color: Color(0xFF0F172A), fontSize: 18, fontWeight: FontWeight.w800),
-                      ),
-                      Text(
-                        'Mandat: ${virement.numeroMandat ?? "—"} • ${_formatCurrency(virement.fond)}',
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(color: AppTheme.primary, fontSize: 13, fontWeight: FontWeight.w600),
-                      ),
-                    ],
-                  ),
-                ),
-                IconButton(
-                  icon: const Icon(LucideIcons.x, color: Color(0xFF64748B)),
-                  onPressed: () => Get.back(),
-                ),
-              ],
-            ),
-            const SizedBox(height: 14),
-            const Divider(color: Color(0xFFE2E8F0), height: 1),
-            const SizedBox(height: 14),
-
-            const Text(
-              'Expéditions créditées par ce virement :',
-              style: TextStyle(color: Color(0xFF475569), fontSize: 13, fontWeight: FontWeight.w600),
-            ),
-            const SizedBox(height: 10),
-
-            Obx(() {
-              if (ctrl.isLoadingDetail.value) {
-                return const Center(child: Padding(padding: EdgeInsets.all(20), child: CircularProgressIndicator(color: AppTheme.primary)));
-              }
-
-              if (ctrl.selectedVirementDetails.isEmpty) {
-                return const Padding(
-                  padding: EdgeInsets.all(16.0),
-                  child: Center(child: Text('Aucune expédition rattachée', style: TextStyle(color: Color(0xFF64748B)))),
-                );
-              }
-
-              return Flexible(
-                child: ListView.separated(
-                  shrinkWrap: true,
-                  itemCount: ctrl.selectedVirementDetails.length,
-                  separatorBuilder: (_, __) => const SizedBox(height: 8),
-                  itemBuilder: (context, idx) {
-                    final item = ctrl.selectedVirementDetails[idx];
-                    return GlassContainer(
-                      borderRadius: 14,
-                      padding: const EdgeInsets.all(12),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'Décl: ${item.numDeclaration}',
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: const TextStyle(color: Color(0xFF0F172A), fontWeight: FontWeight.w700, fontSize: 13),
-                                ),
-                                Text(
-                                  'Dest: ${item.destinataire ?? "—"} (${item.destination ?? "—"})',
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: const TextStyle(color: Color(0xFF64748B), fontSize: 11.5),
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          Text(_formatCurrency(item.montant), style: const TextStyle(color: AppTheme.statusSuccess, fontWeight: FontWeight.w700, fontSize: 13.5)),
-                        ],
-                      ),
-                    );
-                  },
-                ),
-              );
-            }),
-          ],
-        ),
-      ),
-      isScrollControlled: true,
+  void _openVirementDetail(BuildContext context, VirementCrbtModel virement) {
+    Get.to(
+      () => VirementDetailScreen(virement: virement),
+      transition: Transition.cupertino,
+      duration: const Duration(milliseconds: 360),
     );
   }
 
@@ -411,7 +214,7 @@ class CrbtScreen extends StatelessWidget {
         return GlassContainer(
           borderRadius: 18,
           padding: const EdgeInsets.all(15),
-          onTap: () => _showChequeDetailDialog(context, item, ctrl),
+          onTap: () => _openChequeDetail(context, item),
           child: Row(
             children: [
               Container(
@@ -475,7 +278,7 @@ class CrbtScreen extends StatelessWidget {
         return GlassContainer(
           borderRadius: 18,
           padding: const EdgeInsets.all(15),
-          onTap: () => _showVirementDetailDialog(context, item, ctrl),
+          onTap: () => _openVirementDetail(context, item),
           child: Row(
             children: [
               Container(
