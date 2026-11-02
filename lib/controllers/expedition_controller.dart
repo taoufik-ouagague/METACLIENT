@@ -82,7 +82,7 @@ class ExpeditionController extends GetxController {
         'Erreur de chargement',
         e.toString().replaceAll('ApiException', '').trim(),
         snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: const Color(0xFFEF4444).withOpacity(0.8),
+        backgroundColor: const Color(0xFFEF4444).withValues(alpha: 0.8),
         colorText: Colors.white,
       );
     } finally {
@@ -102,7 +102,7 @@ class ExpeditionController extends GetxController {
         'Détail indisponible',
         e.toString().replaceAll('ApiException', '').trim(),
         snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: const Color(0xFFEF4444).withOpacity(0.8),
+        backgroundColor: const Color(0xFFEF4444).withValues(alpha: 0.8),
         colorText: Colors.white,
       );
     } finally {

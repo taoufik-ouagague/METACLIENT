@@ -37,7 +37,7 @@ class GlassContainer extends StatelessWidget {
     final light = isLight ?? (Theme.of(context).brightness == Brightness.light);
 
     final effectiveColor = color ??
-        (light ? Colors.white.withOpacity(0.85) : AppTheme.glassBg);
+        (light ? Colors.white.withValues(alpha: 0.85) : AppTheme.glassBg);
 
     final effectiveBorder = border ??
         (light
@@ -48,14 +48,14 @@ class GlassContainer extends StatelessWidget {
         (light
             ? [
                 BoxShadow(
-                  color: const Color(0xFF0F172A).withOpacity(0.06),
+                  color: const Color(0xFF0F172A).withValues(alpha: 0.06),
                   blurRadius: 16,
                   offset: const Offset(0, 5),
                 ),
               ]
             : [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.2),
+                  color: Colors.black.withValues(alpha: 0.2),
                   blurRadius: 16,
                   offset: const Offset(0, 8),
                 ),

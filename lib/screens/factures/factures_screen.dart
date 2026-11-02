@@ -32,12 +32,12 @@ class FacturesScreen extends StatelessWidget {
               height: 48,
               padding: const EdgeInsets.all(4),
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.85),
+                color: Colors.white.withValues(alpha: 0.85),
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(color: Colors.white, width: 1.5),
                 boxShadow: [
                   BoxShadow(
-                    color: const Color(0xFF0F172A).withOpacity(0.04),
+                    color: const Color(0xFF0F172A).withValues(alpha: 0.04),
                     blurRadius: 10,
                     offset: const Offset(0, 2),
                   ),
@@ -128,7 +128,7 @@ class FacturesScreen extends StatelessWidget {
               child: ListView.separated(
                 padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
                 itemCount: list.length,
-                separatorBuilder: (_, __) => const SizedBox(height: 10),
+                separatorBuilder: (_, _) => const SizedBox(height: 10),
                 itemBuilder: (context, index) {
                   final item = list[index];
                   return _buildFactureCard(item);
@@ -213,14 +213,14 @@ class FacturesScreen extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
         decoration: BoxDecoration(
-          color: isSel ? AppTheme.primary.withOpacity(0.12) : Colors.white,
+          color: isSel ? AppTheme.primary.withValues(alpha: 0.12) : Colors.white,
           borderRadius: BorderRadius.circular(10),
           border: Border.all(
             color: isSel ? AppTheme.primary : const Color(0xFFE2E8F0),
           ),
           boxShadow: [
             BoxShadow(
-              color: const Color(0xFF0F172A).withOpacity(0.04),
+              color: const Color(0xFF0F172A).withValues(alpha: 0.04),
               blurRadius: 6,
             ),
           ],
@@ -257,8 +257,8 @@ class FacturesScreen extends StatelessWidget {
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
                   color: hasSolde
-                      ? AppTheme.statusDanger.withOpacity(0.12)
-                      : AppTheme.statusSuccess.withOpacity(0.12),
+                      ? AppTheme.statusDanger.withValues(alpha: 0.12)
+                      : AppTheme.statusSuccess.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Icon(

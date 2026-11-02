@@ -71,7 +71,7 @@ class ProfileScreen extends StatefulWidget {
                           'Serveur mis à jour',
                           ApiService.baseUrl,
                           snackPosition: SnackPosition.BOTTOM,
-                          backgroundColor: AppTheme.statusSuccess.withOpacity(0.85),
+                          backgroundColor: AppTheme.statusSuccess.withValues(alpha: 0.85),
                           colorText: Colors.white,
                         );
                       }
@@ -253,7 +253,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         'Succès',
         'Photo de profil mise à jour avec succès',
         snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: AppTheme.statusSuccess.withOpacity(0.9),
+        backgroundColor: AppTheme.statusSuccess.withValues(alpha: 0.9),
         colorText: Colors.white,
       );
     } catch (e) {
@@ -293,20 +293,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 child: Container(
                   padding: const EdgeInsets.fromLTRB(28, 32, 28, 24),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.85),
+                    color: Colors.white.withValues(alpha: 0.85),
                     borderRadius: BorderRadius.circular(24),
                     border: Border.all(
-                      color: Colors.white.withOpacity(0.9),
+                      color: Colors.white.withValues(alpha: 0.9),
                       width: 1.5,
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: const Color(0xFF0F172A).withOpacity(0.10),
+                        color: const Color(0xFF0F172A).withValues(alpha: 0.10),
                         blurRadius: 40,
                         offset: const Offset(0, 12),
                       ),
                       BoxShadow(
-                        color: const Color(0xFFDC2626).withOpacity(0.06),
+                        color: const Color(0xFFDC2626).withValues(alpha: 0.06),
                         blurRadius: 60,
                         offset: const Offset(0, 20),
                       ),
@@ -326,12 +326,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               begin: Alignment.topLeft,
                               end: Alignment.bottomRight,
                               colors: [
-                                const Color(0xFFFEE2E2).withOpacity(0.9),
-                                const Color(0xFFFECACA).withOpacity(0.7),
+                                const Color(0xFFFEE2E2).withValues(alpha: 0.9),
+                                const Color(0xFFFECACA).withValues(alpha: 0.7),
                               ],
                             ),
                             border: Border.all(
-                              color: const Color(0xFFFCA5A5).withOpacity(0.5),
+                              color: const Color(0xFFFCA5A5).withValues(alpha: 0.5),
                               width: 1,
                             ),
                           ),
@@ -374,10 +374,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   child: Container(
                                     height: 48,
                                     decoration: BoxDecoration(
-                                      color: const Color(0xFFF1F5F9).withOpacity(0.7),
+                                      color: const Color(0xFFF1F5F9).withValues(alpha: 0.7),
                                       borderRadius: BorderRadius.circular(14),
                                       border: Border.all(
-                                        color: const Color(0xFFE2E8F0).withOpacity(0.8),
+                                        color: const Color(0xFFE2E8F0).withValues(alpha: 0.8),
                                         width: 1.2,
                                       ),
                                     ),
@@ -418,7 +418,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                       ),
                                       boxShadow: [
                                         BoxShadow(
-                                          color: const Color(0xFFDC2626).withOpacity(0.30),
+                                          color: const Color(0xFFDC2626).withValues(alpha: 0.30),
                                           blurRadius: 12,
                                           offset: const Offset(0, 4),
                                         ),
@@ -459,7 +459,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
         ),
       ),
-      barrierColor: const Color(0xFF0F172A).withOpacity(0.35),
+      barrierColor: const Color(0xFF0F172A).withValues(alpha: 0.35),
       barrierDismissible: true,
     );
   }
@@ -500,7 +500,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             border: Border.all(color: Colors.white, width: 3.5),
                             boxShadow: [
                               BoxShadow(
-                                color: AppTheme.primaryIcons.withOpacity(0.20),
+                                color: AppTheme.primaryIcons.withValues(alpha: 0.20),
                                 blurRadius: 18,
                                 offset: const Offset(0, 6),
                               ),
@@ -543,7 +543,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 ),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: Colors.black.withOpacity(0.20),
+                                    color: Colors.black.withValues(alpha: 0.20),
                                     blurRadius: 6,
                                     offset: const Offset(0, 2),
                                   ),
@@ -627,7 +627,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   borderRadius: BorderRadius.circular(16),
                   boxShadow: [
                     BoxShadow(
-                      color: const Color(0xFFDC2626).withOpacity(0.08),
+                      color: const Color(0xFFDC2626).withValues(alpha: 0.08),
                       blurRadius: 16,
                       offset: const Offset(0, 4),
                     ),
@@ -653,7 +653,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ),
                       ),
                       style: OutlinedButton.styleFrom(
-                        backgroundColor: const Color(0xFFFEF2F2).withOpacity(0.85),
+                        backgroundColor: const Color(0xFFFEF2F2).withValues(alpha: 0.85),
                         side: const BorderSide(
                           color: Color(0xFFFECACA),
                           width: 1.5,
@@ -728,15 +728,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
         Container(
           padding: const EdgeInsets.all(4),
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.70),
+            color: Colors.white.withValues(alpha: 0.70),
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
-              color: Colors.white.withOpacity(0.90),
+              color: Colors.white.withValues(alpha: 0.90),
               width: 1.5,
             ),
             boxShadow: [
               BoxShadow(
-                color: AppTheme.primary.withOpacity(0.05),
+                color: AppTheme.primary.withValues(alpha: 0.05),
                 blurRadius: 12,
                 offset: const Offset(0, 3),
               ),
@@ -762,7 +762,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       boxShadow: _profileCurrentPage == 0
                           ? [
                               BoxShadow(
-                                color: Colors.black.withOpacity(0.06),
+                                color: Colors.black.withValues(alpha: 0.06),
                                 blurRadius: 8,
                                 offset: const Offset(0, 2),
                               ),
@@ -815,7 +815,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       boxShadow: _profileCurrentPage == 1
                           ? [
                               BoxShadow(
-                                color: Colors.black.withOpacity(0.06),
+                                color: Colors.black.withValues(alpha: 0.06),
                                 blurRadius: 8,
                                 offset: const Offset(0, 2),
                               ),
@@ -862,7 +862,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           decoration: BoxDecoration(
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.06),
+                color: Colors.black.withValues(alpha: 0.06),
                 blurRadius: 20,
                 offset: const Offset(0, 8),
               ),
@@ -936,7 +936,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         borderRadius: BorderRadius.circular(22),
         boxShadow: [
           BoxShadow(
-            color: AppTheme.primary.withOpacity(0.08),
+            color: AppTheme.primary.withValues(alpha: 0.08),
             blurRadius: 20,
             offset: const Offset(0, 8),
           ),
@@ -953,12 +953,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
                 colors: [
-                  Colors.white.withOpacity(0.88),
-                  Colors.white.withOpacity(0.68),
+                  Colors.white.withValues(alpha: 0.88),
+                  Colors.white.withValues(alpha: 0.68),
                 ],
               ),
               border: Border.all(
-                color: Colors.white.withOpacity(0.92),
+                color: Colors.white.withValues(alpha: 0.92),
                 width: 1.5,
               ),
             ),
@@ -1039,12 +1039,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
         decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.72),
+          color: Colors.white.withValues(alpha: 0.72),
           borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: Colors.white.withOpacity(0.88)),
+          border: Border.all(color: Colors.white.withValues(alpha: 0.88)),
           boxShadow: [
             BoxShadow(
-              color: AppTheme.primary.withOpacity(0.03),
+              color: AppTheme.primary.withValues(alpha: 0.03),
               blurRadius: 6,
               offset: const Offset(0, 2),
             ),

@@ -66,10 +66,10 @@ class _ChequeDetailScreenState extends State<ChequeDetailScreen> {
                       Container(
                         padding: const EdgeInsets.all(10),
                         decoration: BoxDecoration(
-                          color: AppTheme.primary.withOpacity(0.12),
+                          color: AppTheme.primary.withValues(alpha: 0.12),
                           borderRadius: BorderRadius.circular(12),
                           border: Border.all(
-                            color: AppTheme.primary.withOpacity(0.25),
+                            color: AppTheme.primary.withValues(alpha: 0.25),
                           ),
                         ),
                         child: const Icon(
@@ -191,10 +191,10 @@ class _ChequeDetailScreenState extends State<ChequeDetailScreen> {
                 Obx(() => Container(
                       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3.5),
                       decoration: BoxDecoration(
-                        color: AppTheme.primary.withOpacity(0.09),
+                        color: AppTheme.primary.withValues(alpha: 0.09),
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(
-                          color: AppTheme.primary.withOpacity(0.2),
+                          color: AppTheme.primary.withValues(alpha: 0.2),
                         ),
                       ),
                       child: Text(
@@ -246,7 +246,7 @@ class _ChequeDetailScreenState extends State<ChequeDetailScreen> {
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
                 itemCount: details.length,
-                separatorBuilder: (_, __) => const SizedBox(height: 10),
+                separatorBuilder: (_, _) => const SizedBox(height: 10),
                 itemBuilder: (context, idx) {
                   final item = details[idx];
                   return GlassContainer(

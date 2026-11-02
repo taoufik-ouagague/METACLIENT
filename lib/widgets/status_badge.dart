@@ -18,16 +18,16 @@ class StatusBadge extends StatelessWidget {
     final s = status.toLowerCase().trim();
 
     if (s.contains('cloture') || s.contains('livr') || s.contains('notifie') || s.contains('pay')) {
-      bg = AppTheme.statusSuccess.withOpacity(0.18);
+      bg = AppTheme.statusSuccess.withValues(alpha: 0.18);
       fg = AppTheme.statusSuccess;
     } else if (s.contains('cours') || s.contains('attente')) {
-      bg = AppTheme.statusWarning.withOpacity(0.18);
+      bg = AppTheme.statusWarning.withValues(alpha: 0.18);
       fg = AppTheme.statusWarning;
     } else if (s.contains('rejet') || s.contains('annul') || s.contains('instance')) {
-      bg = AppTheme.statusDanger.withOpacity(0.18);
+      bg = AppTheme.statusDanger.withValues(alpha: 0.18);
       fg = AppTheme.statusDanger;
     } else {
-      bg = AppTheme.primaryIcons.withOpacity(0.18);
+      bg = AppTheme.primaryIcons.withValues(alpha: 0.18);
       fg = AppTheme.primaryIcons;
     }
 
@@ -36,7 +36,7 @@ class StatusBadge extends StatelessWidget {
       decoration: BoxDecoration(
         color: bg,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: fg.withOpacity(0.4), width: 1),
+        border: Border.all(color: fg.withValues(alpha: 0.4), width: 1),
       ),
       child: Text(
         status.toUpperCase(),

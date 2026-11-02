@@ -71,15 +71,15 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                   height: 140,
                   borderRadius: 36,
                   padding: const EdgeInsets.all(24),
-                  color: Colors.white.withOpacity(0.08),
+                  color: Colors.white.withValues(alpha: 0.08),
                   border: Border.all(
-                    color: AppTheme.primaryIcons.withOpacity(0.5),
+                    color: AppTheme.primaryIcons.withValues(alpha: 0.5),
                     width: 1.5,
                   ),
                   child: Image.asset(
                     'assets/img/logo.png',
                     fit: BoxFit.contain,
-                    errorBuilder: (_, __, ___) => const Icon(
+                    errorBuilder: (_, _, _) => const Icon(
                       Icons.hub_rounded,
                       size: 64,
                       color: AppTheme.primaryIcons,
@@ -105,7 +105,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                 Text(
                   'KAY TECHNOLOGY • METAPHORE',
                   style: TextStyle(
-                    color: Colors.white.withOpacity(0.6),
+                    color: Colors.white.withValues(alpha: 0.6),
                     fontSize: 12.5,
                     fontWeight: FontWeight.w600,
                     letterSpacing: 1.2,
@@ -120,7 +120,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                   child: CircularProgressIndicator(
                     strokeWidth: 2.8,
                     valueColor: const AlwaysStoppedAnimation<Color>(AppTheme.primaryIcons),
-                    backgroundColor: Colors.white.withOpacity(0.1),
+                    backgroundColor: Colors.white.withValues(alpha: 0.1),
                   ),
                 ),
               ],

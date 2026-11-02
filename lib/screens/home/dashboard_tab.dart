@@ -202,7 +202,7 @@ class DashboardTab extends StatelessWidget {
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
                 itemCount: dashCtrl.recentExpeditions.length,
-                separatorBuilder: (_, __) => const SizedBox(height: 10),
+                separatorBuilder: (_, _) => const SizedBox(height: 10),
                 itemBuilder: (context, index) {
                   final item = dashCtrl.recentExpeditions[index];
                   return GlassContainer(
@@ -222,7 +222,7 @@ class DashboardTab extends StatelessWidget {
                         Container(
                           padding: const EdgeInsets.all(10),
                           decoration: BoxDecoration(
-                            color: AppTheme.primaryIcons.withOpacity(0.12),
+                            color: AppTheme.primaryIcons.withValues(alpha: 0.12),
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: const Icon(LucideIcons.package, color: AppTheme.primary, size: 22),

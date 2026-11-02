@@ -7,7 +7,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../../controllers/auth_controller.dart';
 import '../../controllers/config_controller.dart';
-import '../../controllers/dashboard_controller.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/ambient_background.dart';
 import '../crbt/crbt_screen.dart';
@@ -120,7 +119,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   fit: StackFit.expand,
                   children: <Widget>[
                     ...previousChildren,
-                    if (currentChild != null) currentChild,
+                    ?currentChild,
                   ],
                 );
               },
@@ -215,9 +214,9 @@ class _HomeScreenState extends State<HomeScreen> {
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              Colors.white.withOpacity(0.95),
-              Colors.white.withOpacity(0.70),
-              Colors.white.withOpacity(0.0),
+              Colors.white.withValues(alpha: 0.95),
+              Colors.white.withValues(alpha: 0.70),
+              Colors.white.withValues(alpha: 0.0),
             ],
             stops: const [0.0, 0.70, 1.0],
           ),
@@ -233,37 +232,8 @@ class _HomeScreenState extends State<HomeScreen> {
             onPressed: () => _cleScaffold.currentState?.openDrawer(),
           ),
           const SizedBox(width: 2),
-          Container(
-            width: 32,
-            height: 32,
-            padding: const EdgeInsets.all(4),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(
-                color: (configCtrl?.secondaryColor ?? AppTheme.primaryIcons).withOpacity(0.4),
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: const Color(0xFF0F172A).withOpacity(0.06),
-                  blurRadius: 8,
-                ),
-              ],
-            ),
-            child: Image.asset(
-              'assets/img/logo.png',
-              fit: BoxFit.contain,
-              errorBuilder: (_, __, ___) => Icon(
-                LucideIcons.truck,
-                color: configCtrl?.secondaryColor ?? AppTheme.primaryIcons,
-                size: 18,
-              ),
-            ),
-          ),
-          const SizedBox(width: 8),
           ShaderMask(
-            shaderCallback: (bounds) =>
-                (configCtrl?.brandGradient ?? AppTheme.iconGradient).createShader(bounds),
+            shaderCallback: (bounds) => AppTheme.logoGradient.createShader(bounds),
             child: Text(
               'METACLIENT',
               style: GoogleFonts.poppins(
@@ -319,14 +289,14 @@ class _HomeScreenState extends State<HomeScreen> {
         decoration: BoxDecoration(
           shape: BoxShape.circle,
           gradient: isProfileActive ? AppTheme.primaryGradient : null,
-          color: isProfileActive ? null : Colors.white.withOpacity(0.85),
+          color: isProfileActive ? null : Colors.white.withValues(alpha: 0.85),
           border: Border.all(
             color: isProfileActive ? Colors.white : const Color(0xFFE2E8F0),
             width: 1.6,
           ),
           boxShadow: [
             BoxShadow(
-              color: AppTheme.primary.withOpacity(0.15),
+              color: AppTheme.primary.withValues(alpha: 0.15),
               blurRadius: 10,
               offset: const Offset(0, 3),
             ),
@@ -375,7 +345,7 @@ class _HomeScreenState extends State<HomeScreen> {
         shape: BoxShape.circle,
         boxShadow: [
           BoxShadow(
-            color: AppTheme.primary.withOpacity(0.08),
+            color: AppTheme.primary.withValues(alpha: 0.08),
             blurRadius: 10,
             offset: const Offset(0, 3),
           ),
@@ -386,7 +356,7 @@ class _HomeScreenState extends State<HomeScreen> {
         child: BackdropFilter(
           filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
           child: Material(
-            color: Colors.white.withOpacity(0.85),
+            color: Colors.white.withValues(alpha: 0.85),
             shape: const CircleBorder(
               side: BorderSide(color: Colors.white, width: 1.2),
             ),
@@ -438,12 +408,12 @@ class _HomeScreenState extends State<HomeScreen> {
           borderRadius: BorderRadius.circular(30),
           boxShadow: [
             BoxShadow(
-              color: AppTheme.primary.withOpacity(0.12),
+              color: AppTheme.primary.withValues(alpha: 0.12),
               blurRadius: 28,
               offset: const Offset(0, 10),
             ),
             BoxShadow(
-              color: AppTheme.primaryIcons.withOpacity(0.08),
+              color: AppTheme.primaryIcons.withValues(alpha: 0.08),
               blurRadius: 18,
               offset: const Offset(0, 4),
             ),
@@ -461,12 +431,12 @@ class _HomeScreenState extends State<HomeScreen> {
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                   colors: [
-                    Colors.white.withOpacity(0.92),
-                    Colors.white.withOpacity(0.70),
+                    Colors.white.withValues(alpha: 0.92),
+                    Colors.white.withValues(alpha: 0.70),
                   ],
                 ),
                 border: Border.all(
-                  color: Colors.white.withOpacity(0.95),
+                  color: Colors.white.withValues(alpha: 0.95),
                   width: 1.5,
                 ),
               ),
@@ -513,7 +483,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         borderRadius: BorderRadius.circular(12),
                         boxShadow: [
                           BoxShadow(
-                            color: (configCtrl?.primaryColor ?? AppTheme.primary).withOpacity(0.35),
+                            color: (configCtrl?.primaryColor ?? AppTheme.primary).withValues(alpha: 0.35),
                             blurRadius: 8,
                             offset: const Offset(0, 3),
                           ),
@@ -634,14 +604,14 @@ class _HomeScreenState extends State<HomeScreen> {
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
                 colors: [
-                  Colors.white.withOpacity(0.92),
-                  Colors.white.withOpacity(0.70),
+                  Colors.white.withValues(alpha: 0.92),
+                  Colors.white.withValues(alpha: 0.70),
                 ],
               ),
-              border: Border.all(color: Colors.white.withOpacity(0.95)),
+              border: Border.all(color: Colors.white.withValues(alpha: 0.95)),
               boxShadow: [
                 BoxShadow(
-                  color: AppTheme.primary.withOpacity(0.08),
+                  color: AppTheme.primary.withValues(alpha: 0.08),
                   blurRadius: 14,
                   offset: const Offset(0, 4),
                 ),
@@ -715,15 +685,15 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _champRechercheMenu() {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.85),
+        color: Colors.white.withValues(alpha: 0.85),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: Colors.white.withOpacity(0.95),
+          color: Colors.white.withValues(alpha: 0.95),
           width: 1.2,
         ),
         boxShadow: [
           BoxShadow(
-            color: AppTheme.primary.withOpacity(0.05),
+            color: AppTheme.primary.withValues(alpha: 0.05),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
@@ -794,8 +764,8 @@ class _HomeScreenState extends State<HomeScreen> {
       padding: const EdgeInsets.only(bottom: 6),
       child: Material(
         color: actif
-            ? teinte.withOpacity(0.12)
-            : Colors.white.withOpacity(0.60),
+            ? teinte.withValues(alpha: 0.12)
+            : Colors.white.withValues(alpha: 0.60),
         borderRadius: BorderRadius.circular(14),
         child: InkWell(
           onTap: onTap,

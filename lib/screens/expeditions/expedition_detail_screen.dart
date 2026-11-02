@@ -119,7 +119,7 @@ class _ExpeditionDetailScreenState extends State<ExpeditionDetailScreen> {
                         Expanded(
                           child: Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 8),
-                            child: Divider(color: AppTheme.primary.withOpacity(0.3), thickness: 1.5),
+                            child: Divider(color: AppTheme.primary.withValues(alpha: 0.3), thickness: 1.5),
                           ),
                         ),
                         _buildRoutePill(LucideIcons.mapPin, 'Destination', detail.destination ?? '—'),
@@ -181,7 +181,7 @@ class _ExpeditionDetailScreenState extends State<ExpeditionDetailScreen> {
               if (detail.processus.isEmpty)
                 const GlassContainer(
                   borderRadius: 18,
-                  padding: const EdgeInsets.all(18),
+                  padding: EdgeInsets.all(18),
                   child: Center(
                     child: Text(
                       'Aucune étape de transport enregistrée',
@@ -208,7 +208,7 @@ class _ExpeditionDetailScreenState extends State<ExpeditionDetailScreen> {
                                 Container(
                                   width: 2,
                                   height: 8,
-                                  color: AppTheme.primary.withOpacity(0.25),
+                                  color: AppTheme.primary.withValues(alpha: 0.25),
                                 )
                               else
                                 const SizedBox(height: 8),
@@ -217,8 +217,8 @@ class _ExpeditionDetailScreenState extends State<ExpeditionDetailScreen> {
                                 height: 28,
                                 decoration: BoxDecoration(
                                   color: isLast
-                                      ? AppTheme.statusSuccess.withOpacity(0.15)
-                                      : AppTheme.primary.withOpacity(0.12),
+                                      ? AppTheme.statusSuccess.withValues(alpha: 0.15)
+                                      : AppTheme.primary.withValues(alpha: 0.12),
                                   shape: BoxShape.circle,
                                   border: Border.all(
                                     color: isLast ? AppTheme.statusSuccess : AppTheme.primary,
@@ -237,7 +237,7 @@ class _ExpeditionDetailScreenState extends State<ExpeditionDetailScreen> {
                                 Expanded(
                                   child: Container(
                                     width: 2,
-                                    color: AppTheme.primary.withOpacity(0.25),
+                                    color: AppTheme.primary.withValues(alpha: 0.25),
                                   ),
                                 )
                               else
@@ -556,7 +556,7 @@ class _ExpeditionDetailScreenState extends State<ExpeditionDetailScreen> {
         Container(
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: AppTheme.primary.withOpacity(0.10),
+            color: AppTheme.primary.withValues(alpha: 0.10),
             borderRadius: BorderRadius.circular(10),
           ),
           child: Icon(icon, color: AppTheme.primary, size: 18),

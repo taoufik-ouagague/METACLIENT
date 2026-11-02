@@ -12,8 +12,8 @@ class AppTheme {
   static const Color textPrimary = Color(0xFF0F172A);
   static const Color textSecondary = Color(0xFF475569);
   static const Color textMuted = Color(0xFF94A3B8);
-  static Color glassBgLight = Colors.white.withOpacity(0.85);
-  static Color glassBorderLight = Colors.white.withOpacity(0.9);
+  static Color glassBgLight = Colors.white.withValues(alpha: 0.85);
+  static Color glassBorderLight = Colors.white.withValues(alpha: 0.9);
 
   // Background Colors (Deep Glassmorphic Canvas)
   static const Color bgDark = Color(0xFF09111E);
@@ -21,10 +21,10 @@ class AppTheme {
   static const Color bgSurface = Color(0xFF132238);
 
   // Glassmorphic Surface & Border Colors
-  static Color glassBg = Colors.white.withOpacity(0.07);
-  static Color glassBgHover = Colors.white.withOpacity(0.12);
-  static Color glassBorder = Colors.white.withOpacity(0.18);
-  static Color glassBorderActive = const Color(0xFF22B7CE).withOpacity(0.6);
+  static Color glassBg = Colors.white.withValues(alpha: 0.07);
+  static Color glassBgHover = Colors.white.withValues(alpha: 0.12);
+  static Color glassBorder = Colors.white.withValues(alpha: 0.18);
+  static Color glassBorderActive = const Color(0xFF22B7CE).withValues(alpha: 0.6);
 
   // Status Colors
   static const Color statusSuccess = Color(0xFF10B981);
@@ -37,6 +37,16 @@ class AppTheme {
     colors: [Color(0xFF2193B0), Color(0xFF6DD5ED)],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
+  );
+
+  /// Les trois teintes relevees dans assets/img/logo.png : l'arc sombre,
+  /// les barres bleues, l'anneau cyan. Les arrets gardent le mot lisible sur
+  /// fond clair : il ne s'eclaircit que sur la fin, comme la pointe de la fleche.
+  static const LinearGradient logoGradient = LinearGradient(
+    colors: [Color(0xFF000D16), Color(0xFF027BA8), Color(0xFF1CB8CF)],
+    stops: [0.0, 0.55, 1.0],
+    begin: Alignment.centerLeft,
+    end: Alignment.centerRight,
   );
 
   static const LinearGradient iconGradient = LinearGradient(

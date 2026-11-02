@@ -50,7 +50,7 @@ class CrbtScreen extends StatelessWidget {
               height: 48,
               padding: const EdgeInsets.all(4),
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.7),
+                color: Colors.white.withValues(alpha: 0.7),
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(color: const Color(0xFFE2E8F0)),
               ),
@@ -145,7 +145,7 @@ class CrbtScreen extends StatelessWidget {
     return ListView.separated(
       padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
       itemCount: ctrl.expeditionsCrbt.length,
-      separatorBuilder: (_, __) => const SizedBox(height: 10),
+      separatorBuilder: (_, _) => const SizedBox(height: 10),
       itemBuilder: (context, idx) {
         final item = ctrl.expeditionsCrbt[idx];
         return GlassContainer(
@@ -208,7 +208,7 @@ class CrbtScreen extends StatelessWidget {
     return ListView.separated(
       padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
       itemCount: ctrl.chequesCrbt.length,
-      separatorBuilder: (_, __) => const SizedBox(height: 10),
+      separatorBuilder: (_, _) => const SizedBox(height: 10),
       itemBuilder: (context, idx) {
         final item = ctrl.chequesCrbt[idx];
         return GlassContainer(
@@ -220,7 +220,7 @@ class CrbtScreen extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: AppTheme.primary.withOpacity(0.1),
+                  color: AppTheme.primary.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: const Icon(LucideIcons.landmark, color: AppTheme.primary, size: 20),
@@ -272,7 +272,7 @@ class CrbtScreen extends StatelessWidget {
     return ListView.separated(
       padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
       itemCount: ctrl.virementsCrbt.length,
-      separatorBuilder: (_, __) => const SizedBox(height: 10),
+      separatorBuilder: (_, _) => const SizedBox(height: 10),
       itemBuilder: (context, idx) {
         final item = ctrl.virementsCrbt[idx];
         return GlassContainer(
@@ -284,7 +284,7 @@ class CrbtScreen extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: AppTheme.statusSuccess.withOpacity(0.12),
+                  color: AppTheme.statusSuccess.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: const Icon(LucideIcons.arrowUpRight, color: AppTheme.statusSuccess, size: 20),

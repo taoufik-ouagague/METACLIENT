@@ -57,7 +57,7 @@ class GlassTextField extends StatelessWidget {
             hintText: hintText,
             labelText: labelText,
             hintStyle: TextStyle(
-              color: light ? const Color(0xFF94A3B8) : Colors.white.withOpacity(0.4),
+              color: light ? const Color(0xFF94A3B8) : Colors.white.withValues(alpha: 0.4),
               fontSize: 13.5,
             ),
             labelStyle: const TextStyle(
@@ -65,7 +65,7 @@ class GlassTextField extends StatelessWidget {
               fontSize: 13,
             ),
             filled: true,
-            fillColor: light ? Colors.white.withOpacity(0.9) : Colors.white.withOpacity(0.06),
+            fillColor: light ? Colors.white.withValues(alpha: 0.9) : Colors.white.withValues(alpha: 0.06),
             prefixIcon: prefixIcon != null
                 ? Icon(prefixIcon, color: AppTheme.primaryIcons, size: 20)
                 : null,
@@ -74,14 +74,14 @@ class GlassTextField extends StatelessWidget {
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16),
               borderSide: BorderSide(
-                color: light ? const Color(0xFFE2E8F0) : Colors.white.withOpacity(0.18),
+                color: light ? const Color(0xFFE2E8F0) : Colors.white.withValues(alpha: 0.18),
                 width: 1.2,
               ),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16),
               borderSide: BorderSide(
-                color: light ? const Color(0xFFE2E8F0) : Colors.white.withOpacity(0.18),
+                color: light ? const Color(0xFFE2E8F0) : Colors.white.withValues(alpha: 0.18),
                 width: 1.2,
               ),
             ),

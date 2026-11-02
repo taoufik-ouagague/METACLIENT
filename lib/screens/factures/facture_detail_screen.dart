@@ -202,7 +202,7 @@ class _FactureDetailScreenState extends State<FactureDetailScreen> {
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
                 itemCount: reglements.length,
-                separatorBuilder: (_, __) => const SizedBox(height: 10),
+                separatorBuilder: (_, _) => const SizedBox(height: 10),
                 itemBuilder: (context, idx) {
                   final reg = reglements[idx];
                   return GlassContainer(
@@ -216,7 +216,7 @@ class _FactureDetailScreenState extends State<FactureDetailScreen> {
                             Container(
                               padding: const EdgeInsets.all(8),
                               decoration: BoxDecoration(
-                                color: AppTheme.statusSuccess.withOpacity(0.12),
+                                color: AppTheme.statusSuccess.withValues(alpha: 0.12),
                                 borderRadius: BorderRadius.circular(10),
                               ),
                               child: const Icon(LucideIcons.badgeCheck, color: AppTheme.statusSuccess, size: 20),

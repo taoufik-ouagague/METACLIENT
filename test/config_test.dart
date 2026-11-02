@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:metaclient/models/client_config_model.dart';
-import 'package:metaclient/theme/app_theme.dart';
 
 void main() {
   group('ClientConfigModel Tests', () {

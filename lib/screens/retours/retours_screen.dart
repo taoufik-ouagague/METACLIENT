@@ -55,7 +55,7 @@ class RetoursScreen extends StatelessWidget {
                   hintText: '01/01/2026',
                   hintStyle: const TextStyle(color: Color(0xFF94A3B8)),
                   filled: true,
-                  fillColor: Colors.white.withOpacity(0.9),
+                  fillColor: Colors.white.withValues(alpha: 0.9),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(14),
                     borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
@@ -76,7 +76,7 @@ class RetoursScreen extends StatelessWidget {
                   hintText: '31/12/2026',
                   hintStyle: const TextStyle(color: Color(0xFF94A3B8)),
                   filled: true,
-                  fillColor: Colors.white.withOpacity(0.9),
+                  fillColor: Colors.white.withValues(alpha: 0.9),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(14),
                     borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
@@ -139,7 +139,7 @@ class RetoursScreen extends StatelessWidget {
               height: 48,
               padding: const EdgeInsets.all(4),
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.7),
+                color: Colors.white.withValues(alpha: 0.7),
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(color: const Color(0xFFE2E8F0)),
               ),
@@ -182,10 +182,10 @@ class RetoursScreen extends StatelessWidget {
               }),
               IconButton(
                 style: IconButton.styleFrom(
-                  backgroundColor: AppTheme.primary.withOpacity(0.08),
+                  backgroundColor: AppTheme.primary.withValues(alpha: 0.08),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(14),
-                    side: BorderSide(color: AppTheme.primary.withOpacity(0.2)),
+                    side: BorderSide(color: AppTheme.primary.withValues(alpha: 0.2)),
                   ),
                 ),
                 icon: const Icon(LucideIcons.calendar, color: AppTheme.primary, size: 18),
@@ -237,7 +237,7 @@ class RetoursScreen extends StatelessWidget {
               child: ListView.separated(
                 padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
                 itemCount: list.length,
-                separatorBuilder: (_, __) => const SizedBox(height: 10),
+                separatorBuilder: (_, _) => const SizedBox(height: 10),
                 itemBuilder: (context, index) {
                   final item = list[index];
                   return _buildRetourCard(item);
@@ -292,7 +292,7 @@ class RetoursScreen extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: AppTheme.primary.withOpacity(0.1),
+                  color: AppTheme.primary.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Icon(

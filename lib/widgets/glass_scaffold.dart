@@ -68,8 +68,8 @@ class GlassScaffold extends StatelessWidget {
                             shape: BoxShape.circle,
                             gradient: RadialGradient(
                               colors: [
-                                (hasCustom ? oColor : AppTheme.primaryIcons).withOpacity(0.16),
-                                (hasCustom ? oColor : AppTheme.primaryIcons).withOpacity(0.04),
+                                (hasCustom ? oColor : AppTheme.primaryIcons).withValues(alpha: 0.16),
+                                (hasCustom ? oColor : AppTheme.primaryIcons).withValues(alpha: 0.04),
                                 Colors.transparent,
                               ],
                               stops: const [0.0, 0.50, 1.0],
@@ -88,8 +88,8 @@ class GlassScaffold extends StatelessWidget {
                             shape: BoxShape.circle,
                             gradient: RadialGradient(
                               colors: [
-                                (hasCustom ? sColor : AppTheme.primary).withOpacity(0.14),
-                                (hasCustom ? sColor : AppTheme.primary).withOpacity(0.03),
+                                (hasCustom ? sColor : AppTheme.primary).withValues(alpha: 0.14),
+                                (hasCustom ? sColor : AppTheme.primary).withValues(alpha: 0.03),
                                 Colors.transparent,
                               ],
                               stops: const [0.0, 0.50, 1.0],
@@ -108,7 +108,7 @@ class GlassScaffold extends StatelessWidget {
                             shape: BoxShape.circle,
                             gradient: RadialGradient(
                               colors: [
-                                (hasCustom ? pColor : const Color(0xFF38BDF8)).withOpacity(0.12),
+                                (hasCustom ? pColor : const Color(0xFF38BDF8)).withValues(alpha: 0.12),
                                 Colors.transparent,
                               ],
                               stops: const [0.0, 0.60],
@@ -132,8 +132,8 @@ class GlassScaffold extends StatelessWidget {
                             shape: BoxShape.circle,
                             gradient: RadialGradient(
                               colors: [
-                                (hasCustom ? oColor : AppTheme.primary).withOpacity(0.20),
-                                (hasCustom ? oColor : AppTheme.primary).withOpacity(0.04),
+                                (hasCustom ? oColor : AppTheme.primary).withValues(alpha: 0.20),
+                                (hasCustom ? oColor : AppTheme.primary).withValues(alpha: 0.04),
                                 Colors.transparent,
                               ],
                               stops: const [0.0, 0.50, 1.0],
@@ -152,8 +152,8 @@ class GlassScaffold extends StatelessWidget {
                             shape: BoxShape.circle,
                             gradient: RadialGradient(
                               colors: [
-                                (hasCustom ? sColor : AppTheme.primaryIcons).withOpacity(0.20),
-                                (hasCustom ? sColor : AppTheme.primaryIcons).withOpacity(0.05),
+                                (hasCustom ? sColor : AppTheme.primaryIcons).withValues(alpha: 0.20),
+                                (hasCustom ? sColor : AppTheme.primaryIcons).withValues(alpha: 0.05),
                                 Colors.transparent,
                               ],
                               stops: const [0.0, 0.50, 1.0],
@@ -172,8 +172,8 @@ class GlassScaffold extends StatelessWidget {
                             shape: BoxShape.circle,
                             gradient: RadialGradient(
                               colors: [
-                                (hasCustom ? pColor : AppTheme.primary).withOpacity(0.28),
-                                (hasCustom ? pColor : AppTheme.primary).withOpacity(0.08),
+                                (hasCustom ? pColor : AppTheme.primary).withValues(alpha: 0.28),
+                                (hasCustom ? pColor : AppTheme.primary).withValues(alpha: 0.08),
                                 Colors.transparent,
                               ],
                               stops: const [0.0, 0.55, 1.0],

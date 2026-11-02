@@ -83,7 +83,7 @@ class GlassButton extends StatelessWidget {
 
     // 1. Explicit gradient passed as parameter
     if (gradient != null) {
-      return buildContent(gradient!, gradient!.colors.first.withOpacity(0.35));
+      return buildContent(gradient!, gradient!.colors.first.withValues(alpha: 0.35));
     }
 
     // 2. Dynamic config from API (if available) with fallback to normal color
@@ -91,12 +91,12 @@ class GlassButton extends StatelessWidget {
       return Obx(() {
         final configCtrl = Get.find<ConfigController>();
         final effectiveGradient = configCtrl.buttonGradient;
-        final effectiveShadow = configCtrl.primaryColor.withOpacity(0.35);
+        final effectiveShadow = configCtrl.primaryColor.withValues(alpha: 0.35);
         return buildContent(effectiveGradient, effectiveShadow);
       });
     }
 
     // 3. Fallback normal theme
-    return buildContent(AppTheme.primaryGradient, AppTheme.primary.withOpacity(0.35));
+    return buildContent(AppTheme.primaryGradient, AppTheme.primary.withValues(alpha: 0.35));
   }
 }

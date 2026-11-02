@@ -57,7 +57,7 @@ class ClientConfigModel {
       );
     } else if (p != null) {
       return LinearGradient(
-        colors: [p, p.withOpacity(0.85)],
+        colors: [p, p.withValues(alpha: 0.85)],
         begin: Alignment.topLeft,
         end: Alignment.bottomRight,
       );

@@ -7,7 +7,7 @@ import 'storage_service.dart';
 
 class ApiService {
   static final Logger _logger = Logger(
-    printer: PrettyPrinter(methodCount: 0, printTime: false),
+    printer: PrettyPrinter(methodCount: 0, dateTimeFormat: DateTimeFormat.none),
   );
 
   static const String defaultDevUrl = 'https://metaphore.kaytechnology.com:6799/CLIENTMOBILE';

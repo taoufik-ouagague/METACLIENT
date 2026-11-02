@@ -52,7 +52,7 @@ class AuthController extends GetxController {
           'Erreur de connexion',
           'Identifiants incorrects ou token manquant',
           snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: const Color(0xFFEF4444).withOpacity(0.85),
+          backgroundColor: const Color(0xFFEF4444).withValues(alpha: 0.85),
           colorText: Colors.white,
         );
         return false;
@@ -97,7 +97,7 @@ class AuthController extends GetxController {
         'Erreur de connexion',
         e.toString().replaceAll('ApiException', '').trim(),
         snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: const Color(0xFFEF4444).withOpacity(0.85),
+        backgroundColor: const Color(0xFFEF4444).withValues(alpha: 0.85),
         colorText: Colors.white,
       );
       return false;

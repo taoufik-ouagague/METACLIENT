@@ -74,11 +74,11 @@ class _AnimatedGradientBorderBoxState extends State<AnimatedGradientBorderBox>
                 height: widget.height,
                 padding: widget.padding,
                 decoration: BoxDecoration(
-                  color: widget.backgroundColor ?? Colors.white.withOpacity(0.08),
+                  color: widget.backgroundColor ?? Colors.white.withValues(alpha: 0.08),
                   borderRadius: BorderRadius.circular(widget.borderRadius),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.25),
+                      color: Colors.black.withValues(alpha: 0.25),
                       blurRadius: 16,
                       offset: const Offset(0, 6),
                     ),

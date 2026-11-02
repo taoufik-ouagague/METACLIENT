@@ -68,15 +68,15 @@ class _LoginScreenState extends State<LoginScreen> {
                         height: 86,
                         borderRadius: 24,
                         padding: const EdgeInsets.all(13),
-                        color: Colors.white.withOpacity(0.08),
+                        color: Colors.white.withValues(alpha: 0.08),
                         border: Border.all(
-                          color: AppTheme.primaryIcons.withOpacity(0.5),
+                          color: AppTheme.primaryIcons.withValues(alpha: 0.5),
                           width: 1.5,
                         ),
                         child: Image.asset(
                           'assets/img/logo.png',
                           fit: BoxFit.contain,
-                          errorBuilder: (_, __, ___) => const Icon(
+                          errorBuilder: (_, _, _) => const Icon(
                             LucideIcons.truck,
                             size: 38,
                             color: AppTheme.primary,
@@ -96,9 +96,9 @@ class _LoginScreenState extends State<LoginScreen> {
                               begin: Alignment.topCenter,
                               end: Alignment.bottomCenter,
                               colors: [
-                                AppTheme.primaryIcons.withOpacity(0.1),
-                                AppTheme.primaryIcons.withOpacity(0.6),
-                                AppTheme.primaryIcons.withOpacity(0.1),
+                                AppTheme.primaryIcons.withValues(alpha: 0.1),
+                                AppTheme.primaryIcons.withValues(alpha: 0.6),
+                                AppTheme.primaryIcons.withValues(alpha: 0.1),
                               ],
                             ),
                           ),
@@ -110,14 +110,22 @@ class _LoginScreenState extends State<LoginScreen> {
                         width: 86,
                         height: 86,
                         borderRadius: 24,
-                        padding: const EdgeInsets.all(11),
-                        color: Colors.white.withOpacity(0.08),
+                        padding: const EdgeInsets.all(10),
+                        blur: 0,
+                        color: Colors.white,
                         border: Border.all(
-                          color: AppTheme.primaryIcons.withOpacity(0.5),
+                          color: AppTheme.primaryIcons.withValues(alpha: 0.5),
                           width: 1.5,
                         ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppTheme.primaryIcons.withValues(alpha: 0.22),
+                            blurRadius: 18,
+                            offset: const Offset(0, 8),
+                          ),
+                        ],
                         child: ClipRRect(
-                          borderRadius: BorderRadius.circular(16),
+                          borderRadius: BorderRadius.circular(14),
                           child: Image.network(
                             clientLogoUrl,
                             fit: BoxFit.contain,
@@ -136,10 +144,10 @@ class _LoginScreenState extends State<LoginScreen> {
                                 ),
                               );
                             },
-                            errorBuilder: (_, __, ___) => const Icon(
+                            errorBuilder: (_, _, _) => const Icon(
                               LucideIcons.building,
                               size: 32,
-                              color: Color(0xFF64748B),
+                              color: Color(0xFF334155),
                             ),
                           ),
                         ),
@@ -154,15 +162,15 @@ class _LoginScreenState extends State<LoginScreen> {
                   height: 96,
                   borderRadius: 26,
                   padding: const EdgeInsets.all(16),
-                  color: Colors.white.withOpacity(0.08),
+                  color: Colors.white.withValues(alpha: 0.08),
                   border: Border.all(
-                    color: AppTheme.primaryIcons.withOpacity(0.5),
+                    color: AppTheme.primaryIcons.withValues(alpha: 0.5),
                     width: 1.5,
                   ),
                   child: Image.asset(
                     'assets/img/logo.png',
                     fit: BoxFit.contain,
-                    errorBuilder: (_, __, ___) => const Icon(
+                    errorBuilder: (_, _, _) => const Icon(
                       LucideIcons.truck,
                       size: 40,
                       color: AppTheme.primary,
@@ -196,7 +204,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 'Espace Client • Suivi Transport & Messagerie',
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  color: Colors.white.withOpacity(0.65),
+                  color: Colors.white.withValues(alpha: 0.65),
                   fontSize: 13,
                   fontWeight: FontWeight.w500,
                 ),
@@ -272,7 +280,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         suffixIcon: IconButton(
                           icon: Icon(
                             _obscurePwd ? LucideIcons.eyeOff : LucideIcons.eye,
-                            color: Colors.white.withOpacity(0.6),
+                            color: Colors.white.withValues(alpha: 0.6),
                             size: 18,
                           ),
                           onPressed: () => setState(() => _obscurePwd = !_obscurePwd),
@@ -308,14 +316,14 @@ class _LoginScreenState extends State<LoginScreen> {
                       Container(
                         width: 24,
                         height: 1,
-                        color: Colors.white.withOpacity(0.18),
+                        color: Colors.white.withValues(alpha: 0.18),
                       ),
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 10),
                         child: Text(
                           'Propulsé par',
                           style: TextStyle(
-                            color: Colors.white.withOpacity(0.55),
+                            color: Colors.white.withValues(alpha: 0.55),
                             fontSize: 11,
                             fontWeight: FontWeight.w600,
                             letterSpacing: 0.8,
@@ -325,7 +333,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       Container(
                         width: 24,
                         height: 1,
-                        color: Colors.white.withOpacity(0.18),
+                        color: Colors.white.withValues(alpha: 0.18),
                       ),
                     ],
                   ),

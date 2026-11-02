@@ -135,12 +135,12 @@ class ExpeditionsScreen extends StatelessWidget {
               height: 48,
               padding: const EdgeInsets.all(4),
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.85),
+                color: Colors.white.withValues(alpha: 0.85),
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(color: Colors.white, width: 1.5),
                 boxShadow: [
                   BoxShadow(
-                    color: const Color(0xFF0F172A).withOpacity(0.04),
+                    color: const Color(0xFF0F172A).withValues(alpha: 0.04),
                     blurRadius: 10,
                     offset: const Offset(0, 2),
                   ),
@@ -217,7 +217,7 @@ class ExpeditionsScreen extends StatelessWidget {
                     borderRadius: BorderRadius.circular(14),
                     side: const BorderSide(color: Color(0xFFE2E8F0)),
                   ),
-                  shadowColor: const Color(0xFF0F172A).withOpacity(0.06),
+                  shadowColor: const Color(0xFF0F172A).withValues(alpha: 0.06),
                   elevation: 2,
                 ),
                 icon: const Icon(LucideIcons.slidersHorizontal, color: AppTheme.primary, size: 18),
@@ -269,7 +269,7 @@ class ExpeditionsScreen extends StatelessWidget {
               child: ListView.separated(
                 padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
                 itemCount: list.length,
-                separatorBuilder: (_, __) => const SizedBox(height: 10),
+                separatorBuilder: (_, _) => const SizedBox(height: 10),
                 itemBuilder: (context, index) {
                   final item = list[index];
                   return _buildExpeditionCard(item);
@@ -363,7 +363,7 @@ class ExpeditionsScreen extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(7),
                 decoration: BoxDecoration(
-                  color: AppTheme.primary.withOpacity(0.10),
+                  color: AppTheme.primary.withValues(alpha: 0.10),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: const Icon(LucideIcons.package, color: AppTheme.primary, size: 18),
