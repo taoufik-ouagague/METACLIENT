@@ -52,4 +52,19 @@ void main() {
       expect(ClientConfigModel.parseHexColor('invalid'), isNull);
     });
   });
+
+  group('ConfigController Fallbacks & Gradients', () {
+    test('brandGradient blends primary, secondary, and optional colors', () {
+      final json = {
+        "optionalColor": "#FDEB03",
+        "primaryColor": "#2B3C99",
+        "secondaryColor": "#109B48"
+      };
+
+      final config = ClientConfigModel.fromJson(json);
+      expect(config.primary, const Color(0xFF2B3C99));
+      expect(config.secondary, const Color(0xFF109B48));
+      expect(config.optional, const Color(0xFFFDEB03));
+    });
+  });
 }

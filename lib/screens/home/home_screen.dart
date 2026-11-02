@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../../controllers/auth_controller.dart';
+import '../../controllers/config_controller.dart';
 import '../../controllers/dashboard_controller.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/ambient_background.dart';
@@ -199,6 +200,10 @@ class _HomeScreenState extends State<HomeScreen> {
 
   // ==================== APP BAR STYLE DÉGRADÉ (STYLE META FLEET) ====================
   PreferredSizeWidget _buildAppBar() {
+    final configCtrl = Get.isRegistered<ConfigController>()
+        ? Get.find<ConfigController>()
+        : null;
+
     return AppBar(
       toolbarHeight: 48,
       backgroundColor: Colors.transparent,
@@ -224,7 +229,7 @@ class _HomeScreenState extends State<HomeScreen> {
         children: [
           IconButton(
             icon: const Icon(LucideIcons.menu, size: 22),
-            color: AppTheme.primary,
+            color: configCtrl?.primaryColor ?? AppTheme.primary,
             onPressed: () => _cleScaffold.currentState?.openDrawer(),
           ),
           const SizedBox(width: 2),
@@ -235,7 +240,9 @@ class _HomeScreenState extends State<HomeScreen> {
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: AppTheme.primaryIcons.withOpacity(0.4)),
+              border: Border.all(
+                color: (configCtrl?.secondaryColor ?? AppTheme.primaryIcons).withOpacity(0.4),
+              ),
               boxShadow: [
                 BoxShadow(
                   color: const Color(0xFF0F172A).withOpacity(0.06),
@@ -246,20 +253,17 @@ class _HomeScreenState extends State<HomeScreen> {
             child: Image.asset(
               'assets/img/logo.png',
               fit: BoxFit.contain,
-              errorBuilder: (_, __, ___) => const Icon(
+              errorBuilder: (_, __, ___) => Icon(
                 LucideIcons.truck,
-                color: AppTheme.primaryIcons,
+                color: configCtrl?.secondaryColor ?? AppTheme.primaryIcons,
                 size: 18,
               ),
             ),
           ),
           const SizedBox(width: 8),
           ShaderMask(
-            shaderCallback: (bounds) => const LinearGradient(
-              colors: [Color(0xFF2193b0), Color(0xFF22b7ce)],
-              begin: Alignment.centerLeft,
-              end: Alignment.centerRight,
-            ).createShader(bounds),
+            shaderCallback: (bounds) =>
+                (configCtrl?.brandGradient ?? AppTheme.iconGradient).createShader(bounds),
             child: Text(
               'METACLIENT',
               style: GoogleFonts.poppins(
@@ -483,6 +487,10 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _navItem(int idx, IconData icon, String label) {
     final active = _index == idx;
+    final configCtrl = Get.isRegistered<ConfigController>()
+        ? Get.find<ConfigController>()
+        : null;
+
     return GestureDetector(
       onTap: () => _changerOnglet(idx),
       behavior: HitTestBehavior.opaque,
@@ -501,11 +509,11 @@ class _HomeScreenState extends State<HomeScreen> {
                 height: active ? 36 : 26,
                 decoration: active
                     ? BoxDecoration(
-                        gradient: AppTheme.primaryGradient,
+                        gradient: configCtrl?.buttonGradient ?? AppTheme.primaryGradient,
                         borderRadius: BorderRadius.circular(12),
                         boxShadow: [
                           BoxShadow(
-                            color: AppTheme.primary.withOpacity(0.35),
+                            color: (configCtrl?.primaryColor ?? AppTheme.primary).withOpacity(0.35),
                             blurRadius: 8,
                             offset: const Offset(0, 3),
                           ),
@@ -645,7 +653,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   width: 46,
                   height: 46,
                   decoration: BoxDecoration(
-                    gradient: AppTheme.primaryGradient,
+                    gradient: (Get.isRegistered<ConfigController>()
+                        ? Get.find<ConfigController>().buttonGradient
+                        : AppTheme.primaryGradient),
                     shape: BoxShape.circle,
                     border: Border.all(
                       color: Colors.white,
@@ -775,7 +785,10 @@ class _HomeScreenState extends State<HomeScreen> {
     bool actif = false,
     Color? couleur,
   }) {
-    final teinte = couleur ?? AppTheme.primary;
+    final configCtrl = Get.isRegistered<ConfigController>()
+        ? Get.find<ConfigController>()
+        : null;
+    final teinte = couleur ?? (configCtrl?.primaryColor ?? AppTheme.primary);
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 6),

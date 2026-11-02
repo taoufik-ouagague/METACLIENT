@@ -62,15 +62,15 @@ class _LoginScreenState extends State<LoginScreen> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      // App Logo
+                      // App Logo (Homogeneous clean frosted glass card)
                       GlassContainer(
                         width: 86,
                         height: 86,
                         borderRadius: 24,
-                        padding: const EdgeInsets.all(14),
-                        color: Colors.white.withOpacity(0.08),
+                        padding: const EdgeInsets.all(13),
+                        color: Colors.white.withOpacity(0.92),
                         border: Border.all(
-                          color: AppTheme.primaryIcons.withOpacity(0.4),
+                          color: Colors.white.withOpacity(0.85),
                           width: 1.2,
                         ),
                         child: Image.asset(
@@ -79,39 +79,40 @@ class _LoginScreenState extends State<LoginScreen> {
                           errorBuilder: (_, __, ___) => const Icon(
                             LucideIcons.truck,
                             size: 38,
-                            color: AppTheme.primaryIcons,
+                            color: AppTheme.primary,
                           ),
                         ),
                       ),
 
-                      // Stylish Divider between logos
+                      // Stylish Homogeneous Divider blending Yellow, Green & Blue
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 14),
                         child: Container(
-                          width: 1.5,
-                          height: 44,
+                          width: 2,
+                          height: 48,
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(2),
                             gradient: LinearGradient(
                               begin: Alignment.topCenter,
                               end: Alignment.bottomCenter,
                               colors: [
-                                Colors.white.withOpacity(0.05),
-                                Colors.white.withOpacity(0.4),
-                                Colors.white.withOpacity(0.05),
+                                (configCtrl?.optionalColor ?? AppTheme.accentCyan).withOpacity(0.2),
+                                (configCtrl?.optionalColor ?? AppTheme.accentCyan).withOpacity(0.85),
+                                (configCtrl?.secondaryColor ?? AppTheme.primaryIcons).withOpacity(0.85),
+                                (configCtrl?.primaryColor ?? AppTheme.primary).withOpacity(0.2),
                               ],
                             ),
                           ),
                         ),
                       ),
 
-                      // Client Logo from API (Clean frosted white card for maximum brand clarity)
+                      // Client Logo from API (Matching homogeneous clean frosted glass card)
                       GlassContainer(
                         width: 86,
                         height: 86,
                         borderRadius: 24,
-                        padding: const EdgeInsets.all(10),
-                        color: Colors.white.withOpacity(0.94),
+                        padding: const EdgeInsets.all(11),
+                        color: Colors.white.withOpacity(0.92),
                         border: Border.all(
                           color: Colors.white.withOpacity(0.85),
                           width: 1.2,
@@ -123,14 +124,14 @@ class _LoginScreenState extends State<LoginScreen> {
                             fit: BoxFit.contain,
                             loadingBuilder: (context, child, progress) {
                               if (progress == null) return child;
-                              return const Center(
+                              return Center(
                                 child: SizedBox(
                                   width: 22,
                                   height: 22,
                                   child: CircularProgressIndicator(
                                     strokeWidth: 2,
                                     valueColor: AlwaysStoppedAnimation<Color>(
-                                      AppTheme.primary,
+                                      configCtrl?.primaryColor ?? AppTheme.primary,
                                     ),
                                   ),
                                 ),
@@ -154,9 +155,9 @@ class _LoginScreenState extends State<LoginScreen> {
                   height: 96,
                   borderRadius: 26,
                   padding: const EdgeInsets.all(16),
-                  color: Colors.white.withOpacity(0.08),
+                  color: Colors.white.withOpacity(0.92),
                   border: Border.all(
-                    color: AppTheme.primaryIcons.withOpacity(0.4),
+                    color: Colors.white.withOpacity(0.85),
                     width: 1.2,
                   ),
                   child: Image.asset(
@@ -165,25 +166,32 @@ class _LoginScreenState extends State<LoginScreen> {
                     errorBuilder: (_, __, ___) => const Icon(
                       LucideIcons.truck,
                       size: 40,
-                      color: AppTheme.primaryIcons,
+                      color: AppTheme.primary,
                     ),
                   ),
                 );
               }),
               const SizedBox(height: 20),
 
-              ShaderMask(
-                shaderCallback: (bounds) => AppTheme.iconGradient.createShader(bounds),
-                child: const Text(
-                  'METACLIENT',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 28,
-                    fontWeight: FontWeight.w900,
-                    letterSpacing: 1.5,
+              // Title with dynamic 3-color brand gradient (Blue -> Green -> Yellow)
+              Obx(() {
+                final configCtrl = Get.isRegistered<ConfigController>()
+                    ? Get.find<ConfigController>()
+                    : null;
+                final textGradient = configCtrl?.brandGradient ?? AppTheme.iconGradient;
+                return ShaderMask(
+                  shaderCallback: (bounds) => textGradient.createShader(bounds),
+                  child: const Text(
+                    'METACLIENT',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 28,
+                      fontWeight: FontWeight.w900,
+                      letterSpacing: 1.5,
+                    ),
                   ),
-                ),
-              ),
+                );
+              }),
               const SizedBox(height: 6),
               Text(
                 'Espace Client • Suivi Transport & Messagerie',
@@ -225,14 +233,20 @@ class _LoginScreenState extends State<LoginScreen> {
                       const SizedBox(height: 24),
 
                       // Login Field Title & Input
-                      const Text(
-                        'Identifiant',
-                        style: TextStyle(
-                          color: AppTheme.primaryIcons,
-                          fontSize: 12.5,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
+                      Obx(() {
+                        final configCtrl = Get.isRegistered<ConfigController>()
+                            ? Get.find<ConfigController>()
+                            : null;
+                        final labelColor = configCtrl?.secondaryColor ?? AppTheme.primaryIcons;
+                        return Text(
+                          'Identifiant',
+                          style: TextStyle(
+                            color: labelColor,
+                            fontSize: 12.5,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        );
+                      }),
                       const SizedBox(height: 8),
                       GlassTextField(
                         controller: _loginCtrl,
@@ -244,14 +258,20 @@ class _LoginScreenState extends State<LoginScreen> {
                       const SizedBox(height: 18),
 
                       // Password Field Title & Input
-                      const Text(
-                        'Mot de passe',
-                        style: TextStyle(
-                          color: AppTheme.primaryIcons,
-                          fontSize: 12.5,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
+                      Obx(() {
+                        final configCtrl = Get.isRegistered<ConfigController>()
+                            ? Get.find<ConfigController>()
+                            : null;
+                        final labelColor = configCtrl?.secondaryColor ?? AppTheme.primaryIcons;
+                        return Text(
+                          'Mot de passe',
+                          style: TextStyle(
+                            color: labelColor,
+                            fontSize: 12.5,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        );
+                      }),
                       const SizedBox(height: 8),
                       GlassTextField(
                         controller: _pwdCtrl,
