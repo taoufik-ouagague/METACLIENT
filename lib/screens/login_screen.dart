@@ -222,15 +222,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           fontWeight: FontWeight.w700,
                         ),
                       ),
-                      const SizedBox(height: 6),
-                      Text(
-                        'Entrez vos identifiants pour accéder à votre espace',
-                        style: TextStyle(
-                          color: Colors.white.withOpacity(0.6),
-                          fontSize: 12.5,
-                        ),
-                      ),
-                      const SizedBox(height: 24),
+                      const SizedBox(height: 20),
 
                       // Login Field Title & Input
                       Obx(() {
