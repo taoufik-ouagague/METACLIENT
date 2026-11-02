@@ -203,63 +203,6 @@ class ProfileScreen extends StatelessWidget {
             );
           }),
 
-          const SizedBox(height: 22),
-
-          // ─── PARAMÈTRES RÉSEAU ───────────────────────────────────────────
-          const Row(
-            children: [
-              Icon(LucideIcons.settings, color: AppTheme.primary, size: 20),
-              SizedBox(width: 8),
-              Text(
-                'Paramètres Système',
-                style: TextStyle(
-                  color: Color(0xFF0F172A),
-                  fontSize: 16,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 10),
-
-          GlassContainer(
-            borderRadius: 20,
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Row(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                            color: AppTheme.primary.withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: const Icon(LucideIcons.server, color: AppTheme.primary, size: 20),
-                        ),
-                        const SizedBox(width: 12),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Text('Serveur API', style: TextStyle(color: Color(0xFF0F172A), fontWeight: FontWeight.w700, fontSize: 14)),
-                            Text(ApiService.baseUrl, style: const TextStyle(color: Color(0xFF64748B), fontSize: 11.5)),
-                          ],
-                        ),
-                      ],
-                    ),
-                    TextButton(
-                      onPressed: () => showServerConfigDialog(context),
-                      child: const Text('Modifier', style: TextStyle(color: AppTheme.primary, fontWeight: FontWeight.w600)),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-
           const SizedBox(height: 26),
 
           // ─── LOGOUT BUTTON ───────────────────────────────────────────────
