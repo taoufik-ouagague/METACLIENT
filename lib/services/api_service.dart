@@ -10,8 +10,8 @@ class ApiService {
     printer: PrettyPrinter(methodCount: 0, printTime: false),
   );
 
-  static const String defaultDevUrl = 'http://localhost:1599/METACLIENT';
-  static const String defaultAndroidEmulatorUrl = 'http://10.0.2.2:1599/METACLIENT';
+  static const String defaultDevUrl = 'https://metaphore.kaytechnology.com:6799/CLIENTMOBILE';
+  static const String defaultAndroidEmulatorUrl = 'https://metaphore.kaytechnology.com:6799/CLIENTMOBILE';
 
   static String baseUrl = _resolveDefaultUrl();
 

@@ -26,23 +26,23 @@ class ProfileScreen extends StatelessWidget {
             children: [
               const Row(
                 children: [
-                  Icon(LucideIcons.server, color: AppTheme.primaryIcons, size: 20),
+                  Icon(LucideIcons.server, color: AppTheme.primary, size: 20),
                   SizedBox(width: 10),
                   Text(
                     'Configuration API',
-                    style: TextStyle(color: Colors.white, fontSize: 16.5, fontWeight: FontWeight.w700),
+                    style: TextStyle(color: Color(0xFF0F172A), fontSize: 16.5, fontWeight: FontWeight.w700),
                   ),
                 ],
               ),
               const SizedBox(height: 14),
               const Text(
                 'Adresse URL du backend METACLIENT :',
-                style: TextStyle(color: Color(0xFF94A3B8), fontSize: 13),
+                style: TextStyle(color: Color(0xFF64748B), fontSize: 13),
               ),
               const SizedBox(height: 12),
               GlassTextField(
                 controller: urlCtrl,
-                hintText: 'http://192.168.x.x:1599/METACLIENT',
+                hintText: 'https://metaphore.kaytechnology.com:6799/CLIENTMOBILE',
                 prefixIcon: LucideIcons.link,
               ),
               const SizedBox(height: 20),
@@ -51,7 +51,7 @@ class ProfileScreen extends StatelessWidget {
                 children: [
                   TextButton(
                     onPressed: () => Get.back(),
-                    child: const Text('Annuler', style: TextStyle(color: Colors.white60)),
+                    child: const Text('Annuler', style: TextStyle(color: Color(0xFF64748B))),
                   ),
                   const SizedBox(width: 8),
                   ElevatedButton(
@@ -130,7 +130,7 @@ class ProfileScreen extends StatelessWidget {
                       name,
                       textAlign: TextAlign.center,
                       style: const TextStyle(
-                        color: Colors.white,
+                        color: Color(0xFF0F172A),
                         fontSize: 19,
                         fontWeight: FontWeight.w800,
                       ),
@@ -139,13 +139,13 @@ class ProfileScreen extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                       decoration: BoxDecoration(
-                        color: AppTheme.primaryIcons.withOpacity(0.15),
+                        color: AppTheme.primary.withOpacity(0.1),
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: Text(
                         'Code Client: $code',
                         style: const TextStyle(
-                          color: AppTheme.primaryIcons,
+                          color: AppTheme.primary,
                           fontSize: 12.5,
                           fontWeight: FontWeight.w700,
                         ),
@@ -162,12 +162,12 @@ class ProfileScreen extends StatelessWidget {
           // ─── CLIENT INFO DETAILS ─────────────────────────────────────────
           const Row(
             children: [
-              Icon(LucideIcons.info, color: AppTheme.primaryIcons, size: 20),
+              Icon(LucideIcons.info, color: AppTheme.primary, size: 20),
               SizedBox(width: 8),
               Text(
                 'Coordonnées & Affectation',
                 style: TextStyle(
-                  color: Colors.white,
+                  color: Color(0xFF0F172A),
                   fontSize: 16,
                   fontWeight: FontWeight.w700,
                 ),
@@ -184,18 +184,18 @@ class ProfileScreen extends StatelessWidget {
               child: Column(
                 children: [
                   _buildInfoRow(LucideIcons.mapPin, 'Adresse', client?.adresse ?? '—'),
-                  const Divider(color: Colors.white10, height: 20),
+                  const Divider(color: Color(0xFFE2E8F0), height: 20),
                   _buildInfoRow(LucideIcons.building, 'Agence d\'affectation', client?.agenceAffectation ?? '—'),
-                  const Divider(color: Colors.white10, height: 20),
+                  const Divider(color: Color(0xFFE2E8F0), height: 20),
                   _buildInfoRow(LucideIcons.userCheck, 'Commercial dédié', client?.commercialLibelle ?? '—'),
-                  const Divider(color: Colors.white10, height: 20),
+                  const Divider(color: Color(0xFFE2E8F0), height: 20),
                   _buildInfoRow(LucideIcons.phone, 'Téléphone', client?.telephone ?? '—'),
                   if (client?.commercialTelephone != null && client!.commercialTelephone!.isNotEmpty) ...[
-                    const Divider(color: Colors.white10, height: 20),
+                    const Divider(color: Color(0xFFE2E8F0), height: 20),
                     _buildInfoRow(LucideIcons.phoneCall, 'Tél. Commercial', client.commercialTelephone!),
                   ],
                   if (client?.email != null && client!.email!.isNotEmpty) ...[
-                    const Divider(color: Colors.white10, height: 20),
+                    const Divider(color: Color(0xFFE2E8F0), height: 20),
                     _buildInfoRow(LucideIcons.mail, 'Email', client.email!),
                   ],
                 ],
@@ -208,12 +208,12 @@ class ProfileScreen extends StatelessWidget {
           // ─── PARAMÈTRES RÉSEAU ───────────────────────────────────────────
           const Row(
             children: [
-              Icon(LucideIcons.settings, color: AppTheme.primaryIcons, size: 20),
+              Icon(LucideIcons.settings, color: AppTheme.primary, size: 20),
               SizedBox(width: 8),
               Text(
                 'Paramètres Système',
                 style: TextStyle(
-                  color: Colors.white,
+                  color: Color(0xFF0F172A),
                   fontSize: 16,
                   fontWeight: FontWeight.w700,
                 ),
@@ -235,24 +235,24 @@ class ProfileScreen extends StatelessWidget {
                         Container(
                           padding: const EdgeInsets.all(8),
                           decoration: BoxDecoration(
-                            color: AppTheme.primaryIcons.withOpacity(0.12),
+                            color: AppTheme.primary.withOpacity(0.1),
                             borderRadius: BorderRadius.circular(10),
                           ),
-                          child: const Icon(LucideIcons.server, color: AppTheme.primaryIcons, size: 20),
+                          child: const Icon(LucideIcons.server, color: AppTheme.primary, size: 20),
                         ),
                         const SizedBox(width: 12),
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text('Serveur API', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 14)),
-                            Text(ApiService.baseUrl, style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 11.5)),
+                            const Text('Serveur API', style: TextStyle(color: Color(0xFF0F172A), fontWeight: FontWeight.w700, fontSize: 14)),
+                            Text(ApiService.baseUrl, style: const TextStyle(color: Color(0xFF64748B), fontSize: 11.5)),
                           ],
                         ),
                       ],
                     ),
                     TextButton(
                       onPressed: () => _showServerConfigDialog(context),
-                      child: const Text('Modifier', style: TextStyle(color: AppTheme.primaryIcons, fontWeight: FontWeight.w600)),
+                      child: const Text('Modifier', style: TextStyle(color: AppTheme.primary, fontWeight: FontWeight.w600)),
                     ),
                   ],
                 ),
@@ -282,7 +282,7 @@ class ProfileScreen extends StatelessWidget {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Icon(icon, color: AppTheme.primaryIcons, size: 18),
+        Icon(icon, color: AppTheme.primary, size: 18),
         const SizedBox(width: 12),
         Expanded(
           child: Column(
@@ -290,13 +290,13 @@ class ProfileScreen extends StatelessWidget {
             children: [
               Text(
                 title,
-                style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 11.5),
+                style: const TextStyle(color: Color(0xFF64748B), fontSize: 11.5),
               ),
               const SizedBox(height: 2),
               Text(
                 value,
                 style: const TextStyle(
-                  color: Colors.white,
+                  color: Color(0xFF0F172A),
                   fontWeight: FontWeight.w600,
                   fontSize: 13.5,
                 ),

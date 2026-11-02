@@ -32,9 +32,16 @@ class FacturesScreen extends StatelessWidget {
               height: 48,
               padding: const EdgeInsets.all(4),
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.06),
+                color: Colors.white.withOpacity(0.85),
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: Colors.white.withOpacity(0.12)),
+                border: Border.all(color: Colors.white, width: 1.5),
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0xFF0F172A).withOpacity(0.04),
+                    blurRadius: 10,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
               ),
               child: Row(
                 children: [
@@ -83,7 +90,7 @@ class FacturesScreen extends StatelessWidget {
         Expanded(
           child: Obx(() {
             if (factureCtrl.isLoading.value) {
-              return const Center(child: CircularProgressIndicator(color: AppTheme.primaryIcons));
+              return const Center(child: CircularProgressIndicator(color: AppTheme.primary));
             }
 
             final list = factureCtrl.activeTab.value == 0
@@ -95,13 +102,13 @@ class FacturesScreen extends StatelessWidget {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(LucideIcons.fileCheck, color: Colors.white.withOpacity(0.3), size: 48),
+                    const Icon(LucideIcons.fileCheck, color: Color(0xFFCBD5E1), size: 48),
                     const SizedBox(height: 12),
                     Text(
                       factureCtrl.activeTab.value == 0
                           ? 'Toutes les factures sont à jour (aucun impayé) !'
                           : 'Aucune facture trouvée',
-                      style: TextStyle(color: Colors.white.withOpacity(0.55), fontSize: 14),
+                      style: const TextStyle(color: Color(0xFF64748B), fontSize: 14),
                     ),
                   ],
                 ),
@@ -109,8 +116,8 @@ class FacturesScreen extends StatelessWidget {
             }
 
             return RefreshIndicator(
-              color: AppTheme.primaryIcons,
-              backgroundColor: AppTheme.bgSurface,
+              color: AppTheme.primary,
+              backgroundColor: Colors.white,
               onRefresh: () async {
                 if (factureCtrl.activeTab.value == 0) {
                   await factureCtrl.fetchFacturesInstances();
@@ -143,15 +150,15 @@ class FacturesScreen extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     IconButton(
-                      icon: const Icon(LucideIcons.chevronLeft, color: AppTheme.primaryIcons),
+                      icon: const Icon(LucideIcons.chevronLeft, color: AppTheme.primary),
                       onPressed: factureCtrl.currentPage.value > 1 ? factureCtrl.previousPage : null,
                     ),
                     Text(
                       'Page ${factureCtrl.currentPage.value} / ${factureCtrl.totalPages.value}',
-                      style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w600),
+                      style: const TextStyle(color: Color(0xFF0F172A), fontSize: 13, fontWeight: FontWeight.w600),
                     ),
                     IconButton(
-                      icon: const Icon(LucideIcons.chevronRight, color: AppTheme.primaryIcons),
+                      icon: const Icon(LucideIcons.chevronRight, color: AppTheme.primary),
                       onPressed:
                           factureCtrl.currentPage.value < factureCtrl.totalPages.value
                               ? factureCtrl.nextPage
@@ -186,7 +193,7 @@ class FacturesScreen extends StatelessWidget {
           child: Text(
             title,
             style: TextStyle(
-              color: isSelected ? Colors.white : Colors.white60,
+              color: isSelected ? Colors.white : const Color(0xFF64748B),
               fontSize: 13,
               fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
             ),
@@ -206,16 +213,22 @@ class FacturesScreen extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
         decoration: BoxDecoration(
-          color: isSel ? AppTheme.primaryIcons.withOpacity(0.2) : Colors.white.withOpacity(0.06),
+          color: isSel ? AppTheme.primary.withOpacity(0.12) : Colors.white,
           borderRadius: BorderRadius.circular(10),
           border: Border.all(
-            color: isSel ? AppTheme.primaryIcons : Colors.white.withOpacity(0.12),
+            color: isSel ? AppTheme.primary : const Color(0xFFE2E8F0),
           ),
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0xFF0F172A).withOpacity(0.04),
+              blurRadius: 6,
+            ),
+          ],
         ),
         child: Text(
           label,
           style: TextStyle(
-            color: isSel ? AppTheme.primaryIcons : Colors.white70,
+            color: isSel ? AppTheme.primary : const Color(0xFF64748B),
             fontSize: 12,
             fontWeight: isSel ? FontWeight.w700 : FontWeight.w500,
           ),
@@ -243,8 +256,8 @@ class FacturesScreen extends StatelessWidget {
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
                       color: hasSolde
-                          ? AppTheme.statusDanger.withOpacity(0.15)
-                          : AppTheme.statusSuccess.withOpacity(0.15),
+                          ? AppTheme.statusDanger.withOpacity(0.12)
+                          : AppTheme.statusSuccess.withOpacity(0.12),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Icon(
@@ -260,7 +273,7 @@ class FacturesScreen extends StatelessWidget {
                       Text(
                         'Facture N° ${item.numFacture}',
                         style: const TextStyle(
-                          color: Colors.white,
+                          color: Color(0xFF0F172A),
                           fontSize: 15,
                           fontWeight: FontWeight.w800,
                         ),
@@ -268,7 +281,7 @@ class FacturesScreen extends StatelessWidget {
                       const SizedBox(height: 2),
                       Text(
                         item.dateFacture ?? '—',
-                        style: TextStyle(color: Colors.white.withOpacity(0.55), fontSize: 12),
+                        style: const TextStyle(color: Color(0xFF64748B), fontSize: 12),
                       ),
                     ],
                   ),
@@ -278,7 +291,7 @@ class FacturesScreen extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 12),
-          const Divider(color: Colors.white10, height: 1),
+          const Divider(color: Color(0xFFE2E8F0), height: 1),
           const SizedBox(height: 12),
 
           Row(
@@ -287,15 +300,15 @@ class FacturesScreen extends StatelessWidget {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
+                  const Text(
                     'Montant TTC',
-                    style: TextStyle(color: Colors.white.withOpacity(0.55), fontSize: 11.5),
+                    style: TextStyle(color: Color(0xFF64748B), fontSize: 11.5),
                   ),
                   const SizedBox(height: 2),
                   Text(
                     _formatCurrency(item.mntTtc),
                     style: const TextStyle(
-                      color: Colors.white,
+                      color: Color(0xFF0F172A),
                       fontSize: 14,
                       fontWeight: FontWeight.w700,
                     ),
@@ -305,9 +318,9 @@ class FacturesScreen extends StatelessWidget {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  Text(
+                  const Text(
                     'Reste à payer (Solde)',
-                    style: TextStyle(color: Colors.white.withOpacity(0.55), fontSize: 11.5),
+                    style: TextStyle(color: Color(0xFF64748B), fontSize: 11.5),
                   ),
                   const SizedBox(height: 2),
                   Text(

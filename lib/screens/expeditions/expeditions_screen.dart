@@ -34,36 +34,50 @@ class ExpeditionsScreen extends StatelessWidget {
             children: [
               const Row(
                 children: [
-                  Icon(LucideIcons.slidersHorizontal, color: AppTheme.primaryIcons, size: 20),
+                  Icon(LucideIcons.slidersHorizontal, color: AppTheme.primary, size: 20),
                   SizedBox(width: 10),
                   Text(
                     'Filtrer les expéditions',
-                    style: TextStyle(color: Colors.white, fontSize: 16.5, fontWeight: FontWeight.w700),
+                    style: TextStyle(color: Color(0xFF0F172A), fontSize: 16.5, fontWeight: FontWeight.w700),
                   ),
                 ],
               ),
               const SizedBox(height: 18),
               TextField(
                 controller: duCtrl,
-                style: const TextStyle(color: Colors.white, fontSize: 13.5),
+                style: const TextStyle(color: Color(0xFF0F172A), fontSize: 13.5),
                 decoration: InputDecoration(
                   labelText: 'Date début (JJ/MM/AAAA)',
-                  labelStyle: const TextStyle(color: AppTheme.primaryIcons, fontSize: 12),
+                  labelStyle: const TextStyle(color: AppTheme.primary, fontSize: 12),
                   hintText: '01/01/2026',
-                  hintStyle: TextStyle(color: Colors.white.withOpacity(0.3)),
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
+                  hintStyle: const TextStyle(color: Color(0xFF94A3B8)),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(14),
+                    borderSide: const BorderSide(color: Color(0xFFCBD5E1)),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(14),
+                    borderSide: const BorderSide(color: AppTheme.primary, width: 1.5),
+                  ),
                 ),
               ),
               const SizedBox(height: 12),
               TextField(
                 controller: auCtrl,
-                style: const TextStyle(color: Colors.white, fontSize: 13.5),
+                style: const TextStyle(color: Color(0xFF0F172A), fontSize: 13.5),
                 decoration: InputDecoration(
                   labelText: 'Date fin (JJ/MM/AAAA)',
-                  labelStyle: const TextStyle(color: AppTheme.primaryIcons, fontSize: 12),
+                  labelStyle: const TextStyle(color: AppTheme.primary, fontSize: 12),
                   hintText: '31/12/2026',
-                  hintStyle: TextStyle(color: Colors.white.withOpacity(0.3)),
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
+                  hintStyle: const TextStyle(color: Color(0xFF94A3B8)),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(14),
+                    borderSide: const BorderSide(color: Color(0xFFCBD5E1)),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(14),
+                    borderSide: const BorderSide(color: AppTheme.primary, width: 1.5),
+                  ),
                 ),
               ),
               const SizedBox(height: 20),
@@ -77,7 +91,7 @@ class ExpeditionsScreen extends StatelessWidget {
                       ctrl.fetchAllExpeditions(resetPage: true);
                       Get.back();
                     },
-                    child: const Text('Réinitialiser', style: TextStyle(color: Colors.white60)),
+                    child: const Text('Réinitialiser', style: TextStyle(color: Color(0xFF64748B))),
                   ),
                   const SizedBox(width: 8),
                   ElevatedButton(
@@ -117,9 +131,16 @@ class ExpeditionsScreen extends StatelessWidget {
               height: 48,
               padding: const EdgeInsets.all(4),
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.06),
+                color: Colors.white.withOpacity(0.85),
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: Colors.white.withOpacity(0.12)),
+                border: Border.all(color: Colors.white, width: 1.5),
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0xFF0F172A).withOpacity(0.04),
+                    blurRadius: 10,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
               ),
               child: Row(
                 children: [
@@ -159,10 +180,10 @@ class ExpeditionsScreen extends StatelessWidget {
                       Expanded(
                         child: TextField(
                           controller: searchCtrl,
-                          style: const TextStyle(color: Colors.white, fontSize: 13),
-                          decoration: InputDecoration(
+                          style: const TextStyle(color: Color(0xFF0F172A), fontSize: 13),
+                          decoration: const InputDecoration(
                             hintText: 'N° déclaration...',
-                            hintStyle: TextStyle(color: Colors.white.withOpacity(0.35), fontSize: 12.5),
+                            hintStyle: TextStyle(color: Color(0xFF94A3B8), fontSize: 12.5),
                             border: InputBorder.none,
                           ),
                           onSubmitted: (v) {
@@ -173,7 +194,7 @@ class ExpeditionsScreen extends StatelessWidget {
                       ),
                       if (expCtrl.searchQuery.value.isNotEmpty)
                         IconButton(
-                          icon: const Icon(LucideIcons.x, color: Colors.white54, size: 16),
+                          icon: const Icon(LucideIcons.x, color: Color(0xFF94A3B8), size: 16),
                           onPressed: () {
                             searchCtrl.clear();
                             expCtrl.searchQuery.value = '';
@@ -187,13 +208,15 @@ class ExpeditionsScreen extends StatelessWidget {
               const SizedBox(width: 10),
               IconButton(
                 style: IconButton.styleFrom(
-                  backgroundColor: AppTheme.primaryIcons.withOpacity(0.15),
+                  backgroundColor: Colors.white,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(14),
-                    side: BorderSide(color: AppTheme.primaryIcons.withOpacity(0.3)),
+                    side: const BorderSide(color: Color(0xFFE2E8F0)),
                   ),
+                  shadowColor: const Color(0xFF0F172A).withOpacity(0.06),
+                  elevation: 2,
                 ),
-                icon: const Icon(LucideIcons.slidersHorizontal, color: AppTheme.primaryIcons, size: 18),
+                icon: const Icon(LucideIcons.slidersHorizontal, color: AppTheme.primary, size: 18),
                 onPressed: () => _showFilterDialog(context, expCtrl),
               ),
             ],
@@ -206,7 +229,7 @@ class ExpeditionsScreen extends StatelessWidget {
         Expanded(
           child: Obx(() {
             if (expCtrl.isLoading.value) {
-              return const Center(child: CircularProgressIndicator(color: AppTheme.primaryIcons));
+              return const Center(child: CircularProgressIndicator(color: AppTheme.primary));
             }
 
             final list = expCtrl.activeTab.value == 0
@@ -214,15 +237,15 @@ class ExpeditionsScreen extends StatelessWidget {
                 : expCtrl.allExpeditions;
 
             if (list.isEmpty) {
-              return Center(
+              return const Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(LucideIcons.packageOpen, color: Colors.white.withOpacity(0.3), size: 48),
-                    const SizedBox(height: 12),
+                    Icon(LucideIcons.packageOpen, color: Color(0xFFCBD5E1), size: 48),
+                    SizedBox(height: 12),
                     Text(
                       'Aucune expédition trouvée',
-                      style: TextStyle(color: Colors.white.withOpacity(0.55), fontSize: 14),
+                      style: TextStyle(color: Color(0xFF64748B), fontSize: 14),
                     ),
                   ],
                 ),
@@ -230,8 +253,8 @@ class ExpeditionsScreen extends StatelessWidget {
             }
 
             return RefreshIndicator(
-              color: AppTheme.primaryIcons,
-              backgroundColor: AppTheme.bgSurface,
+              color: AppTheme.primary,
+              backgroundColor: Colors.white,
               onRefresh: () async {
                 if (expCtrl.activeTab.value == 0) {
                   await expCtrl.fetchExpeditionsEncours();
@@ -264,15 +287,15 @@ class ExpeditionsScreen extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     IconButton(
-                      icon: const Icon(LucideIcons.chevronLeft, color: AppTheme.primaryIcons),
+                      icon: const Icon(LucideIcons.chevronLeft, color: AppTheme.primary),
                       onPressed: expCtrl.currentPage.value > 1 ? expCtrl.previousPage : null,
                     ),
                     Text(
                       'Page ${expCtrl.currentPage.value} / ${expCtrl.totalPages.value}',
-                      style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w600),
+                      style: const TextStyle(color: Color(0xFF0F172A), fontSize: 13, fontWeight: FontWeight.w600),
                     ),
                     IconButton(
-                      icon: const Icon(LucideIcons.chevronRight, color: AppTheme.primaryIcons),
+                      icon: const Icon(LucideIcons.chevronRight, color: AppTheme.primary),
                       onPressed:
                           expCtrl.currentPage.value < expCtrl.totalPages.value ? expCtrl.nextPage : null,
                     ),
@@ -305,7 +328,7 @@ class ExpeditionsScreen extends StatelessWidget {
           child: Text(
             title,
             style: TextStyle(
-              color: isSelected ? Colors.white : Colors.white60,
+              color: isSelected ? Colors.white : const Color(0xFF64748B),
               fontSize: 13,
               fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
             ),
@@ -335,16 +358,16 @@ class ExpeditionsScreen extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.all(7),
                     decoration: BoxDecoration(
-                      color: AppTheme.primaryIcons.withOpacity(0.12),
+                      color: AppTheme.primary.withOpacity(0.10),
                       borderRadius: BorderRadius.circular(10),
                     ),
-                    child: const Icon(LucideIcons.package, color: AppTheme.primaryIcons, size: 18),
+                    child: const Icon(LucideIcons.package, color: AppTheme.primary, size: 18),
                   ),
                   const SizedBox(width: 10),
                   Text(
                     item.numDeclaration,
                     style: const TextStyle(
-                      color: Colors.white,
+                      color: Color(0xFF0F172A),
                       fontSize: 15,
                       fontWeight: FontWeight.w800,
                     ),
@@ -364,7 +387,7 @@ class ExpeditionsScreen extends StatelessWidget {
               Text(
                 '${item.origine ?? "—"} → ${item.destination ?? "—"}',
                 style: const TextStyle(
-                  color: Colors.white,
+                  color: Color(0xFF334155),
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
                 ),
@@ -373,7 +396,7 @@ class ExpeditionsScreen extends StatelessWidget {
               Text(
                 _formatCurrency(item.mntTtc),
                 style: const TextStyle(
-                  color: AppTheme.primaryIcons,
+                  color: AppTheme.primary,
                   fontSize: 13.5,
                   fontWeight: FontWeight.w700,
                 ),
@@ -392,16 +415,16 @@ class ExpeditionsScreen extends StatelessWidget {
                   'Dest: ${item.destinataire ?? "—"}',
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    color: Colors.white.withOpacity(0.55),
+                  style: const TextStyle(
+                    color: Color(0xFF64748B),
                     fontSize: 12,
                   ),
                 ),
               ),
               Text(
                 '${item.colis ?? 1} colis • ${item.poids ?? 0} kg',
-                style: TextStyle(
-                  color: Colors.white.withOpacity(0.55),
+                style: const TextStyle(
+                  color: Color(0xFF64748B),
                   fontSize: 11.5,
                 ),
               ),

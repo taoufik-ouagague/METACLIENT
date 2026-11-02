@@ -20,6 +20,8 @@ class StatCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isLight = Theme.of(context).brightness == Brightness.light;
+
     return GlassContainer(
       onTap: onTap,
       borderRadius: 18,
@@ -55,8 +57,8 @@ class StatCard extends StatelessWidget {
           const SizedBox(height: 12),
           Text(
             value,
-            style: const TextStyle(
-              color: Colors.white,
+            style: TextStyle(
+              color: isLight ? const Color(0xFF0F172A) : Colors.white,
               fontSize: 20,
               fontWeight: FontWeight.w800,
             ),
@@ -65,7 +67,7 @@ class StatCard extends StatelessWidget {
           Text(
             title,
             style: TextStyle(
-              color: Colors.white.withOpacity(0.7),
+              color: isLight ? const Color(0xFF64748B) : Colors.white.withOpacity(0.7),
               fontSize: 12.5,
               fontWeight: FontWeight.w500,
             ),

@@ -7,6 +7,14 @@ class AppTheme {
   static const Color primaryIcons = Color(0xFF22B7CE);
   static const Color accentCyan = Color(0xFF6DD5ED);
   
+  // Light Theme Colors
+  static const Color bgLight = Color(0xFFF8FAFC);
+  static const Color textPrimary = Color(0xFF0F172A);
+  static const Color textSecondary = Color(0xFF475569);
+  static const Color textMuted = Color(0xFF94A3B8);
+  static Color glassBgLight = Colors.white.withOpacity(0.85);
+  static Color glassBorderLight = Colors.white.withOpacity(0.9);
+
   // Background Colors (Deep Glassmorphic Canvas)
   static const Color bgDark = Color(0xFF09111E);
   static const Color bgDarkAlt = Color(0xFF0F1B2D);
@@ -51,6 +59,66 @@ class AppTheme {
     begin: Alignment.topCenter,
     end: Alignment.bottomCenter,
   );
+
+  static const LinearGradient lightBackgroundGradient = LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [
+      Color(0xFFEBF3FA),
+      Color(0xFFFFFFFF),
+      Color(0xFFF1F6FB),
+      Color(0xFFE8F2FA),
+    ],
+    stops: [0.0, 0.35, 0.70, 1.0],
+  );
+
+  static ThemeData get lightTheme {
+    return ThemeData(
+      useMaterial3: true,
+      brightness: Brightness.light,
+      scaffoldBackgroundColor: bgLight,
+      primaryColor: primary,
+      colorScheme: const ColorScheme.light(
+        primary: primary,
+        secondary: primaryIcons,
+        surface: Colors.white,
+        onPrimary: Colors.white,
+        onSecondary: Colors.black,
+        onSurface: textPrimary,
+      ),
+      textTheme: GoogleFonts.poppinsTextTheme().copyWith(
+        titleLarge: GoogleFonts.poppins(
+          color: textPrimary,
+          fontSize: 20,
+          fontWeight: FontWeight.w700,
+        ),
+        titleMedium: GoogleFonts.poppins(
+          color: textPrimary,
+          fontSize: 16,
+          fontWeight: FontWeight.w600,
+        ),
+        bodyMedium: GoogleFonts.poppins(
+          color: textSecondary,
+          fontSize: 14,
+        ),
+        bodySmall: GoogleFonts.poppins(
+          color: textMuted,
+          fontSize: 12,
+        ),
+      ),
+      appBarTheme: AppBarTheme(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        centerTitle: true,
+        titleTextStyle: GoogleFonts.poppins(
+          color: textPrimary,
+          fontSize: 18,
+          fontWeight: FontWeight.w700,
+        ),
+        iconTheme: const IconThemeData(color: primaryIcons),
+      ),
+    );
+  }
 
   static ThemeData get darkTheme {
     return ThemeData(

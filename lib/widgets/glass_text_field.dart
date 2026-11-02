@@ -14,6 +14,7 @@ class GlassTextField extends StatelessWidget {
   final String? Function(String?)? validator;
   final bool readOnly;
   final VoidCallback? onTap;
+  final bool? isLight;
 
   const GlassTextField({
     super.key,
@@ -28,10 +29,13 @@ class GlassTextField extends StatelessWidget {
     this.validator,
     this.readOnly = false,
     this.onTap,
+    this.isLight,
   });
 
   @override
   Widget build(BuildContext context) {
+    final light = isLight ?? (Theme.of(context).brightness == Brightness.light);
+
     return ClipRRect(
       borderRadius: BorderRadius.circular(16),
       child: BackdropFilter(
@@ -44,8 +48,8 @@ class GlassTextField extends StatelessWidget {
           validator: validator,
           readOnly: readOnly,
           onTap: onTap,
-          style: const TextStyle(
-            color: Colors.white,
+          style: TextStyle(
+            color: light ? const Color(0xFF0F172A) : Colors.white,
             fontSize: 14.5,
             fontWeight: FontWeight.w500,
           ),
@@ -53,7 +57,7 @@ class GlassTextField extends StatelessWidget {
             hintText: hintText,
             labelText: labelText,
             hintStyle: TextStyle(
-              color: Colors.white.withOpacity(0.4),
+              color: light ? const Color(0xFF94A3B8) : Colors.white.withOpacity(0.4),
               fontSize: 13.5,
             ),
             labelStyle: const TextStyle(
@@ -61,7 +65,7 @@ class GlassTextField extends StatelessWidget {
               fontSize: 13,
             ),
             filled: true,
-            fillColor: Colors.white.withOpacity(0.06),
+            fillColor: light ? Colors.white.withOpacity(0.9) : Colors.white.withOpacity(0.06),
             prefixIcon: prefixIcon != null
                 ? Icon(prefixIcon, color: AppTheme.primaryIcons, size: 20)
                 : null,
@@ -70,14 +74,14 @@ class GlassTextField extends StatelessWidget {
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16),
               borderSide: BorderSide(
-                color: Colors.white.withOpacity(0.18),
+                color: light ? const Color(0xFFE2E8F0) : Colors.white.withOpacity(0.18),
                 width: 1.2,
               ),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16),
               borderSide: BorderSide(
-                color: Colors.white.withOpacity(0.18),
+                color: light ? const Color(0xFFE2E8F0) : Colors.white.withOpacity(0.18),
                 width: 1.2,
               ),
             ),

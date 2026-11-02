@@ -35,26 +35,30 @@ class _ExpeditionDetailScreenState extends State<ExpeditionDetailScreen> {
   @override
   Widget build(BuildContext context) {
     return GlassScaffold(
+      isLight: true,
       appBar: AppBar(
-        title: const Text('Détail Expédition'),
+        title: const Text(
+          'Détail Expédition',
+          style: TextStyle(color: Color(0xFF0F172A), fontWeight: FontWeight.w700),
+        ),
         leading: IconButton(
-          icon: const Icon(LucideIcons.arrowLeft, color: AppTheme.primaryIcons),
+          icon: const Icon(LucideIcons.arrowLeft, color: AppTheme.primary),
           onPressed: () => Get.back(),
         ),
       ),
       body: Obx(() {
         if (_controller.isLoadingDetail.value) {
           return const Center(
-            child: CircularProgressIndicator(color: AppTheme.primaryIcons),
+            child: CircularProgressIndicator(color: AppTheme.primary),
           );
         }
 
         final detail = _controller.selectedDetail.value;
         if (detail == null) {
-          return Center(
+          return const Center(
             child: Text(
               'Aucune donnée disponible',
-              style: TextStyle(color: Colors.white.withOpacity(0.6)),
+              style: TextStyle(color: Color(0xFF64748B)),
             ),
           );
         }
@@ -80,7 +84,7 @@ class _ExpeditionDetailScreenState extends State<ExpeditionDetailScreen> {
                             Text(
                               'N° ${detail.numDeclaration}',
                               style: const TextStyle(
-                                color: Colors.white,
+                                color: Color(0xFF0F172A),
                                 fontSize: 20,
                                 fontWeight: FontWeight.w800,
                               ),
@@ -88,8 +92,8 @@ class _ExpeditionDetailScreenState extends State<ExpeditionDetailScreen> {
                             const SizedBox(height: 3),
                             Text(
                               'Date taxation : ${detail.dateTaxation ?? "—"}',
-                              style: TextStyle(
-                                color: Colors.white.withOpacity(0.6),
+                              style: const TextStyle(
+                                color: Color(0xFF64748B),
                                 fontSize: 12.5,
                               ),
                             ),
@@ -99,7 +103,7 @@ class _ExpeditionDetailScreenState extends State<ExpeditionDetailScreen> {
                       ],
                     ),
                     const SizedBox(height: 16),
-                    const Divider(color: Colors.white12, height: 1),
+                    const Divider(color: Color(0xFFE2E8F0), height: 1),
                     const SizedBox(height: 16),
 
                     // Route (Origine -> Destination)
@@ -109,7 +113,7 @@ class _ExpeditionDetailScreenState extends State<ExpeditionDetailScreen> {
                         Expanded(
                           child: Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 8),
-                            child: Divider(color: AppTheme.primaryIcons.withOpacity(0.5), thickness: 1.5),
+                            child: Divider(color: AppTheme.primary.withOpacity(0.3), thickness: 1.5),
                           ),
                         ),
                         _buildRoutePill(LucideIcons.mapPin, 'Destination', detail.destination ?? '—'),
@@ -142,7 +146,7 @@ class _ExpeditionDetailScreenState extends State<ExpeditionDetailScreen> {
                   children: [
                     _buildActorRow(LucideIcons.send, 'Expéditeur', detail.expediteur ?? '—', detail.expediteurAdresse),
                     const SizedBox(height: 14),
-                    const Divider(color: Colors.white10, height: 1),
+                    const Divider(color: Color(0xFFE2E8F0), height: 1),
                     const SizedBox(height: 14),
                     _buildActorRow(LucideIcons.userCheck, 'Destinataire', detail.destinataire ?? '—', null),
                   ],
@@ -154,12 +158,12 @@ class _ExpeditionDetailScreenState extends State<ExpeditionDetailScreen> {
               // ─── SUIVI PROCESSUS (TIMELINE DE LIVRAISON) ───────────────────
               const Row(
                 children: [
-                  Icon(LucideIcons.gitCommit, color: AppTheme.primaryIcons, size: 20),
+                  Icon(LucideIcons.gitCommit, color: AppTheme.primary, size: 20),
                   SizedBox(width: 8),
                   Text(
                     'Suivi & Étapes de Livraison',
                     style: TextStyle(
-                      color: Colors.white,
+                      color: Color(0xFF0F172A),
                       fontSize: 16.5,
                       fontWeight: FontWeight.w700,
                     ),
@@ -169,13 +173,13 @@ class _ExpeditionDetailScreenState extends State<ExpeditionDetailScreen> {
               const SizedBox(height: 12),
 
               if (detail.processus.isEmpty)
-                GlassContainer(
+                const GlassContainer(
                   borderRadius: 18,
                   padding: const EdgeInsets.all(18),
                   child: Center(
                     child: Text(
                       'Aucune étape de transport enregistrée',
-                      style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 13),
+                      style: TextStyle(color: Color(0xFF64748B), fontSize: 13),
                     ),
                   ),
                 )
@@ -199,11 +203,11 @@ class _ExpeditionDetailScreenState extends State<ExpeditionDetailScreen> {
                                 height: 28,
                                 decoration: BoxDecoration(
                                   color: isLast
-                                      ? AppTheme.statusSuccess.withOpacity(0.2)
-                                      : AppTheme.primaryIcons.withOpacity(0.2),
+                                      ? AppTheme.statusSuccess.withOpacity(0.15)
+                                      : AppTheme.primary.withOpacity(0.12),
                                   shape: BoxShape.circle,
                                   border: Border.all(
-                                    color: isLast ? AppTheme.statusSuccess : AppTheme.primaryIcons,
+                                    color: isLast ? AppTheme.statusSuccess : AppTheme.primary,
                                     width: 2,
                                   ),
                                 ),
@@ -211,7 +215,7 @@ class _ExpeditionDetailScreenState extends State<ExpeditionDetailScreen> {
                                   child: Icon(
                                     isLast ? LucideIcons.check : LucideIcons.circle,
                                     size: 14,
-                                    color: isLast ? AppTheme.statusSuccess : AppTheme.primaryIcons,
+                                    color: isLast ? AppTheme.statusSuccess : AppTheme.primary,
                                   ),
                                 ),
                               ),
@@ -219,7 +223,7 @@ class _ExpeditionDetailScreenState extends State<ExpeditionDetailScreen> {
                                 Expanded(
                                   child: Container(
                                     width: 2,
-                                    color: AppTheme.primaryIcons.withOpacity(0.3),
+                                    color: AppTheme.primary.withOpacity(0.25),
                                   ),
                                 ),
                             ],
@@ -240,7 +244,7 @@ class _ExpeditionDetailScreenState extends State<ExpeditionDetailScreen> {
                                         Text(
                                           step.processus,
                                           style: const TextStyle(
-                                            color: Colors.white,
+                                            color: Color(0xFF0F172A),
                                             fontSize: 14.5,
                                             fontWeight: FontWeight.w700,
                                           ),
@@ -253,12 +257,12 @@ class _ExpeditionDetailScreenState extends State<ExpeditionDetailScreen> {
                                     if (step.dateAction != null)
                                       Row(
                                         children: [
-                                          Icon(LucideIcons.clock, size: 12, color: Colors.white.withOpacity(0.5)),
+                                          const Icon(LucideIcons.clock, size: 12, color: Color(0xFF94A3B8)),
                                           const SizedBox(width: 4),
                                           Text(
                                             step.dateAction!,
-                                            style: TextStyle(
-                                              color: Colors.white.withOpacity(0.6),
+                                            style: const TextStyle(
+                                              color: Color(0xFF64748B),
                                               fontSize: 12,
                                             ),
                                           ),
@@ -268,8 +272,8 @@ class _ExpeditionDetailScreenState extends State<ExpeditionDetailScreen> {
                                       const SizedBox(height: 4),
                                       Text(
                                         'Lieu: ${step.faitA ?? "—"} • Agent: ${step.faitPar ?? "—"}',
-                                        style: TextStyle(
-                                          color: Colors.white.withOpacity(0.55),
+                                        style: const TextStyle(
+                                          color: Color(0xFF64748B),
                                           fontSize: 11.5,
                                         ),
                                       ),
@@ -279,7 +283,7 @@ class _ExpeditionDetailScreenState extends State<ExpeditionDetailScreen> {
                                       Text(
                                         'Chauffeur: ${step.livreurChauffeur}',
                                         style: const TextStyle(
-                                          color: AppTheme.primaryIcons,
+                                          color: AppTheme.primary,
                                           fontSize: 11.5,
                                           fontWeight: FontWeight.w600,
                                         ),
@@ -302,12 +306,12 @@ class _ExpeditionDetailScreenState extends State<ExpeditionDetailScreen> {
               if (detail.gedDocuments.isNotEmpty) ...[
                 const Row(
                   children: [
-                    Icon(LucideIcons.fileText, color: AppTheme.primaryIcons, size: 20),
+                    Icon(LucideIcons.fileText, color: AppTheme.primary, size: 20),
                     SizedBox(width: 8),
                     Text(
                       'Documents GED (Preuves / Facturation)',
                       style: TextStyle(
-                        color: Colors.white,
+                        color: Color(0xFF0F172A),
                         fontSize: 16,
                         fontWeight: FontWeight.w700,
                       ),
@@ -321,7 +325,7 @@ class _ExpeditionDetailScreenState extends State<ExpeditionDetailScreen> {
                       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                       child: Row(
                         children: [
-                          const Icon(LucideIcons.fileCode, color: AppTheme.primaryIcons, size: 24),
+                          const Icon(LucideIcons.fileCode, color: AppTheme.primary, size: 24),
                           const SizedBox(width: 12),
                           Expanded(
                             child: Column(
@@ -330,7 +334,7 @@ class _ExpeditionDetailScreenState extends State<ExpeditionDetailScreen> {
                                 Text(
                                   doc.typeDocument.isNotEmpty ? doc.typeDocument : 'Document GED',
                                   style: const TextStyle(
-                                    color: Colors.white,
+                                    color: Color(0xFF0F172A),
                                     fontSize: 13.5,
                                     fontWeight: FontWeight.w600,
                                   ),
@@ -339,8 +343,8 @@ class _ExpeditionDetailScreenState extends State<ExpeditionDetailScreen> {
                                   doc.lien,
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
-                                  style: TextStyle(
-                                    color: Colors.white.withOpacity(0.4),
+                                  style: const TextStyle(
+                                    color: Color(0xFF94A3B8),
                                     fontSize: 11.5,
                                   ),
                                 ),
@@ -348,14 +352,14 @@ class _ExpeditionDetailScreenState extends State<ExpeditionDetailScreen> {
                             ),
                           ),
                           IconButton(
-                            icon: const Icon(LucideIcons.externalLink, color: AppTheme.primaryIcons, size: 18),
+                            icon: const Icon(LucideIcons.externalLink, color: AppTheme.primary, size: 18),
                             onPressed: () {
                               Get.snackbar(
                                 'Lien GED',
                                 doc.lien,
                                 snackPosition: SnackPosition.BOTTOM,
-                                backgroundColor: AppTheme.bgSurface,
-                                colorText: Colors.white,
+                                backgroundColor: Colors.white,
+                                colorText: const Color(0xFF0F172A),
                               );
                             },
                           ),
@@ -369,12 +373,12 @@ class _ExpeditionDetailScreenState extends State<ExpeditionDetailScreen> {
               if (detail.retourCcCt.isNotEmpty) ...[
                 const Row(
                   children: [
-                    Icon(LucideIcons.badgePercent, color: AppTheme.primaryIcons, size: 20),
+                    Icon(LucideIcons.badgePercent, color: AppTheme.primary, size: 20),
                     SizedBox(width: 8),
                     Text(
                       'Retours Chèques / Traites',
                       style: TextStyle(
-                        color: Colors.white,
+                        color: Color(0xFF0F172A),
                         fontSize: 16,
                         fontWeight: FontWeight.w700,
                       ),
@@ -394,18 +398,18 @@ class _ExpeditionDetailScreenState extends State<ExpeditionDetailScreen> {
                             children: [
                               Text(
                                 '${item["nature"] ?? "CC/CT"} • BL/Fact: ${item["num_bl_fact"] ?? "—"}',
-                                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 13.5),
+                                style: const TextStyle(color: Color(0xFF0F172A), fontWeight: FontWeight.w700, fontSize: 13.5),
                               ),
                               Text(
                                 _formatCurrency(item["fond"] as num?),
-                                style: const TextStyle(color: AppTheme.primaryIcons, fontWeight: FontWeight.w700, fontSize: 13.5),
+                                style: const TextStyle(color: AppTheme.primary, fontWeight: FontWeight.w700, fontSize: 13.5),
                               ),
                             ],
                           ),
                           const SizedBox(height: 4),
                           Text(
                             'Banque: ${item["banque"] ?? "—"} • Encaissement: ${item["date_encaissement"] ?? "—"} • Remise: ${item["date_remise"] ?? "—"}',
-                            style: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 11.5),
+                            style: const TextStyle(color: Color(0xFF64748B), fontSize: 11.5),
                           ),
                         ],
                       ),
@@ -417,12 +421,12 @@ class _ExpeditionDetailScreenState extends State<ExpeditionDetailScreen> {
               if (detail.commentaires.isNotEmpty) ...[
                 const Row(
                   children: [
-                    Icon(LucideIcons.messageSquare, color: AppTheme.primaryIcons, size: 20),
+                    Icon(LucideIcons.messageSquare, color: AppTheme.primary, size: 20),
                     SizedBox(width: 8),
                     Text(
                       'Commentaires & Réserves',
                       style: TextStyle(
-                        color: Colors.white,
+                        color: Color(0xFF0F172A),
                         fontSize: 16,
                         fontWeight: FontWeight.w700,
                       ),
@@ -450,20 +454,20 @@ class _ExpeditionDetailScreenState extends State<ExpeditionDetailScreen> {
                               ),
                               Text(
                                 c.dateComment ?? '',
-                                style: TextStyle(color: Colors.white.withOpacity(0.4), fontSize: 11),
+                                style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 11),
                               ),
                             ],
                           ),
                           const SizedBox(height: 4),
                           Text(
                             c.libelleComment ?? '',
-                            style: const TextStyle(color: Colors.white, fontSize: 12.5),
+                            style: const TextStyle(color: Color(0xFF334155), fontSize: 12.5),
                           ),
                           if (c.agentComment != null) ...[
                             const SizedBox(height: 2),
                             Text(
                               'Par: ${c.agentComment}',
-                              style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 11),
+                              style: const TextStyle(color: Color(0xFF64748B), fontSize: 11),
                             ),
                           ],
                         ],
@@ -482,16 +486,16 @@ class _ExpeditionDetailScreenState extends State<ExpeditionDetailScreen> {
   Widget _buildRoutePill(IconData icon, String label, String city) {
     return Column(
       children: [
-        Icon(icon, color: AppTheme.primaryIcons, size: 18),
+        Icon(icon, color: AppTheme.primary, size: 18),
         const SizedBox(height: 4),
         Text(
           label,
-          style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 11),
+          style: const TextStyle(color: Color(0xFF64748B), fontSize: 11),
         ),
         Text(
           city,
           style: const TextStyle(
-            color: Colors.white,
+            color: Color(0xFF0F172A),
             fontWeight: FontWeight.w700,
             fontSize: 14,
           ),
@@ -506,7 +510,7 @@ class _ExpeditionDetailScreenState extends State<ExpeditionDetailScreen> {
         Text(
           value,
           style: const TextStyle(
-            color: Colors.white,
+            color: Color(0xFF0F172A),
             fontWeight: FontWeight.w800,
             fontSize: 13.5,
           ),
@@ -514,8 +518,8 @@ class _ExpeditionDetailScreenState extends State<ExpeditionDetailScreen> {
         const SizedBox(height: 2),
         Text(
           label,
-          style: TextStyle(
-            color: Colors.white.withOpacity(0.55),
+          style: const TextStyle(
+            color: Color(0xFF64748B),
             fontSize: 11,
           ),
         ),
@@ -530,10 +534,10 @@ class _ExpeditionDetailScreenState extends State<ExpeditionDetailScreen> {
         Container(
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: AppTheme.primaryIcons.withOpacity(0.12),
+            color: AppTheme.primary.withOpacity(0.10),
             borderRadius: BorderRadius.circular(10),
           ),
-          child: Icon(icon, color: AppTheme.primaryIcons, size: 18),
+          child: Icon(icon, color: AppTheme.primary, size: 18),
         ),
         const SizedBox(width: 12),
         Expanded(
@@ -542,12 +546,12 @@ class _ExpeditionDetailScreenState extends State<ExpeditionDetailScreen> {
             children: [
               Text(
                 title,
-                style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 11),
+                style: const TextStyle(color: Color(0xFF64748B), fontSize: 11),
               ),
               Text(
                 name,
                 style: const TextStyle(
-                  color: Colors.white,
+                  color: Color(0xFF0F172A),
                   fontWeight: FontWeight.w700,
                   fontSize: 14,
                 ),
@@ -556,8 +560,8 @@ class _ExpeditionDetailScreenState extends State<ExpeditionDetailScreen> {
                 const SizedBox(height: 2),
                 Text(
                   address,
-                  style: TextStyle(
-                    color: Colors.white.withOpacity(0.6),
+                  style: const TextStyle(
+                    color: Color(0xFF475569),
                     fontSize: 11.5,
                   ),
                 ),

@@ -33,36 +33,54 @@ class RetoursScreen extends StatelessWidget {
             children: [
               const Row(
                 children: [
-                  Icon(LucideIcons.slidersHorizontal, color: AppTheme.primaryIcons, size: 20),
+                  Icon(LucideIcons.slidersHorizontal, color: AppTheme.primary, size: 20),
                   SizedBox(width: 10),
                   Text(
                     'Filtrer les retours',
-                    style: TextStyle(color: Colors.white, fontSize: 16.5, fontWeight: FontWeight.w700),
+                    style: TextStyle(color: Color(0xFF0F172A), fontSize: 16.5, fontWeight: FontWeight.w700),
                   ),
                 ],
               ),
               const SizedBox(height: 18),
               TextField(
                 controller: duCtrl,
-                style: const TextStyle(color: Colors.white, fontSize: 13.5),
+                style: const TextStyle(color: Color(0xFF0F172A), fontSize: 13.5),
                 decoration: InputDecoration(
                   labelText: 'Date début (JJ/MM/AAAA)',
-                  labelStyle: const TextStyle(color: AppTheme.primaryIcons, fontSize: 12),
+                  labelStyle: const TextStyle(color: AppTheme.primary, fontSize: 12),
                   hintText: '01/01/2026',
-                  hintStyle: TextStyle(color: Colors.white.withOpacity(0.3)),
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
+                  hintStyle: const TextStyle(color: Color(0xFF94A3B8)),
+                  filled: true,
+                  fillColor: Colors.white.withOpacity(0.9),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(14),
+                    borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(14),
+                    borderSide: const BorderSide(color: AppTheme.primary, width: 1.5),
+                  ),
                 ),
               ),
               const SizedBox(height: 12),
               TextField(
                 controller: auCtrl,
-                style: const TextStyle(color: Colors.white, fontSize: 13.5),
+                style: const TextStyle(color: Color(0xFF0F172A), fontSize: 13.5),
                 decoration: InputDecoration(
                   labelText: 'Date fin (JJ/MM/AAAA)',
-                  labelStyle: const TextStyle(color: AppTheme.primaryIcons, fontSize: 12),
+                  labelStyle: const TextStyle(color: AppTheme.primary, fontSize: 12),
                   hintText: '31/12/2026',
-                  hintStyle: TextStyle(color: Colors.white.withOpacity(0.3)),
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
+                  hintStyle: const TextStyle(color: Color(0xFF94A3B8)),
+                  filled: true,
+                  fillColor: Colors.white.withOpacity(0.9),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(14),
+                    borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(14),
+                    borderSide: const BorderSide(color: AppTheme.primary, width: 1.5),
+                  ),
                 ),
               ),
               const SizedBox(height: 20),
@@ -77,7 +95,7 @@ class RetoursScreen extends StatelessWidget {
                       ctrl.fetchRetoursBL(resetPage: true);
                       Get.back();
                     },
-                    child: const Text('Réinitialiser', style: TextStyle(color: Colors.white60)),
+                    child: const Text('Réinitialiser', style: TextStyle(color: Color(0xFF64748B))),
                   ),
                   const SizedBox(width: 8),
                   ElevatedButton(
@@ -117,9 +135,9 @@ class RetoursScreen extends StatelessWidget {
               height: 48,
               padding: const EdgeInsets.all(4),
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.06),
+                color: Colors.white.withOpacity(0.7),
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: Colors.white.withOpacity(0.12)),
+                border: Border.all(color: const Color(0xFFE2E8F0)),
               ),
               child: Row(
                 children: [
@@ -155,18 +173,18 @@ class RetoursScreen extends StatelessWidget {
                   hasFilter
                       ? 'Période : ${retourCtrl.filterDu.value} au ${retourCtrl.filterAu.value}'
                       : 'Tous les retours de documents',
-                  style: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 12),
+                  style: const TextStyle(color: Color(0xFF64748B), fontSize: 12),
                 );
               }),
               IconButton(
                 style: IconButton.styleFrom(
-                  backgroundColor: AppTheme.primaryIcons.withOpacity(0.15),
+                  backgroundColor: AppTheme.primary.withOpacity(0.08),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(14),
-                    side: BorderSide(color: AppTheme.primaryIcons.withOpacity(0.3)),
+                    side: BorderSide(color: AppTheme.primary.withOpacity(0.2)),
                   ),
                 ),
-                icon: const Icon(LucideIcons.calendar, color: AppTheme.primaryIcons, size: 18),
+                icon: const Icon(LucideIcons.calendar, color: AppTheme.primary, size: 18),
                 onPressed: () => _showFilterDialog(context, retourCtrl),
               ),
             ],
@@ -179,7 +197,7 @@ class RetoursScreen extends StatelessWidget {
         Expanded(
           child: Obx(() {
             if (retourCtrl.isLoading.value) {
-              return const Center(child: CircularProgressIndicator(color: AppTheme.primaryIcons));
+              return const Center(child: CircularProgressIndicator(color: AppTheme.primary));
             }
 
             final list = retourCtrl.activeTab.value == 0
@@ -191,11 +209,11 @@ class RetoursScreen extends StatelessWidget {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(LucideIcons.fileSearch, color: Colors.white.withOpacity(0.3), size: 48),
+                    Icon(LucideIcons.fileSearch, color: const Color(0xFFCBD5E1), size: 48),
                     const SizedBox(height: 12),
-                    Text(
+                    const Text(
                       'Aucun retour enregistré',
-                      style: TextStyle(color: Colors.white.withOpacity(0.55), fontSize: 14),
+                      style: TextStyle(color: Color(0xFF64748B), fontSize: 14),
                     ),
                   ],
                 ),
@@ -203,8 +221,8 @@ class RetoursScreen extends StatelessWidget {
             }
 
             return RefreshIndicator(
-              color: AppTheme.primaryIcons,
-              backgroundColor: AppTheme.bgSurface,
+              color: AppTheme.primary,
+              backgroundColor: Colors.white,
               onRefresh: () async {
                 if (retourCtrl.activeTab.value == 0) {
                   await retourCtrl.fetchRetoursCCCT();
@@ -246,7 +264,7 @@ class RetoursScreen extends StatelessWidget {
           child: Text(
             title,
             style: TextStyle(
-              color: isSelected ? Colors.white : Colors.white60,
+              color: isSelected ? Colors.white : const Color(0xFF64748B),
               fontSize: 12.5,
               fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
             ),
@@ -273,12 +291,12 @@ class RetoursScreen extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: AppTheme.primaryIcons.withOpacity(0.12),
+                      color: AppTheme.primary.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: Icon(
                       isMoney ? LucideIcons.coins : LucideIcons.fileText,
-                      color: AppTheme.primaryIcons,
+                      color: AppTheme.primary,
                       size: 18,
                     ),
                   ),
@@ -289,7 +307,7 @@ class RetoursScreen extends StatelessWidget {
                       Text(
                         'Décl: ${item.numDeclaration ?? "—"}',
                         style: const TextStyle(
-                          color: Colors.white,
+                          color: Color(0xFF0F172A),
                           fontSize: 14.5,
                           fontWeight: FontWeight.w800,
                         ),
@@ -298,7 +316,7 @@ class RetoursScreen extends StatelessWidget {
                         const SizedBox(height: 2),
                         Text(
                           'Bordereau: ${item.bordereau}',
-                          style: TextStyle(color: Colors.white.withOpacity(0.55), fontSize: 11.5),
+                          style: const TextStyle(color: Color(0xFF64748B), fontSize: 11.5),
                         ),
                       ],
                     ],
@@ -309,7 +327,7 @@ class RetoursScreen extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 12),
-          const Divider(color: Colors.white10, height: 1),
+          const Divider(color: Color(0xFFE2E8F0), height: 1),
           const SizedBox(height: 12),
 
           Row(
@@ -318,15 +336,15 @@ class RetoursScreen extends StatelessWidget {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
+                  const Text(
                     'Destinataire',
-                    style: TextStyle(color: Colors.white.withOpacity(0.55), fontSize: 11.5),
+                    style: TextStyle(color: Color(0xFF64748B), fontSize: 11.5),
                   ),
                   const SizedBox(height: 2),
                   Text(
                     '${item.destinataire ?? "—"} (${item.destination ?? "—"})',
                     style: const TextStyle(
-                      color: Colors.white,
+                      color: Color(0xFF0F172A),
                       fontSize: 13,
                       fontWeight: FontWeight.w600,
                     ),
@@ -337,15 +355,15 @@ class RetoursScreen extends StatelessWidget {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-                    Text(
+                    const Text(
                       'Montant Fond',
-                      style: TextStyle(color: Colors.white.withOpacity(0.55), fontSize: 11.5),
+                      style: TextStyle(color: Color(0xFF64748B), fontSize: 11.5),
                     ),
                     const SizedBox(height: 2),
                     Text(
                       _formatCurrency(item.fond),
                       style: const TextStyle(
-                        color: AppTheme.primaryIcons,
+                        color: AppTheme.primary,
                         fontSize: 14.5,
                         fontWeight: FontWeight.w800,
                       ),
@@ -361,7 +379,7 @@ class RetoursScreen extends StatelessWidget {
               '${item.banque != null ? "Banque: ${item.banque} • " : ""}'
               '${item.dateEncaissement != null ? "Encaissé: ${item.dateEncaissement} • " : ""}'
               '${item.dateRemise != null ? "Remis: ${item.dateRemise}" : ""}',
-              style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 11.5),
+              style: const TextStyle(color: Color(0xFF64748B), fontSize: 11.5),
             ),
           ],
         ],

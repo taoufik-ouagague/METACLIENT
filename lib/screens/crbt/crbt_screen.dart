@@ -24,7 +24,7 @@ class CrbtScreen extends StatelessWidget {
       GlassContainer(
         borderRadius: 28,
         padding: const EdgeInsets.all(22),
-        color: AppTheme.bgDarkAlt.withOpacity(0.92),
+        color: Colors.white.withOpacity(0.96),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -37,39 +37,39 @@ class CrbtScreen extends StatelessWidget {
                   children: [
                     Text(
                       'Chèque N° ${cheque.numCheque}',
-                      style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w800),
+                      style: const TextStyle(color: Color(0xFF0F172A), fontSize: 18, fontWeight: FontWeight.w800),
                     ),
                     Text(
                       'Banque: ${cheque.banque ?? "—"} • ${_formatCurrency(cheque.montant)}',
-                      style: const TextStyle(color: AppTheme.primaryIcons, fontSize: 13, fontWeight: FontWeight.w600),
+                      style: const TextStyle(color: AppTheme.primary, fontSize: 13, fontWeight: FontWeight.w600),
                     ),
                   ],
                 ),
                 IconButton(
-                  icon: const Icon(LucideIcons.x, color: Colors.white60),
+                  icon: const Icon(LucideIcons.x, color: Color(0xFF64748B)),
                   onPressed: () => Get.back(),
                 ),
               ],
             ),
             const SizedBox(height: 14),
-            const Divider(color: Colors.white12, height: 1),
+            const Divider(color: Color(0xFFE2E8F0), height: 1),
             const SizedBox(height: 14),
 
             const Text(
               'Expéditions couvertes par ce chèque :',
-              style: TextStyle(color: Colors.white70, fontSize: 13, fontWeight: FontWeight.w600),
+              style: TextStyle(color: Color(0xFF475569), fontSize: 13, fontWeight: FontWeight.w600),
             ),
             const SizedBox(height: 10),
 
             Obx(() {
               if (ctrl.isLoadingDetail.value) {
-                return const Center(child: Padding(padding: EdgeInsets.all(20), child: CircularProgressIndicator(color: AppTheme.primaryIcons)));
+                return const Center(child: Padding(padding: EdgeInsets.all(20), child: CircularProgressIndicator(color: AppTheme.primary)));
               }
 
               if (ctrl.selectedChequeDetails.isEmpty) {
                 return const Padding(
                   padding: EdgeInsets.all(16.0),
-                  child: Center(child: Text('Aucune expédition rattachée', style: TextStyle(color: Colors.white54))),
+                  child: Center(child: Text('Aucune expédition rattachée', style: TextStyle(color: Color(0xFF64748B)))),
                 );
               }
 
@@ -89,11 +89,11 @@ class CrbtScreen extends StatelessWidget {
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text('Décl: ${item.numDeclaration}', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 13)),
-                              Text('Dest: ${item.destinataire ?? "—"} (${item.destination ?? "—"})', style: TextStyle(color: Colors.white.withOpacity(0.55), fontSize: 11.5)),
+                              Text('Décl: ${item.numDeclaration}', style: const TextStyle(color: Color(0xFF0F172A), fontWeight: FontWeight.w700, fontSize: 13)),
+                              Text('Dest: ${item.destinataire ?? "—"} (${item.destination ?? "—"})', style: const TextStyle(color: Color(0xFF64748B), fontSize: 11.5)),
                             ],
                           ),
-                          Text(_formatCurrency(item.montant), style: const TextStyle(color: AppTheme.primaryIcons, fontWeight: FontWeight.w700, fontSize: 13.5)),
+                          Text(_formatCurrency(item.montant), style: const TextStyle(color: AppTheme.primary, fontWeight: FontWeight.w700, fontSize: 13.5)),
                         ],
                       ),
                     );
@@ -115,7 +115,7 @@ class CrbtScreen extends StatelessWidget {
       GlassContainer(
         borderRadius: 28,
         padding: const EdgeInsets.all(22),
-        color: AppTheme.bgDarkAlt.withOpacity(0.92),
+        color: Colors.white.withOpacity(0.96),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -128,39 +128,39 @@ class CrbtScreen extends StatelessWidget {
                   children: [
                     Text(
                       'Ordre de Virement ${virement.numOv}',
-                      style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w800),
+                      style: const TextStyle(color: Color(0xFF0F172A), fontSize: 18, fontWeight: FontWeight.w800),
                     ),
                     Text(
                       'Mandat: ${virement.numeroMandat ?? "—"} • ${_formatCurrency(virement.fond)}',
-                      style: const TextStyle(color: AppTheme.primaryIcons, fontSize: 13, fontWeight: FontWeight.w600),
+                      style: const TextStyle(color: AppTheme.primary, fontSize: 13, fontWeight: FontWeight.w600),
                     ),
                   ],
                 ),
                 IconButton(
-                  icon: const Icon(LucideIcons.x, color: Colors.white60),
+                  icon: const Icon(LucideIcons.x, color: Color(0xFF64748B)),
                   onPressed: () => Get.back(),
                 ),
               ],
             ),
             const SizedBox(height: 14),
-            const Divider(color: Colors.white12, height: 1),
+            const Divider(color: Color(0xFFE2E8F0), height: 1),
             const SizedBox(height: 14),
 
             const Text(
               'Expéditions créditées par ce virement :',
-              style: TextStyle(color: Colors.white70, fontSize: 13, fontWeight: FontWeight.w600),
+              style: TextStyle(color: Color(0xFF475569), fontSize: 13, fontWeight: FontWeight.w600),
             ),
             const SizedBox(height: 10),
 
             Obx(() {
               if (ctrl.isLoadingDetail.value) {
-                return const Center(child: Padding(padding: EdgeInsets.all(20), child: CircularProgressIndicator(color: AppTheme.primaryIcons)));
+                return const Center(child: Padding(padding: EdgeInsets.all(20), child: CircularProgressIndicator(color: AppTheme.primary)));
               }
 
               if (ctrl.selectedVirementDetails.isEmpty) {
                 return const Padding(
                   padding: EdgeInsets.all(16.0),
-                  child: Center(child: Text('Aucune expédition rattachée', style: TextStyle(color: Colors.white54))),
+                  child: Center(child: Text('Aucune expédition rattachée', style: TextStyle(color: Color(0xFF64748B)))),
                 );
               }
 
@@ -180,8 +180,8 @@ class CrbtScreen extends StatelessWidget {
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text('Décl: ${item.numDeclaration}', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 13)),
-                              Text('Dest: ${item.destinataire ?? "—"} (${item.destination ?? "—"})', style: TextStyle(color: Colors.white.withOpacity(0.55), fontSize: 11.5)),
+                              Text('Décl: ${item.numDeclaration}', style: const TextStyle(color: Color(0xFF0F172A), fontWeight: FontWeight.w700, fontSize: 13)),
+                              Text('Dest: ${item.destinataire ?? "—"} (${item.destination ?? "—"})', style: const TextStyle(color: Color(0xFF64748B), fontSize: 11.5)),
                             ],
                           ),
                           Text(_formatCurrency(item.montant), style: const TextStyle(color: AppTheme.statusSuccess, fontWeight: FontWeight.w700, fontSize: 13.5)),
@@ -213,9 +213,9 @@ class CrbtScreen extends StatelessWidget {
               height: 48,
               padding: const EdgeInsets.all(4),
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.06),
+                color: Colors.white.withOpacity(0.7),
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: Colors.white.withOpacity(0.12)),
+                border: Border.all(color: const Color(0xFFE2E8F0)),
               ),
               child: Row(
                 children: [
@@ -252,7 +252,7 @@ class CrbtScreen extends StatelessWidget {
         Expanded(
           child: Obx(() {
             if (crbtCtrl.isLoading.value) {
-              return const Center(child: CircularProgressIndicator(color: AppTheme.primaryIcons));
+              return const Center(child: CircularProgressIndicator(color: AppTheme.primary));
             }
 
             if (crbtCtrl.activeTab.value == 0) {
@@ -288,7 +288,7 @@ class CrbtScreen extends StatelessWidget {
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: TextStyle(
-              color: isSelected ? Colors.white : Colors.white60,
+              color: isSelected ? Colors.white : const Color(0xFF64748B),
               fontSize: 11.5,
               fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
             ),
@@ -300,8 +300,8 @@ class CrbtScreen extends StatelessWidget {
 
   Widget _buildExpeditionsList(CrbtController ctrl) {
     if (ctrl.expeditionsCrbt.isEmpty) {
-      return Center(
-        child: Text('Aucune expédition CRBT trouvée', style: TextStyle(color: Colors.white.withOpacity(0.55), fontSize: 14)),
+      return const Center(
+        child: Text('Aucune expédition CRBT trouvée', style: TextStyle(color: Color(0xFF64748B), fontSize: 14)),
       );
     }
 
@@ -320,7 +320,7 @@ class CrbtScreen extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text('Déclaration: ${item.numDeclaration}', style: const TextStyle(color: Colors.white, fontSize: 14.5, fontWeight: FontWeight.w700)),
+                  Text('Déclaration: ${item.numDeclaration}', style: const TextStyle(color: Color(0xFF0F172A), fontSize: 14.5, fontWeight: FontWeight.w700)),
                   StatusBadge(status: item.nature ?? 'CRBT'),
                 ],
               ),
@@ -328,13 +328,13 @@ class CrbtScreen extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text('Dest: ${item.destinataire ?? "—"} (${item.destination ?? "—"})', style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 12.5)),
-                  Text(_formatCurrency(item.fond), style: const TextStyle(color: AppTheme.primaryIcons, fontSize: 14, fontWeight: FontWeight.w800)),
+                  Text('Dest: ${item.destinataire ?? "—"} (${item.destination ?? "—"})', style: const TextStyle(color: Color(0xFF475569), fontSize: 12.5)),
+                  Text(_formatCurrency(item.fond), style: const TextStyle(color: AppTheme.primary, fontSize: 14, fontWeight: FontWeight.w800)),
                 ],
               ),
               if (item.dateLivraison != null || item.dateTaxation != null) ...[
                 const SizedBox(height: 4),
-                Text('Date: ${item.dateLivraison ?? item.dateTaxation}', style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 11.5)),
+                Text('Date: ${item.dateLivraison ?? item.dateTaxation}', style: const TextStyle(color: Color(0xFF64748B), fontSize: 11.5)),
               ],
             ],
           ),
@@ -345,8 +345,8 @@ class CrbtScreen extends StatelessWidget {
 
   Widget _buildChequesList(BuildContext context, CrbtController ctrl) {
     if (ctrl.chequesCrbt.isEmpty) {
-      return Center(
-        child: Text('Aucun chèque CRBT trouvé', style: TextStyle(color: Colors.white.withOpacity(0.55), fontSize: 14)),
+      return const Center(
+        child: Text('Aucun chèque CRBT trouvé', style: TextStyle(color: Color(0xFF64748B), fontSize: 14)),
       );
     }
 
@@ -368,27 +368,27 @@ class CrbtScreen extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
-                      color: AppTheme.primaryIcons.withOpacity(0.12),
+                      color: AppTheme.primary.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: const Icon(LucideIcons.landmark, color: AppTheme.primaryIcons, size: 20),
+                    child: const Icon(LucideIcons.landmark, color: AppTheme.primary, size: 20),
                   ),
                   const SizedBox(width: 12),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('Chèque N° ${item.numCheque}', style: const TextStyle(color: Colors.white, fontSize: 14.5, fontWeight: FontWeight.w700)),
+                      Text('Chèque N° ${item.numCheque}', style: const TextStyle(color: Color(0xFF0F172A), fontSize: 14.5, fontWeight: FontWeight.w700)),
                       const SizedBox(height: 3),
-                      Text('Banque: ${item.banque ?? "—"} • Remise: ${item.dateRemise ?? "—"}', style: TextStyle(color: Colors.white.withOpacity(0.55), fontSize: 11.5)),
+                      Text('Banque: ${item.banque ?? "—"} • Remise: ${item.dateRemise ?? "—"}', style: const TextStyle(color: Color(0xFF64748B), fontSize: 11.5)),
                     ],
                   ),
                 ],
               ),
               Row(
                 children: [
-                  Text(_formatCurrency(item.montant), style: const TextStyle(color: AppTheme.primaryIcons, fontSize: 14.5, fontWeight: FontWeight.w800)),
+                  Text(_formatCurrency(item.montant), style: const TextStyle(color: AppTheme.primary, fontSize: 14.5, fontWeight: FontWeight.w800)),
                   const SizedBox(width: 6),
-                  const Icon(LucideIcons.chevronRight, color: Colors.white38, size: 16),
+                  const Icon(LucideIcons.chevronRight, color: Color(0xFF94A3B8), size: 16),
                 ],
               ),
             ],
@@ -400,8 +400,8 @@ class CrbtScreen extends StatelessWidget {
 
   Widget _buildVirementsList(BuildContext context, CrbtController ctrl) {
     if (ctrl.virementsCrbt.isEmpty) {
-      return Center(
-        child: Text('Aucun ordre de virement trouvé', style: TextStyle(color: Colors.white.withOpacity(0.55), fontSize: 14)),
+      return const Center(
+        child: Text('Aucun ordre de virement trouvé', style: TextStyle(color: Color(0xFF64748B), fontSize: 14)),
       );
     }
 
@@ -432,9 +432,9 @@ class CrbtScreen extends StatelessWidget {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('Virement: ${item.numOv}', style: const TextStyle(color: Colors.white, fontSize: 14.5, fontWeight: FontWeight.w700)),
+                      Text('Virement: ${item.numOv}', style: const TextStyle(color: Color(0xFF0F172A), fontSize: 14.5, fontWeight: FontWeight.w700)),
                       const SizedBox(height: 3),
-                      Text('Mandat: ${item.numeroMandat ?? "—"} • ${item.dateVirement ?? "—"}', style: TextStyle(color: Colors.white.withOpacity(0.55), fontSize: 11.5)),
+                      Text('Mandat: ${item.numeroMandat ?? "—"} • ${item.dateVirement ?? "—"}', style: const TextStyle(color: Color(0xFF64748B), fontSize: 11.5)),
                     ],
                   ),
                 ],
@@ -443,7 +443,7 @@ class CrbtScreen extends StatelessWidget {
                 children: [
                   Text(_formatCurrency(item.fond), style: const TextStyle(color: AppTheme.statusSuccess, fontSize: 14.5, fontWeight: FontWeight.w800)),
                   const SizedBox(width: 6),
-                  const Icon(LucideIcons.chevronRight, color: Colors.white38, size: 16),
+                  const Icon(LucideIcons.chevronRight, color: Color(0xFF94A3B8), size: 16),
                 ],
               ),
             ],

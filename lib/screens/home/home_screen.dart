@@ -41,6 +41,7 @@ class _HomeScreenState extends State<HomeScreen> {
     ];
 
     return GlassScaffold(
+      isLight: true,
       appBar: AppBar(
         title: Row(
           mainAxisSize: MainAxisSize.min,
@@ -50,9 +51,15 @@ class _HomeScreenState extends State<HomeScreen> {
               height: 32,
               padding: const EdgeInsets.all(4),
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.08),
+                color: Colors.white,
                 borderRadius: BorderRadius.circular(10),
                 border: Border.all(color: AppTheme.primaryIcons.withOpacity(0.4)),
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0xFF0F172A).withOpacity(0.06),
+                    blurRadius: 8,
+                  ),
+                ],
               ),
               child: Image.asset(
                 'assets/img/logo.png',
@@ -65,7 +72,14 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
             const SizedBox(width: 10),
-            Text(_titles[_currentIndex]),
+            Text(
+              _titles[_currentIndex],
+              style: const TextStyle(
+                color: Color(0xFF0F172A),
+                fontWeight: FontWeight.w700,
+                fontSize: 17.5,
+              ),
+            ),
           ],
         ),
         actions: [
@@ -76,13 +90,23 @@ class _HomeScreenState extends State<HomeScreen> {
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 color: _currentIndex == 5
-                    ? AppTheme.primaryIcons
-                    : Colors.white.withOpacity(0.08),
-                border: Border.all(color: AppTheme.primaryIcons.withOpacity(0.4)),
+                    ? AppTheme.primary
+                    : Colors.white,
+                border: Border.all(
+                  color: _currentIndex == 5
+                      ? AppTheme.primary
+                      : const Color(0xFFE2E8F0),
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0xFF0F172A).withOpacity(0.06),
+                    blurRadius: 8,
+                  ),
+                ],
               ),
               child: Icon(
                 LucideIcons.user,
-                color: _currentIndex == 5 ? Colors.black : AppTheme.primaryIcons,
+                color: _currentIndex == 5 ? Colors.white : AppTheme.primary,
                 size: 18,
               ),
             ),
@@ -109,17 +133,17 @@ class _HomeScreenState extends State<HomeScreen> {
           child: Container(
             height: 68,
             decoration: BoxDecoration(
-              color: const Color(0xFF0F1B2D).withOpacity(0.85),
+              color: Colors.white.withOpacity(0.90),
               borderRadius: BorderRadius.circular(26),
               border: Border.all(
-                color: Colors.white.withOpacity(0.18),
-                width: 1.2,
+                color: Colors.white,
+                width: 1.5,
               ),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.35),
-                  blurRadius: 20,
-                  offset: const Offset(0, 10),
+                  color: const Color(0xFF0F172A).withOpacity(0.08),
+                  blurRadius: 22,
+                  offset: const Offset(0, 8),
                 ),
               ],
             ),
@@ -149,7 +173,7 @@ class _HomeScreenState extends State<HomeScreen> {
         duration: const Duration(milliseconds: 220),
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
         decoration: BoxDecoration(
-          color: isSelected ? AppTheme.primaryIcons.withOpacity(0.15) : Colors.transparent,
+          color: isSelected ? AppTheme.primary.withOpacity(0.12) : Colors.transparent,
           borderRadius: BorderRadius.circular(16),
         ),
         child: Column(
@@ -157,14 +181,14 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
             Icon(
               icon,
-              color: isSelected ? AppTheme.primaryIcons : Colors.white.withOpacity(0.45),
+              color: isSelected ? AppTheme.primary : const Color(0xFF64748B),
               size: isSelected ? 23 : 20,
             ),
             const SizedBox(height: 3),
             Text(
               label,
               style: TextStyle(
-                color: isSelected ? AppTheme.primaryIcons : Colors.white.withOpacity(0.45),
+                color: isSelected ? AppTheme.primary : const Color(0xFF64748B),
                 fontSize: 10.5,
                 fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
               ),

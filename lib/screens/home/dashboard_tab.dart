@@ -30,8 +30,8 @@ class DashboardTab extends StatelessWidget {
     final searchCtrl = TextEditingController();
 
     return RefreshIndicator(
-      color: AppTheme.primaryIcons,
-      backgroundColor: AppTheme.bgSurface,
+      color: AppTheme.primary,
+      backgroundColor: Colors.white,
       onRefresh: () async {
         await dashCtrl.loadDashboardData();
         await authCtrl.fetchClientInfo();
@@ -61,12 +61,13 @@ class DashboardTab extends StatelessWidget {
                       width: 52,
                       height: 52,
                       decoration: BoxDecoration(
-                        gradient: AppTheme.iconGradient,
+                        gradient: AppTheme.primaryGradient,
                         borderRadius: BorderRadius.circular(16),
                         boxShadow: [
                           BoxShadow(
-                            color: AppTheme.primaryIcons.withOpacity(0.3),
+                            color: AppTheme.primary.withOpacity(0.25),
                             blurRadius: 12,
+                            offset: const Offset(0, 4),
                           ),
                         ],
                       ),
@@ -84,7 +85,7 @@ class DashboardTab extends StatelessWidget {
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: const TextStyle(
-                              color: Colors.white,
+                              color: Color(0xFF0F172A),
                               fontSize: 17,
                               fontWeight: FontWeight.w800,
                             ),
@@ -95,7 +96,7 @@ class DashboardTab extends StatelessWidget {
                               Text(
                                 'Code: $code',
                                 style: const TextStyle(
-                                  color: AppTheme.primaryIcons,
+                                  color: AppTheme.primary,
                                   fontSize: 12.5,
                                   fontWeight: FontWeight.w600,
                                 ),
@@ -105,16 +106,20 @@ class DashboardTab extends StatelessWidget {
                                 width: 4,
                                 height: 4,
                                 decoration: const BoxDecoration(
-                                  color: Colors.white38,
+                                  color: Color(0xFFCBD5E1),
                                   shape: BoxShape.circle,
                                 ),
                               ),
                               const SizedBox(width: 8),
-                              Text(
-                                agence,
-                                style: TextStyle(
-                                  color: Colors.white.withOpacity(0.6),
-                                  fontSize: 12,
+                              Expanded(
+                                child: Text(
+                                  agence,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(
+                                    color: Color(0xFF64748B),
+                                    fontSize: 12,
+                                  ),
                                 ),
                               ),
                             ],
@@ -144,10 +149,10 @@ class DashboardTab extends StatelessWidget {
                   Expanded(
                     child: TextField(
                       controller: searchCtrl,
-                      style: const TextStyle(color: Colors.white, fontSize: 13.5),
-                      decoration: InputDecoration(
+                      style: const TextStyle(color: Color(0xFF0F172A), fontSize: 13.5),
+                      decoration: const InputDecoration(
                         hintText: 'Rechercher N° déclaration (ex: F644759)...',
-                        hintStyle: TextStyle(color: Colors.white.withOpacity(0.35), fontSize: 13),
+                        hintStyle: TextStyle(color: Color(0xFF94A3B8), fontSize: 13),
                         border: InputBorder.none,
                       ),
                       onSubmitted: (query) {
@@ -241,7 +246,7 @@ class DashboardTab extends StatelessWidget {
                     Text(
                       'Dernières Expéditions',
                       style: TextStyle(
-                        color: Colors.white,
+                        color: Color(0xFF0F172A),
                         fontSize: 16.5,
                         fontWeight: FontWeight.w700,
                       ),
@@ -252,9 +257,9 @@ class DashboardTab extends StatelessWidget {
                   onPressed: () => onNavigateTab?.call(1),
                   child: const Row(
                     children: [
-                      Text('Voir tout', style: TextStyle(color: AppTheme.primaryIcons, fontSize: 13)),
+                      Text('Voir tout', style: TextStyle(color: AppTheme.primary, fontSize: 13, fontWeight: FontWeight.w600)),
                       SizedBox(width: 4),
-                      Icon(LucideIcons.chevronRight, color: AppTheme.primaryIcons, size: 16),
+                      Icon(LucideIcons.chevronRight, color: AppTheme.primary, size: 16),
                     ],
                   ),
                 ),
@@ -267,7 +272,7 @@ class DashboardTab extends StatelessWidget {
                 return const Center(
                   child: Padding(
                     padding: EdgeInsets.all(24.0),
-                    child: CircularProgressIndicator(color: AppTheme.primaryIcons),
+                    child: CircularProgressIndicator(color: AppTheme.primary),
                   ),
                 );
               }
@@ -276,10 +281,10 @@ class DashboardTab extends StatelessWidget {
                 return GlassContainer(
                   borderRadius: 18,
                   padding: const EdgeInsets.all(24),
-                  child: Center(
+                  child: const Center(
                     child: Text(
                       'Aucune expédition trouvée',
-                      style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 13),
+                      style: TextStyle(color: Color(0xFF64748B), fontSize: 13),
                     ),
                   ),
                 );
@@ -308,7 +313,7 @@ class DashboardTab extends StatelessWidget {
                             color: AppTheme.primaryIcons.withOpacity(0.12),
                             borderRadius: BorderRadius.circular(12),
                           ),
-                          child: const Icon(LucideIcons.package, color: AppTheme.primaryIcons, size: 22),
+                          child: const Icon(LucideIcons.package, color: AppTheme.primary, size: 22),
                         ),
                         const SizedBox(width: 14),
                         Expanded(
@@ -320,7 +325,7 @@ class DashboardTab extends StatelessWidget {
                                   Text(
                                     item.numDeclaration,
                                     style: const TextStyle(
-                                      color: Colors.white,
+                                      color: Color(0xFF0F172A),
                                       fontSize: 14.5,
                                       fontWeight: FontWeight.w700,
                                     ),
@@ -332,12 +337,12 @@ class DashboardTab extends StatelessWidget {
                               const SizedBox(height: 6),
                               Row(
                                 children: [
-                                  Icon(LucideIcons.mapPin, size: 12, color: Colors.white.withOpacity(0.4)),
+                                  const Icon(LucideIcons.mapPin, size: 12, color: Color(0xFF94A3B8)),
                                   const SizedBox(width: 4),
                                   Text(
                                     '${item.origine ?? "—"} → ${item.destination ?? "—"}',
-                                    style: TextStyle(
-                                      color: Colors.white.withOpacity(0.7),
+                                    style: const TextStyle(
+                                      color: Color(0xFF64748B),
                                       fontSize: 12.5,
                                     ),
                                   ),
@@ -345,7 +350,7 @@ class DashboardTab extends StatelessWidget {
                                   Text(
                                     _formatCurrency(item.mntTtc),
                                     style: const TextStyle(
-                                      color: AppTheme.primaryIcons,
+                                      color: AppTheme.primary,
                                       fontSize: 13,
                                       fontWeight: FontWeight.w700,
                                     ),

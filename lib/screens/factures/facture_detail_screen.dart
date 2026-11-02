@@ -68,7 +68,7 @@ class _FactureDetailScreenState extends State<FactureDetailScreen> {
                           Text(
                             'Facture N° ${f.numFacture}',
                             style: const TextStyle(
-                              color: Colors.white,
+                              color: Color(0xFF0F172A),
                               fontSize: 18.5,
                               fontWeight: FontWeight.w800,
                             ),
@@ -76,8 +76,8 @@ class _FactureDetailScreenState extends State<FactureDetailScreen> {
                           const SizedBox(height: 3),
                           Text(
                             'Émise le : ${f.dateFacture ?? "—"}',
-                            style: TextStyle(
-                              color: Colors.white.withOpacity(0.6),
+                            style: const TextStyle(
+                              color: Color(0xFF64748B),
                               fontSize: 12.5,
                             ),
                           ),
@@ -87,7 +87,7 @@ class _FactureDetailScreenState extends State<FactureDetailScreen> {
                     ],
                   ),
                   const SizedBox(height: 16),
-                  const Divider(color: Colors.white12, height: 1),
+                  const Divider(color: Color(0xFFE2E8F0), height: 1),
                   const SizedBox(height: 16),
 
                   // Amount details
@@ -101,7 +101,7 @@ class _FactureDetailScreenState extends State<FactureDetailScreen> {
                   ),
 
                   const SizedBox(height: 16),
-                  const Divider(color: Colors.white12, height: 1),
+                  const Divider(color: Color(0xFFE2E8F0), height: 1),
                   const SizedBox(height: 16),
 
                   // Solde Remaining
@@ -113,7 +113,7 @@ class _FactureDetailScreenState extends State<FactureDetailScreen> {
                         children: [
                           const Text(
                             'Solde restant dû :',
-                            style: TextStyle(color: Color(0xFF94A3B8), fontSize: 13),
+                            style: TextStyle(color: Color(0xFF64748B), fontSize: 13),
                           ),
                           const SizedBox(height: 2),
                           Text(
@@ -133,13 +133,13 @@ class _FactureDetailScreenState extends State<FactureDetailScreen> {
                         children: [
                           const Text(
                             'Échéance :',
-                            style: TextStyle(color: Color(0xFF94A3B8), fontSize: 12),
+                            style: TextStyle(color: Color(0xFF64748B), fontSize: 12),
                           ),
                           const SizedBox(height: 2),
                           Text(
                             f.dateEcheance ?? '—',
                             style: const TextStyle(
-                              color: Colors.white,
+                              color: Color(0xFF0F172A),
                               fontSize: 13.5,
                               fontWeight: FontWeight.w600,
                             ),
@@ -162,7 +162,7 @@ class _FactureDetailScreenState extends State<FactureDetailScreen> {
                 Text(
                   'Règlements enregistrés',
                   style: TextStyle(
-                    color: Colors.white,
+                    color: Color(0xFF0F172A),
                     fontSize: 16.5,
                     fontWeight: FontWeight.w700,
                   ),
@@ -180,13 +180,13 @@ class _FactureDetailScreenState extends State<FactureDetailScreen> {
               final reglements = detail?.reglements ?? [];
 
               if (reglements.isEmpty) {
-                return GlassContainer(
+                return const GlassContainer(
                   borderRadius: 18,
-                  padding: const EdgeInsets.all(20),
+                  padding: EdgeInsets.all(20),
                   child: Center(
                     child: Text(
                       'Aucun règlement rattaché à cette facture',
-                      style: TextStyle(color: Colors.white.withOpacity(0.55), fontSize: 13),
+                      style: TextStyle(color: Color(0xFF64748B), fontSize: 13),
                     ),
                   ),
                 );
@@ -210,7 +210,7 @@ class _FactureDetailScreenState extends State<FactureDetailScreen> {
                             Container(
                               padding: const EdgeInsets.all(8),
                               decoration: BoxDecoration(
-                                color: AppTheme.statusSuccess.withOpacity(0.15),
+                                color: AppTheme.statusSuccess.withOpacity(0.12),
                                 borderRadius: BorderRadius.circular(10),
                               ),
                               child: const Icon(LucideIcons.badgeCheck, color: AppTheme.statusSuccess, size: 20),
@@ -222,7 +222,7 @@ class _FactureDetailScreenState extends State<FactureDetailScreen> {
                                 Text(
                                   reg.modeReglement,
                                   style: const TextStyle(
-                                    color: Colors.white,
+                                    color: Color(0xFF0F172A),
                                     fontSize: 14,
                                     fontWeight: FontWeight.w700,
                                   ),
@@ -230,8 +230,8 @@ class _FactureDetailScreenState extends State<FactureDetailScreen> {
                                 const SizedBox(height: 2),
                                 Text(
                                   'Réf: ${reg.refReglement} • Date: ${reg.dateCreation ?? "—"}',
-                                  style: TextStyle(
-                                    color: Colors.white.withOpacity(0.55),
+                                  style: const TextStyle(
+                                    color: Color(0xFF64748B),
                                     fontSize: 11.5,
                                   ),
                                 ),
@@ -272,7 +272,7 @@ class _FactureDetailScreenState extends State<FactureDetailScreen> {
                       Text(
                         'Avoirs déduits',
                         style: TextStyle(
-                          color: Colors.white,
+                          color: Color(0xFF0F172A),
                           fontSize: 16.5,
                           fontWeight: FontWeight.w700,
                         ),
@@ -293,7 +293,7 @@ class _FactureDetailScreenState extends State<FactureDetailScreen> {
                                 Text(
                                   'Avoir N° ${av.numAvoir}',
                                   style: const TextStyle(
-                                    color: Colors.white,
+                                    color: Color(0xFF0F172A),
                                     fontSize: 13.5,
                                     fontWeight: FontWeight.w700,
                                   ),
@@ -301,7 +301,7 @@ class _FactureDetailScreenState extends State<FactureDetailScreen> {
                                 const SizedBox(height: 2),
                                 Text(
                                   'Créé le : ${av.dateCreation ?? "—"}',
-                                  style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 11.5),
+                                  style: const TextStyle(color: Color(0xFF64748B), fontSize: 11.5),
                                 ),
                               ],
                             ),
@@ -333,13 +333,13 @@ class _FactureDetailScreenState extends State<FactureDetailScreen> {
       children: [
         Text(
           label,
-          style: TextStyle(color: Colors.white.withOpacity(0.55), fontSize: 11.5),
+          style: const TextStyle(color: Color(0xFF64748B), fontSize: 11.5),
         ),
         const SizedBox(height: 3),
         Text(
           value,
           style: TextStyle(
-            color: isBold ? Colors.white : const Color(0xFFCBD5E1),
+            color: isBold ? const Color(0xFF0F172A) : const Color(0xFF334155),
             fontWeight: isBold ? FontWeight.w800 : FontWeight.w600,
             fontSize: isBold ? 14.5 : 13.5,
           ),
