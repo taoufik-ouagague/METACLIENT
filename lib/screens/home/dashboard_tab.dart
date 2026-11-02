@@ -95,22 +95,24 @@ class DashboardTab extends StatelessWidget {
                             value: '${dashCtrl.expeditionsEncoursCount.value}',
                             icon: LucideIcons.truck,
                             subtitle: 'En temps réel',
+                            color: const Color(0xFF0284C7),
                             onTap: () => onNavigateTab?.call(1),
                           ),
                         ),
-                        const SizedBox(width: 12),
+                        const SizedBox(width: 10),
                         Expanded(
                           child: StatCard(
                             title: 'Total Expéditions',
                             value: '${dashCtrl.totalExpeditionsCount.value}',
                             icon: LucideIcons.packageCheck,
                             subtitle: 'Historique',
+                            color: const Color(0xFF6366F1),
                             onTap: () => onNavigateTab?.call(1),
                           ),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: 10),
                     Row(
                       children: [
                         Expanded(
@@ -119,16 +121,18 @@ class DashboardTab extends StatelessWidget {
                             value: '${dashCtrl.facturesInstancesCount.value}',
                             icon: LucideIcons.fileWarning,
                             subtitle: 'À régler',
+                            color: const Color(0xFFD97706),
                             onTap: () => onNavigateTab?.call(2),
                           ),
                         ),
-                        const SizedBox(width: 12),
+                        const SizedBox(width: 10),
                         Expanded(
                           child: StatCard(
                             title: 'Solde dû total',
                             value: _formatCurrency(dashCtrl.totalSoldeDu.value),
                             icon: LucideIcons.wallet,
                             subtitle: 'Impayé',
+                            color: const Color(0xFFE11D48),
                             onTap: () => onNavigateTab?.call(2),
                           ),
                         ),

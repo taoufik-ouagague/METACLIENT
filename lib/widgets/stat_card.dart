@@ -8,6 +8,7 @@ class StatCard extends StatelessWidget {
   final IconData icon;
   final String? subtitle;
   final VoidCallback? onTap;
+  final Color? color;
 
   const StatCard({
     super.key,
@@ -16,59 +17,79 @@ class StatCard extends StatelessWidget {
     required this.icon,
     this.subtitle,
     this.onTap,
+    this.color,
   });
 
   @override
   Widget build(BuildContext context) {
     final isLight = Theme.of(context).brightness == Brightness.light;
+    final accentColor = color ?? AppTheme.primaryIcons;
 
     return GlassContainer(
       onTap: onTap,
-      borderRadius: 18,
-      padding: const EdgeInsets.all(16),
+      borderRadius: 16,
+      padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 10),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Container(
-                padding: const EdgeInsets.all(8),
+                padding: const EdgeInsets.all(6),
                 decoration: BoxDecoration(
-                  color: AppTheme.primaryIcons.withOpacity(0.15),
-                  borderRadius: BorderRadius.circular(12),
+                  color: accentColor.withOpacity(0.12),
+                  borderRadius: BorderRadius.circular(10),
                   border: Border.all(
-                    color: AppTheme.primaryIcons.withOpacity(0.3),
+                    color: accentColor.withOpacity(0.25),
+                    width: 1,
                   ),
                 ),
-                child: Icon(icon, color: AppTheme.primaryIcons, size: 20),
+                child: Icon(icon, color: accentColor, size: 16),
               ),
               if (subtitle != null)
-                Text(
-                  subtitle!,
-                  style: const TextStyle(
-                    color: Color(0xFF94A3B8),
-                    fontSize: 11,
-                    fontWeight: FontWeight.w500,
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: accentColor.withOpacity(0.08),
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: Text(
+                    subtitle!,
+                    style: TextStyle(
+                      color: accentColor,
+                      fontSize: 10,
+                      fontWeight: FontWeight.w600,
+                      letterSpacing: -0.2,
+                    ),
                   ),
                 ),
             ],
           ),
-          const SizedBox(height: 12),
-          Text(
-            value,
-            style: TextStyle(
-              color: isLight ? const Color(0xFF0F172A) : Colors.white,
-              fontSize: 20,
-              fontWeight: FontWeight.w800,
+          const SizedBox(height: 8),
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            alignment: Alignment.centerLeft,
+            child: Text(
+              value,
+              maxLines: 1,
+              style: TextStyle(
+                color: isLight ? const Color(0xFF0F172A) : Colors.white,
+                fontSize: 17,
+                fontWeight: FontWeight.w800,
+                letterSpacing: -0.3,
+              ),
             ),
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: 2),
           Text(
             title,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
             style: TextStyle(
               color: isLight ? const Color(0xFF64748B) : Colors.white.withOpacity(0.7),
-              fontSize: 12.5,
+              fontSize: 11.5,
               fontWeight: FontWeight.w500,
             ),
           ),
