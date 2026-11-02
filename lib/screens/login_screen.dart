@@ -4,7 +4,6 @@ import 'package:lucide_icons/lucide_icons.dart';
 import '../controllers/auth_controller.dart';
 import '../controllers/config_controller.dart';
 import '../theme/app_theme.dart';
-import '../widgets/animated_gradient_border_box.dart';
 import '../widgets/glass_button.dart';
 import '../widgets/glass_container.dart';
 import '../widgets/glass_scaffold.dart';
@@ -50,7 +49,7 @@ class _LoginScreenState extends State<LoginScreen> {
             children: [
               const SizedBox(height: 12),
 
-              // Logo & App Name Header (with animated moving linear gradient border and transparent glass)
+              // Logo & App Name Header (Using identical GlassContainer as Splash screen)
               Obx(() {
                 final configCtrl = Get.isRegistered<ConfigController>()
                     ? Get.find<ConfigController>()
@@ -58,27 +57,22 @@ class _LoginScreenState extends State<LoginScreen> {
                 final clientLogoUrl = configCtrl?.logoUrl;
                 final hasClientLogo = clientLogoUrl != null && clientLogoUrl.trim().isNotEmpty;
 
-                final movingBorderColors = [
-                  configCtrl?.optionalColor ?? const Color(0xFFFDEB03), // Yellow
-                  configCtrl?.secondaryColor ?? const Color(0xFF109B48), // Green
-                  configCtrl?.primaryColor ?? const Color(0xFF2B3C99),   // Blue
-                  configCtrl?.optionalColor ?? const Color(0xFFFDEB03), // Yellow
-                ];
-
                 if (hasClientLogo) {
                   return Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      // App Logo (Transparent glass with moving linear gradient border)
-                      AnimatedGradientBorderBox(
+                      // App Logo (Identical to Splash screen GlassContainer)
+                      GlassContainer(
                         width: 86,
                         height: 86,
                         borderRadius: 24,
-                        borderWidth: 1.4,
                         padding: const EdgeInsets.all(13),
-                        colors: movingBorderColors,
-                        backgroundColor: Colors.white.withOpacity(0.08),
+                        color: Colors.white.withOpacity(0.08),
+                        border: Border.all(
+                          color: AppTheme.primaryIcons.withOpacity(0.5),
+                          width: 1.5,
+                        ),
                         child: Image.asset(
                           'assets/img/logo.png',
                           fit: BoxFit.contain,
@@ -90,11 +84,11 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ),
 
-                      // Stylish Homogeneous Divider blending Yellow, Green & Blue
+                      // Stylish subtle divider matching the splash cyan accent
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 14),
                         child: Container(
-                          width: 2,
+                          width: 1.5,
                           height: 48,
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(2),
@@ -102,25 +96,26 @@ class _LoginScreenState extends State<LoginScreen> {
                               begin: Alignment.topCenter,
                               end: Alignment.bottomCenter,
                               colors: [
-                                (configCtrl?.optionalColor ?? AppTheme.accentCyan).withOpacity(0.2),
-                                (configCtrl?.optionalColor ?? AppTheme.accentCyan).withOpacity(0.85),
-                                (configCtrl?.secondaryColor ?? AppTheme.primaryIcons).withOpacity(0.85),
-                                (configCtrl?.primaryColor ?? AppTheme.primary).withOpacity(0.2),
+                                AppTheme.primaryIcons.withOpacity(0.1),
+                                AppTheme.primaryIcons.withOpacity(0.6),
+                                AppTheme.primaryIcons.withOpacity(0.1),
                               ],
                             ),
                           ),
                         ),
                       ),
 
-                      // Client Logo from API (Transparent glass with moving linear gradient border)
-                      AnimatedGradientBorderBox(
+                      // Client Logo from API (Identical to Splash screen GlassContainer)
+                      GlassContainer(
                         width: 86,
                         height: 86,
                         borderRadius: 24,
-                        borderWidth: 1.4,
                         padding: const EdgeInsets.all(11),
-                        colors: movingBorderColors,
-                        backgroundColor: Colors.white.withOpacity(0.08),
+                        color: Colors.white.withOpacity(0.08),
+                        border: Border.all(
+                          color: AppTheme.primaryIcons.withOpacity(0.5),
+                          width: 1.5,
+                        ),
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(16),
                           child: Image.network(
@@ -153,15 +148,17 @@ class _LoginScreenState extends State<LoginScreen> {
                   );
                 }
 
-                // Fallback: Single centered app logo with moving linear gradient border
-                return AnimatedGradientBorderBox(
+                // Fallback: Single centered app logo identical to Splash screen GlassContainer
+                return GlassContainer(
                   width: 96,
                   height: 96,
                   borderRadius: 26,
-                  borderWidth: 1.4,
                   padding: const EdgeInsets.all(16),
-                  colors: movingBorderColors,
-                  backgroundColor: Colors.white.withOpacity(0.08),
+                  color: Colors.white.withOpacity(0.08),
+                  border: Border.all(
+                    color: AppTheme.primaryIcons.withOpacity(0.5),
+                    width: 1.5,
+                  ),
                   child: Image.asset(
                     'assets/img/logo.png',
                     fit: BoxFit.contain,
