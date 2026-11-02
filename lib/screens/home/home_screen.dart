@@ -511,37 +511,8 @@ class _HomeScreenState extends State<HomeScreen> {
                       },
                     ),
                 const SizedBox(height: 14),
-                Padding(
-                  padding: const EdgeInsets.only(left: 6, bottom: 8),
-                  child: Text(
-                    'Compte',
-                    style: GoogleFonts.poppins(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                      color: const Color(0xFF94A3B8),
-                    ),
-                  ),
-                ),
-                if (_correspond('Profil'))
-                  _ligneMenu(
-                    icone: LucideIcons.user,
-                    label: 'Profil Client',
-                    actif: _index == 5,
-                    onTap: () {
-                      setState(() => _index = 5);
-                      Navigator.of(context).pop();
-                    },
-                  ),
-                if (_correspond('Configuration API') || _correspond('Serveur'))
-                  _ligneMenu(
-                    icone: LucideIcons.server,
-                    label: 'Configuration API',
-                    onTap: () {
-                      Navigator.of(context).pop();
-                      ProfileScreen.showServerConfigDialog(context);
-                    },
-                  ),
-                const SizedBox(height: 10),
+                const Divider(color: Color(0xFFE2E8F0), height: 1),
+                const SizedBox(height: 14),
                 if (_correspond('Déconnexion'))
                   _ligneMenu(
                     icone: LucideIcons.logOut,
