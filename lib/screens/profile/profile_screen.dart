@@ -11,7 +11,7 @@ import '../../widgets/glass_text_field.dart';
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
 
-  void _showServerConfigDialog(BuildContext context) {
+  static void showServerConfigDialog(BuildContext context) {
     final urlCtrl = TextEditingController(text: ApiService.baseUrl);
 
     Get.dialog(
@@ -251,7 +251,7 @@ class ProfileScreen extends StatelessWidget {
                       ],
                     ),
                     TextButton(
-                      onPressed: () => _showServerConfigDialog(context),
+                      onPressed: () => showServerConfigDialog(context),
                       child: const Text('Modifier', style: TextStyle(color: AppTheme.primary, fontWeight: FontWeight.w600)),
                     ),
                   ],

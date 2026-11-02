@@ -1,8 +1,12 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import '../../controllers/auth_controller.dart';
+import '../../controllers/dashboard_controller.dart';
 import '../../theme/app_theme.dart';
-import '../../widgets/glass_scaffold.dart';
+import '../../widgets/ambient_background.dart';
 import '../crbt/crbt_screen.dart';
 import '../expeditions/expeditions_screen.dart';
 import '../factures/factures_screen.dart';
@@ -18,182 +22,729 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  int _currentIndex = 0;
+  final _cleScaffold = GlobalKey<ScaffoldState>();
+  final TextEditingController _rechercheMenu = TextEditingController();
+  String _filtreMenu = '';
+  int _index = 0;
+  final AuthController _authController = Get.find<AuthController>();
 
-  final List<String> _titles = [
-    'Tableau de bord',
-    'Expéditions',
-    'Factures',
-    'Retours Fonds',
-    'CRBT & Virements',
-    'Mon Profil',
-  ];
+  @override
+  void dispose() {
+    _rechercheMenu.dispose();
+    super.dispose();
+  }
+
+  bool _correspond(String label) =>
+      _filtreMenu.isEmpty || label.toLowerCase().contains(_filtreMenu);
+
+  List<({IconData icone, String label, Widget page, bool barre})> _getOnglets() {
+    return [
+      (
+        icone: LucideIcons.home,
+        label: 'Accueil',
+        page: DashboardTab(
+          onNavigateTab: (target) => setState(() => _index = target),
+        ),
+        barre: true,
+      ),
+      (
+        icone: LucideIcons.truck,
+        label: 'Expéditions',
+        page: const ExpeditionsScreen(),
+        barre: true,
+      ),
+      (
+        icone: LucideIcons.fileText,
+        label: 'Factures',
+        page: const FacturesScreen(),
+        barre: true,
+      ),
+      (
+        icone: LucideIcons.rotateCcw,
+        label: 'Retours',
+        page: const RetoursScreen(),
+        barre: true,
+      ),
+      (
+        icone: LucideIcons.banknote,
+        label: 'CRBT',
+        page: const CrbtScreen(),
+        barre: true,
+      ),
+      (
+        icone: LucideIcons.user,
+        label: 'Profil',
+        page: const ProfileScreen(),
+        barre: false,
+      ),
+    ];
+  }
 
   @override
   Widget build(BuildContext context) {
-    final List<Widget> pages = [
-      DashboardTab(onNavigateTab: (idx) => setState(() => _currentIndex = idx)),
-      const ExpeditionsScreen(),
-      const FacturesScreen(),
-      const RetoursScreen(),
-      const CrbtScreen(),
-      const ProfileScreen(),
-    ];
+    final onglets = _getOnglets();
+    if (_index >= onglets.length) _index = 0;
+    final pages = onglets.map((o) => o.page).toList();
 
-    return GlassScaffold(
-      isLight: true,
-      appBar: AppBar(
-        title: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: 32,
-              height: 32,
-              padding: const EdgeInsets.all(4),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: AppTheme.primaryIcons.withOpacity(0.4)),
-                boxShadow: [
-                  BoxShadow(
-                    color: const Color(0xFF0F172A).withOpacity(0.06),
-                    blurRadius: 8,
-                  ),
-                ],
-              ),
-              child: Image.asset(
-                'assets/img/logo.png',
-                fit: BoxFit.contain,
-                errorBuilder: (_, __, ___) => const Icon(
-                  LucideIcons.truck,
-                  color: AppTheme.primaryIcons,
-                  size: 18,
-                ),
-              ),
+    return Scaffold(
+      key: _cleScaffold,
+      extendBody: true,
+      extendBodyBehindAppBar: true,
+      backgroundColor: const Color(0xFFF8FAFC),
+      appBar: _buildAppBar(),
+      drawer: _menuLateral(onglets),
+      body: Stack(
+        fit: StackFit.expand,
+        children: [
+          const AmbientBackground(),
+          SafeArea(
+            bottom: false,
+            child: IndexedStack(
+              index: _index,
+              children: pages,
             ),
-            const SizedBox(width: 10),
-            Text(
-              _titles[_currentIndex],
-              style: const TextStyle(
-                color: Color(0xFF0F172A),
-                fontWeight: FontWeight.w700,
-                fontSize: 17.5,
-              ),
-            ),
-          ],
-        ),
-        actions: [
-          IconButton(
-            tooltip: 'Profil Client',
-            icon: Container(
-              padding: const EdgeInsets.all(6),
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: _currentIndex == 5
-                    ? AppTheme.primary
-                    : Colors.white,
-                border: Border.all(
-                  color: _currentIndex == 5
-                      ? AppTheme.primary
-                      : const Color(0xFFE2E8F0),
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: const Color(0xFF0F172A).withOpacity(0.06),
-                    blurRadius: 8,
-                  ),
-                ],
-              ),
-              child: Icon(
-                LucideIcons.user,
-                color: _currentIndex == 5 ? Colors.white : AppTheme.primary,
-                size: 18,
-              ),
-            ),
-            onPressed: () => setState(() => _currentIndex = 5),
           ),
-          const SizedBox(width: 8),
         ],
       ),
-      body: IndexedStack(
-        index: _currentIndex,
-        children: pages,
+      bottomNavigationBar: Theme(
+        data: ThemeData(canvasColor: Colors.transparent),
+        child: _pillBottomBar(onglets),
       ),
-      bottomNavigationBar: _buildGlassBottomNavBar(),
     );
   }
 
-  Widget _buildGlassBottomNavBar() {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(26),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
-          child: Container(
-            height: 68,
+  // ==================== APP BAR STYLE DÉGRADÉ (STYLE META FLEET) ====================
+  PreferredSizeWidget _buildAppBar() {
+    return AppBar(
+      toolbarHeight: 48,
+      backgroundColor: Colors.transparent,
+      elevation: 0,
+      scrolledUnderElevation: 0,
+      flexibleSpace: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Colors.white.withOpacity(0.95),
+              Colors.white.withOpacity(0.70),
+              Colors.white.withOpacity(0.0),
+            ],
+            stops: const [0.0, 0.70, 1.0],
+          ),
+        ),
+      ),
+      automaticallyImplyLeading: false,
+      titleSpacing: 4,
+      title: Row(
+        children: [
+          IconButton(
+            icon: const Icon(LucideIcons.menu, size: 22),
+            color: AppTheme.primary,
+            onPressed: () => _cleScaffold.currentState?.openDrawer(),
+          ),
+          const SizedBox(width: 2),
+          Container(
+            width: 32,
+            height: 32,
+            padding: const EdgeInsets.all(4),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.90),
-              borderRadius: BorderRadius.circular(26),
-              border: Border.all(
-                color: Colors.white,
-                width: 1.5,
-              ),
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(color: AppTheme.primaryIcons.withOpacity(0.4)),
               boxShadow: [
                 BoxShadow(
-                  color: const Color(0xFF0F172A).withOpacity(0.08),
-                  blurRadius: 22,
-                  offset: const Offset(0, 8),
+                  color: const Color(0xFF0F172A).withOpacity(0.06),
+                  blurRadius: 8,
+                ),
+              ],
+            ),
+            child: Image.asset(
+              'assets/img/logo.png',
+              fit: BoxFit.contain,
+              errorBuilder: (_, __, ___) => const Icon(
+                LucideIcons.truck,
+                color: AppTheme.primaryIcons,
+                size: 18,
+              ),
+            ),
+          ),
+          const SizedBox(width: 8),
+          ShaderMask(
+            shaderCallback: (bounds) => const LinearGradient(
+              colors: [Color(0xFF2193b0), Color(0xFF22b7ce)],
+              begin: Alignment.centerLeft,
+              end: Alignment.centerRight,
+            ).createShader(bounds),
+            child: Text(
+              'METACLIENT',
+              style: GoogleFonts.poppins(
+                fontSize: 18,
+                fontWeight: FontWeight.w800,
+                letterSpacing: 1.2,
+                color: Colors.white,
+              ),
+            ),
+          ),
+        ],
+      ),
+      actions: [
+        // Bouton Recherche rapide
+        _appBarGlassButton(
+          icon: LucideIcons.search,
+          onTap: () => setState(() => _index = 1),
+        ),
+        const SizedBox(width: 8),
+        // Bouton Rafraîchir
+        _appBarGlassButton(
+          icon: LucideIcons.refreshCw,
+          onTap: () {
+            Get.find<DashboardController>().loadDashboardData();
+            _authController.fetchClientInfo();
+          },
+        ),
+        const SizedBox(width: 8),
+        // Bouton Profil
+        _boutonProfil(),
+        const SizedBox(width: 14),
+      ],
+    );
+  }
+
+  Widget _boutonProfil() {
+    return Obx(() {
+      final client = _authController.clientInfo.value;
+      final user = _authController.currentUser.value;
+      final nom = client?.raisonSociale.isNotEmpty == true
+          ? client!.raisonSociale
+          : (user?.libelle ?? 'C');
+      final lettre = nom.isNotEmpty ? nom[0].toUpperCase() : 'C';
+
+      void ouvrir() => setState(() => _index = 5);
+
+      final isProfileActive = _index == 5;
+
+      return Container(
+        width: 40,
+        height: 40,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          gradient: isProfileActive ? AppTheme.primaryGradient : null,
+          color: isProfileActive ? null : Colors.white.withOpacity(0.85),
+          border: Border.all(
+            color: isProfileActive ? Colors.white : const Color(0xFFE2E8F0),
+            width: 1.6,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: AppTheme.primary.withOpacity(0.15),
+              blurRadius: 10,
+              offset: const Offset(0, 3),
+            ),
+          ],
+        ),
+        child: Material(
+          color: Colors.transparent,
+          shape: const CircleBorder(),
+          child: InkWell(
+            customBorder: const CircleBorder(),
+            onTap: ouvrir,
+            child: Center(
+              child: Text(
+                lettre,
+                style: GoogleFonts.poppins(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w700,
+                  color: isProfileActive ? Colors.white : AppTheme.primary,
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+    });
+  }
+
+  Widget _appBarGlassButton({
+    required IconData icon,
+    required VoidCallback onTap,
+    bool hasBadge = false,
+  }) {
+    return Container(
+      width: 40,
+      height: 40,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        boxShadow: [
+          BoxShadow(
+            color: AppTheme.primary.withOpacity(0.08),
+            blurRadius: 10,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(20),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+          child: Material(
+            color: Colors.white.withOpacity(0.85),
+            shape: const CircleBorder(
+              side: BorderSide(color: Colors.white, width: 1.2),
+            ),
+            child: InkWell(
+              customBorder: const CircleBorder(),
+              onTap: onTap,
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  Icon(icon, color: AppTheme.primary, size: 18),
+                  if (hasBadge)
+                    Positioned(
+                      top: 8,
+                      right: 8,
+                      child: Container(
+                        width: 7,
+                        height: 7,
+                        decoration: const BoxDecoration(
+                          color: AppTheme.primaryIcons,
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  // ==================== BARRE DE NAVIGATION FLOTTANTE (GLASSMORPHISM STYLE META FLEET) ====================
+  Widget _pillBottomBar(
+    List<({IconData icone, String label, Widget page, bool barre})> onglets,
+  ) {
+    final bottomPadding = MediaQuery.of(context).padding.bottom;
+
+    return Padding(
+      padding: EdgeInsets.fromLTRB(
+        14,
+        0,
+        14,
+        bottomPadding > 0 ? bottomPadding + 6 : 14,
+      ),
+      child: Container(
+        height: 74,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(30),
+          boxShadow: [
+            BoxShadow(
+              color: AppTheme.primary.withOpacity(0.12),
+              blurRadius: 28,
+              offset: const Offset(0, 10),
+            ),
+            BoxShadow(
+              color: AppTheme.primaryIcons.withOpacity(0.08),
+              blurRadius: 18,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(30),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 6),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(30),
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    Colors.white.withOpacity(0.92),
+                    Colors.white.withOpacity(0.70),
+                  ],
+                ),
+                border: Border.all(
+                  color: Colors.white.withOpacity(0.95),
+                  width: 1.5,
+                ),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  for (var i = 0; i < onglets.length; i++)
+                    if (onglets[i].barre)
+                      _navItem(i, onglets[i].icone, onglets[i].label),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _navItem(int idx, IconData icon, String label) {
+    final active = _index == idx;
+    return GestureDetector(
+      onTap: () => setState(() => _index = idx),
+      behavior: HitTestBehavior.opaque,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 4),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 220),
+              width: active ? 36 : 26,
+              height: active ? 36 : 26,
+              decoration: active
+                  ? BoxDecoration(
+                      gradient: AppTheme.primaryGradient,
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppTheme.primary.withOpacity(0.35),
+                          blurRadius: 8,
+                          offset: const Offset(0, 3),
+                        ),
+                      ],
+                    )
+                  : null,
+              child: Icon(
+                icon,
+                color: active ? Colors.white : const Color(0xFF64748B),
+                size: active ? 18 : 19,
+              ),
+            ),
+            const SizedBox(height: 3),
+            AnimatedDefaultTextStyle(
+              duration: const Duration(milliseconds: 220),
+              style: GoogleFonts.poppins(
+                fontSize: 9.5,
+                height: 1.15,
+                fontWeight: active ? FontWeight.w700 : FontWeight.w500,
+                color: active ? AppTheme.primary : const Color(0xFF94A3B8),
+              ),
+              child: Text(label, maxLines: 1, overflow: TextOverflow.ellipsis),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // ==================== MENU VERTICAL LATÉRAL (DRAWER STYLE META FLEET) ====================
+  Widget _menuLateral(
+    List<({IconData icone, String label, Widget page, bool barre})> onglets,
+  ) {
+    return Drawer(
+      backgroundColor: Colors.transparent,
+      elevation: 0,
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          const AmbientBackground(),
+          SafeArea(
+            child: ListView(
+              padding: const EdgeInsets.fromLTRB(14, 14, 14, 24),
+              children: [
+                _enteteMenu(),
+                const SizedBox(height: 14),
+                _champRechercheMenu(),
+                const SizedBox(height: 14),
+                Padding(
+                  padding: const EdgeInsets.only(left: 6, bottom: 8),
+                  child: Text(
+                    'Raccourcis',
+                    style: GoogleFonts.poppins(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: const Color(0xFF94A3B8),
+                    ),
+                  ),
+                ),
+                for (var i = 0; i < onglets.length; i++)
+                  if (_correspond(onglets[i].label))
+                    _ligneMenu(
+                      icone: onglets[i].icone,
+                      label: onglets[i].label,
+                      actif: _index == i,
+                      onTap: () {
+                        setState(() => _index = i);
+                        Navigator.of(context).pop();
+                      },
+                    ),
+                const SizedBox(height: 14),
+                Padding(
+                  padding: const EdgeInsets.only(left: 6, bottom: 8),
+                  child: Text(
+                    'Compte',
+                    style: GoogleFonts.poppins(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: const Color(0xFF94A3B8),
+                    ),
+                  ),
+                ),
+                if (_correspond('Profil'))
+                  _ligneMenu(
+                    icone: LucideIcons.user,
+                    label: 'Profil Client',
+                    actif: _index == 5,
+                    onTap: () {
+                      setState(() => _index = 5);
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                if (_correspond('Configuration API') || _correspond('Serveur'))
+                  _ligneMenu(
+                    icone: LucideIcons.server,
+                    label: 'Configuration API',
+                    onTap: () {
+                      Navigator.of(context).pop();
+                      ProfileScreen.showServerConfigDialog(context);
+                    },
+                  ),
+                const SizedBox(height: 10),
+                if (_correspond('Déconnexion'))
+                  _ligneMenu(
+                    icone: LucideIcons.logOut,
+                    label: 'Déconnexion',
+                    couleur: const Color(0xFFDC2626),
+                    onTap: () {
+                      Navigator.of(context).pop();
+                      _authController.logout();
+                    },
+                  ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _enteteMenu() {
+    return Obx(() {
+      final client = _authController.clientInfo.value;
+      final user = _authController.currentUser.value;
+      final nom = client?.raisonSociale.isNotEmpty == true
+          ? client!.raisonSociale
+          : (user?.libelle ?? 'Client');
+      final code = client?.code.isNotEmpty == true ? client!.code : (user?.code ?? '');
+      final agence = client?.agenceAffectation ?? 'Réseau National';
+      final lettre = nom.isNotEmpty ? nom[0].toUpperCase() : 'C';
+
+      return Material(
+        color: Colors.transparent,
+        borderRadius: BorderRadius.circular(18),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(18),
+          onTap: () {
+            setState(() => _index = 5);
+            Navigator.of(context).pop();
+          },
+          child: Container(
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(18),
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  Colors.white.withOpacity(0.92),
+                  Colors.white.withOpacity(0.70),
+                ],
+              ),
+              border: Border.all(color: Colors.white.withOpacity(0.95)),
+              boxShadow: [
+                BoxShadow(
+                  color: AppTheme.primary.withOpacity(0.08),
+                  blurRadius: 14,
+                  offset: const Offset(0, 4),
                 ),
               ],
             ),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                _buildNavItem(LucideIcons.layoutDashboard, 'Accueil', 0),
-                _buildNavItem(LucideIcons.truck, 'Expéditions', 1),
-                _buildNavItem(LucideIcons.fileText, 'Factures', 2),
-                _buildNavItem(LucideIcons.rotateCcw, 'Retours', 3),
-                _buildNavItem(LucideIcons.banknote, 'CRBT', 4),
+                Container(
+                  width: 46,
+                  height: 46,
+                  decoration: BoxDecoration(
+                    gradient: AppTheme.primaryGradient,
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: Colors.white,
+                      width: 1.5,
+                    ),
+                  ),
+                  alignment: Alignment.center,
+                  child: Text(
+                    lettre,
+                    style: GoogleFonts.poppins(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        nom,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: GoogleFonts.poppins(
+                          fontSize: 14.5,
+                          fontWeight: FontWeight.w700,
+                          color: const Color(0xFF0F172A),
+                        ),
+                      ),
+                      Text(
+                        'Code: $code • $agence',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: GoogleFonts.poppins(
+                          fontSize: 11.5,
+                          color: const Color(0xFF64748B),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const Icon(
+                  LucideIcons.chevronRight,
+                  size: 17,
+                  color: Color(0xFF94A3B8),
+                ),
               ],
             ),
+          ),
+        ),
+      );
+    });
+  }
+
+  Widget _champRechercheMenu() {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.85),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: Colors.white.withOpacity(0.95),
+          width: 1.2,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: AppTheme.primary.withOpacity(0.05),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(16),
+        child: TextField(
+          controller: _rechercheMenu,
+          onChanged: (val) =>
+              setState(() => _filtreMenu = val.trim().toLowerCase()),
+          style: GoogleFonts.poppins(
+            fontSize: 13,
+            color: const Color(0xFF0F172A),
+          ),
+          decoration: InputDecoration(
+            hintText: 'Rechercher dans le menu…',
+            hintStyle: GoogleFonts.poppins(
+              fontSize: 13,
+              color: const Color(0xFF94A3B8),
+            ),
+            prefixIcon: const Padding(
+              padding: EdgeInsets.only(left: 14, right: 8),
+              child: Icon(
+                LucideIcons.search,
+                size: 18,
+                color: AppTheme.primary,
+              ),
+            ),
+            prefixIconConstraints: const BoxConstraints(
+              minWidth: 0,
+              minHeight: 0,
+            ),
+            suffixIcon: _filtreMenu.isEmpty
+                ? null
+                : IconButton(
+                    icon: const Icon(
+                      LucideIcons.x,
+                      size: 16,
+                      color: Color(0xFF94A3B8),
+                    ),
+                    onPressed: () {
+                      _rechercheMenu.clear();
+                      setState(() => _filtreMenu = '');
+                    },
+                  ),
+            border: InputBorder.none,
+            contentPadding: const EdgeInsets.symmetric(vertical: 12),
           ),
         ),
       ),
     );
   }
 
-  Widget _buildNavItem(IconData icon, String label, int index) {
-    final isSelected = _currentIndex == index;
+  Widget _ligneMenu({
+    required IconData icone,
+    required String label,
+    required VoidCallback onTap,
+    bool actif = false,
+    Color? couleur,
+  }) {
+    final teinte = couleur ?? AppTheme.primary;
 
-    return GestureDetector(
-      onTap: () => setState(() => _currentIndex = index),
-      behavior: HitTestBehavior.opaque,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 220),
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-        decoration: BoxDecoration(
-          color: isSelected ? AppTheme.primary.withOpacity(0.12) : Colors.transparent,
-          borderRadius: BorderRadius.circular(16),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              icon,
-              color: isSelected ? AppTheme.primary : const Color(0xFF64748B),
-              size: isSelected ? 23 : 20,
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 6),
+      child: Material(
+        color: actif
+            ? teinte.withOpacity(0.12)
+            : Colors.white.withOpacity(0.60),
+        borderRadius: BorderRadius.circular(14),
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(14),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+            child: Row(
+              children: [
+                Icon(icone, size: 19, color: teinte),
+                const SizedBox(width: 13),
+                Expanded(
+                  child: Text(
+                    label,
+                    style: GoogleFonts.poppins(
+                      fontSize: 13.5,
+                      fontWeight: actif ? FontWeight.w700 : FontWeight.w600,
+                      color: couleur ?? const Color(0xFF0F172A),
+                    ),
+                  ),
+                ),
+                if (actif)
+                  Container(
+                    width: 6,
+                    height: 6,
+                    decoration: BoxDecoration(
+                      color: teinte,
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+              ],
             ),
-            const SizedBox(height: 3),
-            Text(
-              label,
-              style: TextStyle(
-                color: isSelected ? AppTheme.primary : const Color(0xFF64748B),
-                fontSize: 10.5,
-                fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-              ),
-            ),
-          ],
+          ),
         ),
       ),
     );
