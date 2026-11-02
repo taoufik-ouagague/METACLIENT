@@ -478,7 +478,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
       final code = client?.code.isNotEmpty == true
           ? client!.code
           : (user?.code.isNotEmpty == true ? user!.code : '—');
-      final identifiant = user?.code.isNotEmpty == true ? '@${user!.code}' : '';
 
       return RefreshIndicator(
         onRefresh: () => _authController.fetchClientInfo(),
@@ -578,17 +577,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         color: Color(0xFF0F172A),
                       ),
                     ),
-                    if (identifiant.isNotEmpty) ...[
-                      const SizedBox(height: 3),
-                      Text(
-                        identifiant,
-                        style: const TextStyle(
-                          fontSize: 13,
-                          color: Color(0xFF64748B),
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ],
                     const SizedBox(height: 10),
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
