@@ -39,8 +39,8 @@ class MetaClientApp extends StatelessWidget {
     return GetMaterialApp(
       title: 'METACLIENT',
       debugShowCheckedModeBanner: false,
-      defaultTransition: Transition.fadeIn,
-      transitionDuration: const Duration(milliseconds: 280),
+      defaultTransition: Transition.rightToLeftWithFade,
+      transitionDuration: const Duration(milliseconds: 320),
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
       themeMode: ThemeMode.light,

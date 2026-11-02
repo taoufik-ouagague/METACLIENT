@@ -243,7 +243,11 @@ class FacturesScreen extends StatelessWidget {
     return GlassContainer(
       borderRadius: 18,
       padding: const EdgeInsets.all(16),
-      onTap: () => Get.to(() => FactureDetailScreen(facture: item)),
+      onTap: () => Get.to(
+        () => FactureDetailScreen(facture: item),
+        transition: Transition.rightToLeftWithFade,
+        duration: const Duration(milliseconds: 320),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

@@ -348,7 +348,11 @@ class ExpeditionsScreen extends StatelessWidget {
       padding: const EdgeInsets.all(15),
       onTap: () {
         if (item.idExpedition != null) {
-          Get.to(() => ExpeditionDetailScreen(idExpedition: item.idExpedition!));
+          Get.to(
+            () => ExpeditionDetailScreen(idExpedition: item.idExpedition!),
+            transition: Transition.rightToLeftWithFade,
+            duration: const Duration(milliseconds: 320),
+          );
         }
       },
       child: Column(

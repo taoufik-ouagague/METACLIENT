@@ -42,103 +42,7 @@ class DashboardTab extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // ─── 1. USER HEADER GREETING BANNER ──────────────────────────────
-            Obx(() {
-              final client = authCtrl.clientInfo.value;
-              final user = authCtrl.currentUser.value;
-              final name = client?.raisonSociale.isNotEmpty == true
-                  ? client!.raisonSociale
-                  : (user?.libelle ?? 'Client');
-              final code = client?.code.isNotEmpty == true ? client!.code : (user?.code ?? '');
-              final agence = client?.agenceAffectation ?? 'Réseau National';
-
-              return GlassContainer(
-                borderRadius: 24,
-                padding: const EdgeInsets.all(18),
-                child: Row(
-                  children: [
-                    Container(
-                      width: 52,
-                      height: 52,
-                      decoration: BoxDecoration(
-                        gradient: AppTheme.primaryGradient,
-                        borderRadius: BorderRadius.circular(16),
-                        boxShadow: [
-                          BoxShadow(
-                            color: AppTheme.primary.withOpacity(0.25),
-                            blurRadius: 12,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
-                      ),
-                      child: const Center(
-                        child: Icon(LucideIcons.building, color: Colors.white, size: 26),
-                      ),
-                    ),
-                    const SizedBox(width: 14),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            name,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
-                              color: Color(0xFF0F172A),
-                              fontSize: 17,
-                              fontWeight: FontWeight.w800,
-                            ),
-                          ),
-                          const SizedBox(height: 3),
-                          Row(
-                            children: [
-                              Text(
-                                'Code: $code',
-                                style: const TextStyle(
-                                  color: AppTheme.primary,
-                                  fontSize: 12.5,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                              const SizedBox(width: 8),
-                              Container(
-                                width: 4,
-                                height: 4,
-                                decoration: const BoxDecoration(
-                                  color: Color(0xFFCBD5E1),
-                                  shape: BoxShape.circle,
-                                ),
-                              ),
-                              const SizedBox(width: 8),
-                              Expanded(
-                                child: Text(
-                                  agence,
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: const TextStyle(
-                                    color: Color(0xFF64748B),
-                                    fontSize: 12,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                    IconButton(
-                      icon: const Icon(LucideIcons.refreshCw, color: AppTheme.primaryIcons, size: 20),
-                      onPressed: () => dashCtrl.loadDashboardData(),
-                    ),
-                  ],
-                ),
-              );
-            }),
-
-            const SizedBox(height: 18),
-
-            // ─── 2. QUICK DECLARATION SEARCH BAR ─────────────────────────────
+            // ─── QUICK DECLARATION SEARCH BAR ─────────────────────────────
             GlassContainer(
               borderRadius: 18,
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
@@ -302,7 +206,11 @@ class DashboardTab extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                     onTap: () {
                       if (item.idExpedition != null) {
-                        Get.to(() => ExpeditionDetailScreen(idExpedition: item.idExpedition!));
+                        Get.to(
+                          () => ExpeditionDetailScreen(idExpedition: item.idExpedition!),
+                          transition: Transition.rightToLeftWithFade,
+                          duration: const Duration(milliseconds: 320),
+                        );
                       }
                     },
                     child: Row(
