@@ -123,8 +123,8 @@ class GlassScaffold extends StatelessWidget {
                     children: [
                       // Middle-Right: Warm Yellow Glowing Orb beside card
                       Positioned(
-                        top: 140,
-                        right: -70,
+                        top: 240,
+                        right: -80,
                         child: Container(
                           width: 270,
                           height: 270,
@@ -132,8 +132,8 @@ class GlassScaffold extends StatelessWidget {
                             shape: BoxShape.circle,
                             gradient: RadialGradient(
                               colors: [
-                                (hasCustom ? oColor : AppTheme.primary).withOpacity(0.22),
-                                (hasCustom ? oColor : AppTheme.primary).withOpacity(0.05),
+                                (hasCustom ? oColor : AppTheme.primary).withOpacity(0.20),
+                                (hasCustom ? oColor : AppTheme.primary).withOpacity(0.04),
                                 Colors.transparent,
                               ],
                               stops: const [0.0, 0.50, 1.0],
@@ -143,8 +143,8 @@ class GlassScaffold extends StatelessWidget {
                       ),
                       // Middle-Left: Emerald Green Glowing Orb behind the card
                       Positioned(
-                        top: 300,
-                        left: -80,
+                        top: 420,
+                        left: -90,
                         child: Container(
                           width: 290,
                           height: 290,
@@ -152,8 +152,8 @@ class GlassScaffold extends StatelessWidget {
                             shape: BoxShape.circle,
                             gradient: RadialGradient(
                               colors: [
-                                (hasCustom ? sColor : AppTheme.primaryIcons).withOpacity(0.22),
-                                (hasCustom ? sColor : AppTheme.primaryIcons).withOpacity(0.06),
+                                (hasCustom ? sColor : AppTheme.primaryIcons).withOpacity(0.20),
+                                (hasCustom ? sColor : AppTheme.primaryIcons).withOpacity(0.05),
                                 Colors.transparent,
                               ],
                               stops: const [0.0, 0.50, 1.0],

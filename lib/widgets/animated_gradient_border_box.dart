@@ -75,10 +75,10 @@ class _AnimatedGradientBorderBoxState extends State<AnimatedGradientBorderBox>
             ),
             boxShadow: [
               BoxShadow(
-                color: effectiveColors.first.withOpacity(0.22),
-                blurRadius: 14,
+                color: Colors.black.withOpacity(0.25),
+                blurRadius: 16,
                 spreadRadius: 0,
-                offset: const Offset(0, 4),
+                offset: const Offset(0, 6),
               ),
             ],
           ),
@@ -88,16 +88,22 @@ class _AnimatedGradientBorderBoxState extends State<AnimatedGradientBorderBox>
               borderRadius: BorderRadius.circular(
                 math.max(0, widget.borderRadius - widget.borderWidth),
               ),
-              child: Container(
-                decoration: BoxDecoration(
-                  // Simple clean dark background like Splash logo
-                  color: widget.backgroundColor ?? const Color(0xFF0F1B2D),
-                  borderRadius: BorderRadius.circular(
-                    math.max(0, widget.borderRadius - widget.borderWidth),
-                  ),
+              child: BackdropFilter(
+                filter: ImageFilter.blur(
+                  sigmaX: widget.blur,
+                  sigmaY: widget.blur,
                 ),
-                padding: widget.padding,
-                child: widget.child,
+                child: Container(
+                  decoration: BoxDecoration(
+                    // Translucent frosted glass background identical to Splash screen
+                    color: widget.backgroundColor ?? Colors.white.withOpacity(0.08),
+                    borderRadius: BorderRadius.circular(
+                      math.max(0, widget.borderRadius - widget.borderWidth),
+                    ),
+                  ),
+                  padding: widget.padding,
+                  child: widget.child,
+                ),
               ),
             ),
           ),

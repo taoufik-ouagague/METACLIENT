@@ -75,10 +75,10 @@ class _LoginScreenState extends State<LoginScreen> {
                         width: 86,
                         height: 86,
                         borderRadius: 24,
-                        borderWidth: 1.8,
+                        borderWidth: 1.4,
                         padding: const EdgeInsets.all(13),
                         colors: movingBorderColors,
-                        backgroundColor: const Color(0xFF0F1B2D),
+                        backgroundColor: Colors.white.withOpacity(0.08),
                         child: Image.asset(
                           'assets/img/logo.png',
                           fit: BoxFit.contain,
@@ -117,10 +117,10 @@ class _LoginScreenState extends State<LoginScreen> {
                         width: 86,
                         height: 86,
                         borderRadius: 24,
-                        borderWidth: 1.8,
+                        borderWidth: 1.4,
                         padding: const EdgeInsets.all(11),
                         colors: movingBorderColors,
-                        backgroundColor: const Color(0xFF0F1B2D),
+                        backgroundColor: Colors.white.withOpacity(0.08),
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(16),
                           child: Image.network(
@@ -158,10 +158,10 @@ class _LoginScreenState extends State<LoginScreen> {
                   width: 96,
                   height: 96,
                   borderRadius: 26,
-                  borderWidth: 1.8,
+                  borderWidth: 1.4,
                   padding: const EdgeInsets.all(16),
                   colors: movingBorderColors,
-                  backgroundColor: const Color(0xFF0F1B2D),
+                  backgroundColor: Colors.white.withOpacity(0.08),
                   child: Image.asset(
                     'assets/img/logo.png',
                     fit: BoxFit.contain,
