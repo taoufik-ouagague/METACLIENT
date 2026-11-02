@@ -30,20 +30,25 @@ class CrbtScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Chèque N° ${cheque.numCheque}',
-                      style: const TextStyle(color: Color(0xFF0F172A), fontSize: 18, fontWeight: FontWeight.w800),
-                    ),
-                    Text(
-                      'Banque: ${cheque.banque ?? "—"} • ${_formatCurrency(cheque.montant)}',
-                      style: const TextStyle(color: AppTheme.primary, fontSize: 13, fontWeight: FontWeight.w600),
-                    ),
-                  ],
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Chèque N° ${cheque.numCheque}',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(color: Color(0xFF0F172A), fontSize: 18, fontWeight: FontWeight.w800),
+                      ),
+                      Text(
+                        'Banque: ${cheque.banque ?? "—"} • ${_formatCurrency(cheque.montant)}',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(color: AppTheme.primary, fontSize: 13, fontWeight: FontWeight.w600),
+                      ),
+                    ],
+                  ),
                 ),
                 IconButton(
                   icon: const Icon(LucideIcons.x, color: Color(0xFF64748B)),
@@ -84,15 +89,27 @@ class CrbtScreen extends StatelessWidget {
                       borderRadius: 14,
                       padding: const EdgeInsets.all(12),
                       child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text('Décl: ${item.numDeclaration}', style: const TextStyle(color: Color(0xFF0F172A), fontWeight: FontWeight.w700, fontSize: 13)),
-                              Text('Dest: ${item.destinataire ?? "—"} (${item.destination ?? "—"})', style: const TextStyle(color: Color(0xFF64748B), fontSize: 11.5)),
-                            ],
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Décl: ${item.numDeclaration}',
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(color: Color(0xFF0F172A), fontWeight: FontWeight.w700, fontSize: 13),
+                                ),
+                                Text(
+                                  'Dest: ${item.destinataire ?? "—"} (${item.destination ?? "—"})',
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(color: Color(0xFF64748B), fontSize: 11.5),
+                                ),
+                              ],
+                            ),
                           ),
+                          const SizedBox(width: 8),
                           Text(_formatCurrency(item.montant), style: const TextStyle(color: AppTheme.primary, fontWeight: FontWeight.w700, fontSize: 13.5)),
                         ],
                       ),
@@ -121,20 +138,25 @@ class CrbtScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Ordre de Virement ${virement.numOv}',
-                      style: const TextStyle(color: Color(0xFF0F172A), fontSize: 18, fontWeight: FontWeight.w800),
-                    ),
-                    Text(
-                      'Mandat: ${virement.numeroMandat ?? "—"} • ${_formatCurrency(virement.fond)}',
-                      style: const TextStyle(color: AppTheme.primary, fontSize: 13, fontWeight: FontWeight.w600),
-                    ),
-                  ],
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Ordre de Virement ${virement.numOv}',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(color: Color(0xFF0F172A), fontSize: 18, fontWeight: FontWeight.w800),
+                      ),
+                      Text(
+                        'Mandat: ${virement.numeroMandat ?? "—"} • ${_formatCurrency(virement.fond)}',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(color: AppTheme.primary, fontSize: 13, fontWeight: FontWeight.w600),
+                      ),
+                    ],
+                  ),
                 ),
                 IconButton(
                   icon: const Icon(LucideIcons.x, color: Color(0xFF64748B)),
@@ -175,15 +197,27 @@ class CrbtScreen extends StatelessWidget {
                       borderRadius: 14,
                       padding: const EdgeInsets.all(12),
                       child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text('Décl: ${item.numDeclaration}', style: const TextStyle(color: Color(0xFF0F172A), fontWeight: FontWeight.w700, fontSize: 13)),
-                              Text('Dest: ${item.destinataire ?? "—"} (${item.destination ?? "—"})', style: const TextStyle(color: Color(0xFF64748B), fontSize: 11.5)),
-                            ],
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Décl: ${item.numDeclaration}',
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(color: Color(0xFF0F172A), fontWeight: FontWeight.w700, fontSize: 13),
+                                ),
+                                Text(
+                                  'Dest: ${item.destinataire ?? "—"} (${item.destination ?? "—"})',
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(color: Color(0xFF64748B), fontSize: 11.5),
+                                ),
+                              ],
+                            ),
                           ),
+                          const SizedBox(width: 8),
                           Text(_formatCurrency(item.montant), style: const TextStyle(color: AppTheme.statusSuccess, fontWeight: FontWeight.w700, fontSize: 13.5)),
                         ],
                       ),

@@ -35,9 +35,13 @@ class RetoursScreen extends StatelessWidget {
                 children: [
                   Icon(LucideIcons.slidersHorizontal, color: AppTheme.primary, size: 20),
                   SizedBox(width: 10),
-                  Text(
-                    'Filtrer les retours',
-                    style: TextStyle(color: Color(0xFF0F172A), fontSize: 16.5, fontWeight: FontWeight.w700),
+                  Expanded(
+                    child: Text(
+                      'Filtrer les retours',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(color: Color(0xFF0F172A), fontSize: 16.5, fontWeight: FontWeight.w700),
+                    ),
                   ),
                 ],
               ),
