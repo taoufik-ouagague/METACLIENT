@@ -15,6 +15,7 @@ class AuthController extends GetxController {
   final RxBool isLoggedIn = false.obs;
   final Rxn<UserModel> currentUser = Rxn<UserModel>();
   final Rxn<ClientInfoModel> clientInfo = Rxn<ClientInfoModel>();
+  final RxnString profilePhoto = RxnString();
 
   @override
   void onInit() {
@@ -25,6 +26,7 @@ class AuthController extends GetxController {
   void checkAuthStatus() {
     final hasToken = StorageService.hasToken();
     isLoggedIn.value = hasToken;
+    profilePhoto.value = StorageService.getProfilePhoto();
     if (hasToken) {
       final code = StorageService.getUserCode() ?? '';
       final libelle = StorageService.getUserLibelle() ?? '';
@@ -113,10 +115,16 @@ class AuthController extends GetxController {
     }
   }
 
+  Future<void> updateProfilePhoto(String base64Photo) async {
+    profilePhoto.value = base64Photo;
+    await StorageService.setProfilePhoto(base64Photo);
+  }
+
   Future<void> logout() async {
     await StorageService.clearAll();
     currentUser.value = null;
     clientInfo.value = null;
+    profilePhoto.value = null;
     isLoggedIn.value = false;
     Get.offAllNamed('/login');
   }

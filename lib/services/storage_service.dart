@@ -6,6 +6,7 @@ class StorageService {
   static const String keyLibelle = 'user_libelle';
   static const String keyLogin = 'user_login';
   static const String keyServerUrl = 'server_base_url';
+  static const String keyProfilePhoto = 'user_profile_photo';
 
   static SharedPreferences? _prefs;
 
@@ -34,6 +35,9 @@ class StorageService {
 
   static String? getServerUrl() => prefs.getString(keyServerUrl);
   static Future<bool> setServerUrl(String url) => prefs.setString(keyServerUrl, url);
+
+  static String? getProfilePhoto() => prefs.getString(keyProfilePhoto);
+  static Future<bool> setProfilePhoto(String photo) => prefs.setString(keyProfilePhoto, photo);
 
   static bool hasToken() {
     final t = getToken();
