@@ -285,16 +285,64 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
               ),
 
-              const SizedBox(height: 28),
+              const SizedBox(height: 24),
 
-              // Footer Note
-              Text(
-                'Propulsé par KAY TECHNOLOGY',
-                style: TextStyle(
-                  color: Colors.white.withOpacity(0.35),
-                  fontSize: 11.5,
-                  fontWeight: FontWeight.w500,
-                ),
+              // Footer Note - Propulsé par KAY TECHNOLOGY
+              Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Container(
+                        width: 24,
+                        height: 1,
+                        color: Colors.white.withOpacity(0.18),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 10),
+                        child: Text(
+                          'Propulsé par',
+                          style: TextStyle(
+                            color: Colors.white.withOpacity(0.55),
+                            fontSize: 11,
+                            fontWeight: FontWeight.w600,
+                            letterSpacing: 0.8,
+                          ),
+                        ),
+                      ),
+                      Container(
+                        width: 24,
+                        height: 1,
+                        color: Colors.white.withOpacity(0.18),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 7),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.94),
+                      borderRadius: BorderRadius.circular(14),
+                      border: Border.all(
+                        color: Colors.white.withOpacity(0.85),
+                        width: 1,
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.25),
+                          blurRadius: 12,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: Image.asset(
+                      'assets/img/kay_tech_logo.png',
+                      height: 32,
+                      fit: BoxFit.contain,
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
