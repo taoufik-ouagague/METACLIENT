@@ -76,29 +76,35 @@ class _ExpeditionDetailScreenState extends State<ExpeditionDetailScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'N° ${detail.numDeclaration}',
-                              style: const TextStyle(
-                                color: Color(0xFF0F172A),
-                                fontSize: 20,
-                                fontWeight: FontWeight.w800,
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'N° ${detail.numDeclaration}',
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(
+                                  color: Color(0xFF0F172A),
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w800,
+                                ),
                               ),
-                            ),
-                            const SizedBox(height: 3),
-                            Text(
-                              'Date taxation : ${detail.dateTaxation ?? "—"}',
-                              style: const TextStyle(
-                                color: Color(0xFF64748B),
-                                fontSize: 12.5,
+                              const SizedBox(height: 3),
+                              Text(
+                                'Date taxation : ${detail.dateTaxation ?? "—"}',
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(
+                                  color: Color(0xFF64748B),
+                                  fontSize: 12.5,
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
+                        const SizedBox(width: 8),
                         StatusBadge(status: detail.port ?? 'Standard'),
                       ],
                     ),
@@ -239,18 +245,23 @@ class _ExpeditionDetailScreenState extends State<ExpeditionDetailScreen> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                       children: [
-                                        Text(
-                                          step.processus,
-                                          style: const TextStyle(
-                                            color: Color(0xFF0F172A),
-                                            fontSize: 14.5,
-                                            fontWeight: FontWeight.w700,
+                                        Expanded(
+                                          child: Text(
+                                            step.processus,
+                                            maxLines: 2,
+                                            overflow: TextOverflow.ellipsis,
+                                            style: const TextStyle(
+                                              color: Color(0xFF0F172A),
+                                              fontSize: 14.5,
+                                              fontWeight: FontWeight.w700,
+                                            ),
                                           ),
                                         ),
-                                        if (step.status != null)
+                                        if (step.status != null) ...[
+                                          const SizedBox(width: 8),
                                           StatusBadge(status: step.status!, fontSize: 10),
+                                        ],
                                       ],
                                     ),
                                     const SizedBox(height: 6),

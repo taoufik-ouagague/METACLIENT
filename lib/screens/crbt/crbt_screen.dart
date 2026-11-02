@@ -318,17 +318,35 @@ class CrbtScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text('Déclaration: ${item.numDeclaration}', style: const TextStyle(color: Color(0xFF0F172A), fontSize: 14.5, fontWeight: FontWeight.w700)),
+                  Expanded(
+                    child: Text(
+                      'Déclaration: ${item.numDeclaration}',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        color: Color(0xFF0F172A),
+                        fontSize: 14.5,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
                   StatusBadge(status: item.nature ?? 'CRBT'),
                 ],
               ),
               const SizedBox(height: 8),
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text('Dest: ${item.destinataire ?? "—"} (${item.destination ?? "—"})', style: const TextStyle(color: Color(0xFF475569), fontSize: 12.5)),
+                  Expanded(
+                    child: Text(
+                      'Dest: ${item.destinataire ?? "—"} (${item.destination ?? "—"})',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(color: Color(0xFF475569), fontSize: 12.5),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
                   Text(_formatCurrency(item.fond), style: const TextStyle(color: AppTheme.primary, fontSize: 14, fontWeight: FontWeight.w800)),
                 ],
               ),
@@ -361,30 +379,39 @@ class CrbtScreen extends StatelessWidget {
           padding: const EdgeInsets.all(15),
           onTap: () => _showChequeDetailDialog(context, item, ctrl),
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      color: AppTheme.primary.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: const Icon(LucideIcons.landmark, color: AppTheme.primary, size: 20),
-                  ),
-                  const SizedBox(width: 12),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('Chèque N° ${item.numCheque}', style: const TextStyle(color: Color(0xFF0F172A), fontSize: 14.5, fontWeight: FontWeight.w700)),
-                      const SizedBox(height: 3),
-                      Text('Banque: ${item.banque ?? "—"} • Remise: ${item.dateRemise ?? "—"}', style: const TextStyle(color: Color(0xFF64748B), fontSize: 11.5)),
-                    ],
-                  ),
-                ],
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: AppTheme.primary.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Icon(LucideIcons.landmark, color: AppTheme.primary, size: 20),
               ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Chèque N° ${item.numCheque}',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(color: Color(0xFF0F172A), fontSize: 14.5, fontWeight: FontWeight.w700),
+                    ),
+                    const SizedBox(height: 3),
+                    Text(
+                      'Banque: ${item.banque ?? "—"} • Remise: ${item.dateRemise ?? "—"}',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(color: Color(0xFF64748B), fontSize: 11.5),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 8),
               Row(
+                mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(_formatCurrency(item.montant), style: const TextStyle(color: AppTheme.primary, fontSize: 14.5, fontWeight: FontWeight.w800)),
                   const SizedBox(width: 6),
@@ -416,30 +443,39 @@ class CrbtScreen extends StatelessWidget {
           padding: const EdgeInsets.all(15),
           onTap: () => _showVirementDetailDialog(context, item, ctrl),
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      color: AppTheme.statusSuccess.withOpacity(0.12),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: const Icon(LucideIcons.arrowUpRight, color: AppTheme.statusSuccess, size: 20),
-                  ),
-                  const SizedBox(width: 12),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('Virement: ${item.numOv}', style: const TextStyle(color: Color(0xFF0F172A), fontSize: 14.5, fontWeight: FontWeight.w700)),
-                      const SizedBox(height: 3),
-                      Text('Mandat: ${item.numeroMandat ?? "—"} • ${item.dateVirement ?? "—"}', style: const TextStyle(color: Color(0xFF64748B), fontSize: 11.5)),
-                    ],
-                  ),
-                ],
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: AppTheme.statusSuccess.withOpacity(0.12),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Icon(LucideIcons.arrowUpRight, color: AppTheme.statusSuccess, size: 20),
               ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Virement: ${item.numOv}',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(color: Color(0xFF0F172A), fontSize: 14.5, fontWeight: FontWeight.w700),
+                    ),
+                    const SizedBox(height: 3),
+                    Text(
+                      'Mandat: ${item.numeroMandat ?? "—"} • ${item.dateVirement ?? "—"}',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(color: Color(0xFF64748B), fontSize: 11.5),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 8),
               Row(
+                mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(_formatCurrency(item.fond), style: const TextStyle(color: AppTheme.statusSuccess, fontSize: 14.5, fontWeight: FontWeight.w800)),
                   const SizedBox(width: 6),

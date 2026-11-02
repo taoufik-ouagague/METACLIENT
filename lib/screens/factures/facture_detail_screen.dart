@@ -60,29 +60,35 @@ class _FactureDetailScreenState extends State<FactureDetailScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Facture N° ${f.numFacture}',
-                            style: const TextStyle(
-                              color: Color(0xFF0F172A),
-                              fontSize: 18.5,
-                              fontWeight: FontWeight.w800,
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Facture N° ${f.numFacture}',
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                color: Color(0xFF0F172A),
+                                fontSize: 18.5,
+                                fontWeight: FontWeight.w800,
+                              ),
                             ),
-                          ),
-                          const SizedBox(height: 3),
-                          Text(
-                            'Émise le : ${f.dateFacture ?? "—"}',
-                            style: const TextStyle(
-                              color: Color(0xFF64748B),
-                              fontSize: 12.5,
+                            const SizedBox(height: 3),
+                            Text(
+                              'Émise le : ${f.dateFacture ?? "—"}',
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                color: Color(0xFF64748B),
+                                fontSize: 12.5,
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
+                      const SizedBox(width: 8),
                       StatusBadge(status: f.statut ?? (f.isPayee ? 'Payée' : 'En cours')),
                     ],
                   ),

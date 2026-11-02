@@ -248,45 +248,47 @@ class FacturesScreen extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: hasSolde
-                          ? AppTheme.statusDanger.withOpacity(0.12)
-                          : AppTheme.statusSuccess.withOpacity(0.12),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Icon(
-                      hasSolde ? LucideIcons.fileWarning : LucideIcons.fileCheck2,
-                      color: hasSolde ? AppTheme.statusDanger : AppTheme.statusSuccess,
-                      size: 20,
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Facture N° ${item.numFacture}',
-                        style: const TextStyle(
-                          color: Color(0xFF0F172A),
-                          fontSize: 15,
-                          fontWeight: FontWeight.w800,
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        item.dateFacture ?? '—',
-                        style: const TextStyle(color: Color(0xFF64748B), fontSize: 12),
-                      ),
-                    ],
-                  ),
-                ],
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: hasSolde
+                      ? AppTheme.statusDanger.withOpacity(0.12)
+                      : AppTheme.statusSuccess.withOpacity(0.12),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(
+                  hasSolde ? LucideIcons.fileWarning : LucideIcons.fileCheck2,
+                  color: hasSolde ? AppTheme.statusDanger : AppTheme.statusSuccess,
+                  size: 20,
+                ),
               ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Facture N° ${item.numFacture}',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        color: Color(0xFF0F172A),
+                        fontSize: 15,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      item.dateFacture ?? '—',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(color: Color(0xFF64748B), fontSize: 12),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 8),
               StatusBadge(status: item.statut ?? (hasSolde ? 'En instance' : 'Payée')),
             ],
           ),

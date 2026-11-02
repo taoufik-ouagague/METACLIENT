@@ -351,29 +351,29 @@ class ExpeditionsScreen extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(7),
-                    decoration: BoxDecoration(
-                      color: AppTheme.primary.withOpacity(0.10),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: const Icon(LucideIcons.package, color: AppTheme.primary, size: 18),
-                  ),
-                  const SizedBox(width: 10),
-                  Text(
-                    item.numDeclaration,
-                    style: const TextStyle(
-                      color: Color(0xFF0F172A),
-                      fontSize: 15,
-                      fontWeight: FontWeight.w800,
-                    ),
-                  ),
-                ],
+              Container(
+                padding: const EdgeInsets.all(7),
+                decoration: BoxDecoration(
+                  color: AppTheme.primary.withOpacity(0.10),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: const Icon(LucideIcons.package, color: AppTheme.primary, size: 18),
               ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  item.numDeclaration,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    color: Color(0xFF0F172A),
+                    fontSize: 15,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
               StatusBadge(status: item.statut ?? (item.isLivree ? 'Livré' : 'En cours')),
             ],
           ),
@@ -384,15 +384,19 @@ class ExpeditionsScreen extends StatelessWidget {
             children: [
               const Icon(LucideIcons.mapPin, size: 13, color: AppTheme.primaryIcons),
               const SizedBox(width: 4),
-              Text(
-                '${item.origine ?? "—"} → ${item.destination ?? "—"}',
-                style: const TextStyle(
-                  color: Color(0xFF334155),
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600,
+              Expanded(
+                child: Text(
+                  '${item.origine ?? "—"} → ${item.destination ?? "—"}',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    color: Color(0xFF334155),
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ),
-              const Spacer(),
+              const SizedBox(width: 8),
               Text(
                 _formatCurrency(item.mntTtc),
                 style: const TextStyle(

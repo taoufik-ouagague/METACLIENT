@@ -284,45 +284,47 @@ class RetoursScreen extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: AppTheme.primary.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Icon(
-                      isMoney ? LucideIcons.coins : LucideIcons.fileText,
-                      color: AppTheme.primary,
-                      size: 18,
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Décl: ${item.numDeclaration ?? "—"}',
-                        style: const TextStyle(
-                          color: Color(0xFF0F172A),
-                          fontSize: 14.5,
-                          fontWeight: FontWeight.w800,
-                        ),
-                      ),
-                      if (item.bordereau != null) ...[
-                        const SizedBox(height: 2),
-                        Text(
-                          'Bordereau: ${item.bordereau}',
-                          style: const TextStyle(color: Color(0xFF64748B), fontSize: 11.5),
-                        ),
-                      ],
-                    ],
-                  ),
-                ],
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: AppTheme.primary.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Icon(
+                  isMoney ? LucideIcons.coins : LucideIcons.fileText,
+                  color: AppTheme.primary,
+                  size: 18,
+                ),
               ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Décl: ${item.numDeclaration ?? "—"}',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        color: Color(0xFF0F172A),
+                        fontSize: 14.5,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                    if (item.bordereau != null) ...[
+                      const SizedBox(height: 2),
+                      Text(
+                        'Bordereau: ${item.bordereau}',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(color: Color(0xFF64748B), fontSize: 11.5),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+              const SizedBox(width: 8),
               StatusBadge(status: item.nature),
             ],
           ),
@@ -333,25 +335,30 @@ class RetoursScreen extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'Destinataire',
-                    style: TextStyle(color: Color(0xFF64748B), fontSize: 11.5),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    '${item.destinataire ?? "—"} (${item.destination ?? "—"})',
-                    style: const TextStyle(
-                      color: Color(0xFF0F172A),
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600,
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Destinataire',
+                      style: TextStyle(color: Color(0xFF64748B), fontSize: 11.5),
                     ),
-                  ),
-                ],
+                    const SizedBox(height: 2),
+                    Text(
+                      '${item.destinataire ?? "—"} (${item.destination ?? "—"})',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        color: Color(0xFF0F172A),
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
               ),
-              if (isMoney)
+              if (isMoney) ...[
+                const SizedBox(width: 8),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
@@ -370,6 +377,7 @@ class RetoursScreen extends StatelessWidget {
                     ),
                   ],
                 ),
+              ],
             ],
           ),
 
