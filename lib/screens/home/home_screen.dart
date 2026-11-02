@@ -1,3 +1,5 @@
+import 'dart:convert';
+import 'dart:typed_data';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -277,15 +279,6 @@ class _HomeScreenState extends State<HomeScreen> {
           onTap: () => _changerOnglet(1),
         ),
         const SizedBox(width: 8),
-        // Bouton Rafraîchir
-        _appBarGlassButton(
-          icon: LucideIcons.refreshCw,
-          onTap: () {
-            Get.find<DashboardController>().loadDashboardData();
-            _authController.fetchClientInfo();
-          },
-        ),
-        const SizedBox(width: 8),
         // Bouton Profil
         _boutonProfil(),
         const SizedBox(width: 14),
@@ -297,6 +290,16 @@ class _HomeScreenState extends State<HomeScreen> {
     return Obx(() {
       final client = _authController.clientInfo.value;
       final user = _authController.currentUser.value;
+      final photoBase64 = _authController.profilePhoto.value;
+      Uint8List? photoBytes;
+      if (photoBase64 != null && photoBase64.trim().isNotEmpty) {
+        try {
+          String clean = photoBase64.trim();
+          if (clean.contains(',')) clean = clean.split(',').last;
+          photoBytes = base64Decode(clean);
+        } catch (_) {}
+      }
+
       final nom = client?.raisonSociale.isNotEmpty == true
           ? client!.raisonSociale
           : (user?.libelle ?? 'C');
@@ -331,16 +334,25 @@ class _HomeScreenState extends State<HomeScreen> {
           child: InkWell(
             customBorder: const CircleBorder(),
             onTap: ouvrir,
-            child: Center(
-              child: Text(
-                lettre,
-                style: GoogleFonts.poppins(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w700,
-                  color: isProfileActive ? Colors.white : AppTheme.primary,
-                ),
-              ),
-            ),
+            child: photoBytes != null
+                ? ClipOval(
+                    child: Image.memory(
+                      photoBytes,
+                      fit: BoxFit.cover,
+                      width: 40,
+                      height: 40,
+                    ),
+                  )
+                : Center(
+                    child: Text(
+                      lettre,
+                      style: GoogleFonts.poppins(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w700,
+                        color: isProfileActive ? Colors.white : AppTheme.primary,
+                      ),
+                    ),
+                  ),
           ),
         ),
       );
