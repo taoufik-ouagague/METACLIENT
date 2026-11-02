@@ -121,19 +121,19 @@ class GlassScaffold extends StatelessWidget {
                 } else {
                   return Stack(
                     children: [
-                      // Top-Right: Warm Yellow Glowing Orb
+                      // Middle-Right: Warm Yellow Glowing Orb beside card
                       Positioned(
-                        top: -50,
-                        right: -50,
+                        top: 140,
+                        right: -70,
                         child: Container(
-                          width: 280,
-                          height: 280,
+                          width: 270,
+                          height: 270,
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
                             gradient: RadialGradient(
                               colors: [
-                                (hasCustom ? oColor : AppTheme.primary).withOpacity(0.24),
-                                (hasCustom ? oColor : AppTheme.primary).withOpacity(0.06),
+                                (hasCustom ? oColor : AppTheme.primary).withOpacity(0.22),
+                                (hasCustom ? oColor : AppTheme.primary).withOpacity(0.05),
                                 Colors.transparent,
                               ],
                               stops: const [0.0, 0.50, 1.0],
@@ -143,17 +143,17 @@ class GlassScaffold extends StatelessWidget {
                       ),
                       // Middle-Left: Emerald Green Glowing Orb behind the card
                       Positioned(
-                        top: 220,
+                        top: 300,
                         left: -80,
                         child: Container(
-                          width: 300,
-                          height: 300,
+                          width: 290,
+                          height: 290,
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
                             gradient: RadialGradient(
                               colors: [
-                                (hasCustom ? sColor : AppTheme.primaryIcons).withOpacity(0.25),
-                                (hasCustom ? sColor : AppTheme.primaryIcons).withOpacity(0.07),
+                                (hasCustom ? sColor : AppTheme.primaryIcons).withOpacity(0.22),
+                                (hasCustom ? sColor : AppTheme.primaryIcons).withOpacity(0.06),
                                 Colors.transparent,
                               ],
                               stops: const [0.0, 0.50, 1.0],
@@ -161,26 +161,7 @@ class GlassScaffold extends StatelessWidget {
                           ),
                         ),
                       ),
-                      // Top-Left: Subtle Green glow above logos
-                      Positioned(
-                        top: -40,
-                        left: -40,
-                        child: Container(
-                          width: 220,
-                          height: 220,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            gradient: RadialGradient(
-                              colors: [
-                                (hasCustom ? sColor : AppTheme.primaryIcons).withOpacity(0.18),
-                                Colors.transparent,
-                              ],
-                              stops: const [0.0, 0.55],
-                            ),
-                          ),
-                        ),
-                      ),
-                      // Bottom-Right: Royal Blue Glowing Orb behind footer
+                      // Bottom-Center: Royal Blue Glowing Orb behind footer
                       Positioned(
                         bottom: -60,
                         right: 20,

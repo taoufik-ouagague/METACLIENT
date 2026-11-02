@@ -78,7 +78,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         borderWidth: 1.8,
                         padding: const EdgeInsets.all(13),
                         colors: movingBorderColors,
-                        backgroundColor: Colors.white.withOpacity(0.08),
+                        backgroundColor: const Color(0xFF0F1B2D),
                         child: Image.asset(
                           'assets/img/logo.png',
                           fit: BoxFit.contain,
@@ -120,7 +120,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         borderWidth: 1.8,
                         padding: const EdgeInsets.all(11),
                         colors: movingBorderColors,
-                        backgroundColor: Colors.white.withOpacity(0.08),
+                        backgroundColor: const Color(0xFF0F1B2D),
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(16),
                           child: Image.network(
@@ -161,7 +161,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   borderWidth: 1.8,
                   padding: const EdgeInsets.all(16),
                   colors: movingBorderColors,
-                  backgroundColor: Colors.white.withOpacity(0.08),
+                  backgroundColor: const Color(0xFF0F1B2D),
                   child: Image.asset(
                     'assets/img/logo.png',
                     fit: BoxFit.contain,
