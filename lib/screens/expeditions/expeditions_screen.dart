@@ -551,17 +551,13 @@ class ExpeditionsScreen extends StatelessWidget {
                   'Livré le ${item.dateLivraison}',
                 if (valeurRenseignee(item.dateLivPh))
                   'Prévu le ${item.dateLivPh}',
-                if ((item.notificationLivraison ?? '0') != '0')
-                  'Notifié',
+                if ((item.notificationLivraison ?? '0') != '0') 'Notifié',
                 if ((item.valeurDeclaree ?? 0) > 0)
                   'Val. déclarée ${_formatCurrency(item.valeurDeclaree)}',
               ].join(' • '),
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
-                color: Color(0xFF94A3B8),
-                fontSize: 11,
-              ),
+              style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 11),
             ),
           ],
         ],

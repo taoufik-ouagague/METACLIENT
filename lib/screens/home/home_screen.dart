@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../../controllers/auth_controller.dart';
+import '../expeditions/tracking_screen.dart';
 import '../../controllers/config_controller.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/ambient_background.dart';
@@ -217,7 +218,11 @@ class _HomeScreenState extends State<HomeScreen> {
         // Bouton Recherche rapide
         _appBarGlassButton(
           icon: LucideIcons.search,
-          onTap: () => _changerOnglet(1),
+          onTap: () => Get.to<void>(
+            () => const TrackingScreen(),
+            transition: Transition.cupertino,
+            duration: const Duration(milliseconds: 360),
+          ),
         ),
         const SizedBox(width: 8),
         // Bouton Profil

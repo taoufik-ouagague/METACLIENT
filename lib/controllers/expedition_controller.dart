@@ -18,6 +18,11 @@ class ExpeditionController extends GetxController {
   final RxList<ExpeditionModel> allExpeditions = <ExpeditionModel>[].obs;
   final Rxn<ExpeditionDetailModel> selectedDetail = Rxn<ExpeditionDetailModel>();
 
+  /// Resultats du suivi : l'API renvoie une liste, car un meme numero de
+  /// declaration peut porter plusieurs expeditions (un aller et son retour).
+  final RxList<ExpeditionDetailModel> resultatsTracking =
+      <ExpeditionDetailModel>[].obs;
+
   // Pagination & Filtering
   final RxInt currentPage = 1.obs;
   final RxInt totalPages = 1.obs;
@@ -87,6 +92,37 @@ class ExpeditionController extends GetxController {
       );
     } finally {
       isLoading.value = false;
+    }
+  }
+
+  /// Suivi par n° de declaration. Remplit `resultatsTracking` et renvoie le
+  /// nombre de lignes trouvees — l'API repond 200 avec une liste vide quand le
+  /// numero est inconnu, ce n'est pas une erreur.
+  Future<int> fetchTracking(String numDeclaration) async {
+    try {
+      isLoadingDetail.value = true;
+      resultatsTracking.clear();
+      final res = await ApiService.getTrackingExpedition(numDeclaration);
+      final liste = res['data'] as List? ?? [];
+      resultatsTracking.assignAll(
+        liste.map(
+          (e) => ExpeditionDetailModel.fromJson(Map<String, dynamic>.from(e as Map)),
+        ),
+      );
+
+      return resultatsTracking.length;
+    } catch (e) {
+      Get.snackbar(
+        'Suivi indisponible',
+        e.toString().replaceAll('ApiException', '').trim(),
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: const Color(0xFFEF4444).withValues(alpha: 0.8),
+        colorText: Colors.white,
+      );
+
+      return 0;
+    } finally {
+      isLoadingDetail.value = false;
     }
   }
 

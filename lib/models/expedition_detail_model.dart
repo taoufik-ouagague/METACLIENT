@@ -105,6 +105,10 @@ class ExpeditionDetailModel {
   final String? destinataireCode;
   final String? destinataireAdresse;
   final String? destinataireTel;
+  final double? gpsLatitude;
+  final double? gpsLongitude;
+  final String? gpsGeofence;
+  final String? gpsCapturedAt;
 
   ExpeditionDetailModel({
     this.idExpedition,
@@ -141,7 +145,19 @@ class ExpeditionDetailModel {
     this.destinataireCode,
     this.destinataireAdresse,
     this.destinataireTel,
+    this.gpsLatitude,
+    this.gpsLongitude,
+    this.gpsGeofence,
+    this.gpsCapturedAt,
   });
+
+  static Map<String, dynamic> _geo(Map<String, dynamic> json) =>
+      json['geofence'] is Map
+          ? Map<String, dynamic>.from(json['geofence'] as Map)
+          : const {};
+
+  static double? _nombre(Object? v) =>
+      v == null ? null : double.tryParse(v.toString());
 
   factory ExpeditionDetailModel.fromJson(Map<String, dynamic> json) {
     final rawProc = json['processus'] as List? ?? [];
@@ -186,6 +202,11 @@ class ExpeditionDetailModel {
       destinataireCode: json['destinataire_code']?.toString(),
       destinataireAdresse: json['destinataire_adresse']?.toString(),
       destinataireTel: json['destinataire_tel']?.toString(),
+      // Presente uniquement sur /trackingExpedition.
+      gpsLatitude: _nombre(_geo(json)['gpsLatitude']),
+      gpsLongitude: _nombre(_geo(json)['gpsLongitude']),
+      gpsGeofence: _geo(json)['gpsGeofence']?.toString(),
+      gpsCapturedAt: _geo(json)['gpsCapturedAt']?.toString(),
     );
   }
 }

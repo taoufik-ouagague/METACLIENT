@@ -6,9 +6,24 @@ import 'package:logger/logger.dart';
 import 'storage_service.dart';
 
 class ApiService {
+  /// Journalisation des appels HTTP. Coupee par defaut : les reponses
+  /// contiennent des donnees client (factures, destinataires, montants) et la
+  /// requete de connexion portait le mot de passe en clair dans le terminal.
+  ///
+  /// Pour deboguer un appel, passer a `true` le temps de la session, jamais
+  /// dans un commit. Meme active, les secrets restent masques (voir _sansSecrets).
+  static const bool _tracerHttp = false;
+
   static final Logger _logger = Logger(
+    // Level.off : les appels _logger.* ne produisent plus aucune sortie.
+    level: _tracerHttp ? Level.trace : Level.off,
     printer: PrettyPrinter(methodCount: 0, dateTimeFormat: DateTimeFormat.none),
   );
+
+  /// Masque mot de passe et jeton avant toute trace.
+  static String _sansSecrets(String texte) => texte
+      .replaceAll(RegExp(r'"pwd"\s*:\s*"[^"]*"'), '"pwd":"***"')
+      .replaceAll(RegExp(r'"token"\s*:\s*"[^"]*"'), '"token":"***"');
 
   static const String defaultDevUrl = 'https://metaphore.kaytechnology.com:6799/CLIENTMOBILE';
   static const String defaultAndroidEmulatorUrl = 'https://metaphore.kaytechnology.com:6799/CLIENTMOBILE';
@@ -77,7 +92,7 @@ class ApiService {
       'pwd': pwd.trim(),
     });
 
-    _logger.i('POST $url\nBody: $body');
+    _logger.i('POST $url\nBody: ${_sansSecrets(body)}');
     final response = await http.post(
       url,
       headers: {'Content-Type': 'application/json'},
@@ -147,6 +162,20 @@ class ApiService {
     final url = Uri.parse('$baseUrl/api/clientmobile/factures?page=$page&pageSize=$pageSize');
     final body = jsonEncode({'regle': regle});
     final response = await http.post(url, headers: _buildHeaders(), body: body);
+    return _handleResponse(response);
+  }
+
+  // ─── SUIVI D'UNE EXPEDITION PAR N° DE DECLARATION ───────────────────────────
+  // API Get : /api/clientmobile/trackingExpedition?numDeclaration=...
+  // Meme charge utile que expeditionsDetail, plus un bloc `geofence`.
+  static Future<Map<String, dynamic>> getTrackingExpedition(
+    String numDeclaration,
+  ) async {
+    final url = Uri.parse(
+      '$baseUrl/api/clientmobile/trackingExpedition'
+      '?numDeclaration=${Uri.encodeQueryComponent(numDeclaration)}',
+    );
+    final response = await http.get(url, headers: _buildHeaders());
     return _handleResponse(response);
   }
 
@@ -310,7 +339,7 @@ class ApiService {
   // Helper response handler
   static Map<String, dynamic> _handleResponse(http.Response response) {
     final bodyString = utf8.decode(response.bodyBytes);
-    _logger.d('Status ${response.statusCode}: $bodyString');
+    _logger.d('Status ${response.statusCode}: ${_sansSecrets(bodyString)}');
 
     if (response.statusCode >= 200 && response.statusCode < 300) {
       if (bodyString.isEmpty) return {};

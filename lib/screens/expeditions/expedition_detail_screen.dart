@@ -3,16 +3,26 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../../controllers/expedition_controller.dart';
+import '../../models/expedition_detail_model.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/glass_container.dart';
-import '../../widgets/glass_scaffold.dart';
+import 'table_expedition_screen.dart';
+import '../../widgets/visionneuse_document.dart';
 import '../../widgets/status_badge.dart';
 import '../../widgets/scroll_reveal.dart';
 
 class ExpeditionDetailScreen extends StatefulWidget {
   final int idExpedition;
 
-  const ExpeditionDetailScreen({super.key, required this.idExpedition});
+  /// Le suivi par n° de declaration a deja rempli `selectedDetail` : on ne
+  /// relance pas d'appel, le detail s'affiche tel quel.
+  final bool dejaCharge;
+
+  const ExpeditionDetailScreen({
+    super.key,
+    required this.idExpedition,
+    this.dejaCharge = false,
+  });
 
   @override
   State<ExpeditionDetailScreen> createState() => _ExpeditionDetailScreenState();
@@ -21,10 +31,12 @@ class ExpeditionDetailScreen extends StatefulWidget {
 class _ExpeditionDetailScreenState extends State<ExpeditionDetailScreen> {
   final ExpeditionController _controller = Get.find<ExpeditionController>();
 
+  bool _infosOuvertes = true;
+
   @override
   void initState() {
     super.initState();
-    _controller.fetchDetail(widget.idExpedition);
+    if (!widget.dejaCharge) _controller.fetchDetail(widget.idExpedition);
   }
 
   String _formatCurrency(num? amount) {
@@ -35,21 +47,8 @@ class _ExpeditionDetailScreenState extends State<ExpeditionDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return GlassScaffold(
-      isLight: true,
-      appBar: AppBar(
-        title: const Text(
-          'Détail Expédition',
-          style: TextStyle(
-            color: Color(0xFF0F172A),
-            fontWeight: FontWeight.w700,
-          ),
-        ),
-        leading: IconButton(
-          icon: const Icon(LucideIcons.arrowLeft, color: AppTheme.primary),
-          onPressed: () => Get.back(),
-        ),
-      ),
+    return Scaffold(
+      backgroundColor: const Color(0xFFEFF3F8),
       body: Obx(() {
         if (_controller.isLoadingDetail.value) {
           return const Center(
@@ -67,668 +66,1080 @@ class _ExpeditionDetailScreenState extends State<ExpeditionDetailScreen> {
           );
         }
 
-        return SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // ─── HERO HEADER CARD ──────────────────────────────────────────
-              GlassContainer(
-                borderRadius: 24,
-                padding: const EdgeInsets.all(20),
+        // En-tete peint, cartes posees dessus : l'identite de l'expedition
+        // tient dans le bandeau, les cartes n'ont plus a la repeter.
+        return Stack(
+          children: [
+            _enteteExpedition(detail),
+            SafeArea(
+              bottom: false,
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.fromLTRB(18, 116, 18, 28),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                    // ─── IDENTITE DE L'EXPEDITION (carte a 2 panneaux) ─────────────
+                    GlassContainer(
+                      borderRadius: 24,
+                      padding: const EdgeInsets.all(20),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Route (Origine -> Destination)
+                          Row(
                             children: [
-                              Text(
-                                'N° ${detail.numDeclaration}',
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: const TextStyle(
-                                  color: Color(0xFF0F172A),
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.w800,
+                              _buildRoutePill(
+                                LucideIcons.circleDot,
+                                'Origine',
+                                detail.origine ?? '—',
+                                societe: detail.expediteur,
+                              ),
+                              Expanded(
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 8,
+                                  ),
+                                  child: _traitTrajet(),
                                 ),
                               ),
-                              const SizedBox(height: 3),
-                              Text(
-                                'Date taxation : ${detail.dateTaxation ?? "—"}',
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: const TextStyle(
-                                  color: Color(0xFF64748B),
-                                  fontSize: 12.5,
-                                ),
+                              _buildRoutePill(
+                                LucideIcons.mapPin,
+                                'Destination',
+                                detail.destination ?? '—',
+                                societe: detail.destinataire,
                               ),
                             ],
                           ),
-                        ),
-                        const SizedBox(width: 8),
-                        StatusBadge(status: detail.port ?? 'Standard'),
-                      ],
-                    ),
-                    const SizedBox(height: 16),
-                    const Divider(color: Color(0xFFE2E8F0), height: 1),
-                    const SizedBox(height: 16),
+                          const SizedBox(height: 18),
 
-                    // Route (Origine -> Destination)
-                    Row(
-                      children: [
-                        _buildRoutePill(
-                          LucideIcons.circleDot,
-                          'Origine',
-                          detail.origine ?? '—',
-                        ),
-                        Expanded(
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 8),
-                            child: Divider(
-                              color: AppTheme.primary.withValues(alpha: 0.3),
-                              thickness: 1.5,
-                            ),
-                          ),
-                        ),
-                        _buildRoutePill(
-                          LucideIcons.mapPin,
-                          'Destination',
-                          detail.destination ?? '—',
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 18),
-
-                    // Metrics Row (Poids, Colis, TTC, Fond)
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        _buildMetricCol('Poids', '${detail.poids ?? 0} kg'),
-                        _buildMetricCol('Colis', '${detail.colis ?? 0} colis'),
-                        _buildMetricCol(
-                          'Montant TTC',
-                          _formatCurrency(detail.mntTtc),
-                        ),
-                        _buildMetricCol(
-                          'Fond CRBT',
-                          _formatCurrency(detail.fond),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-
-              const SizedBox(height: 22),
-
-              // ─── EXPÉDITEUR & DESTINATAIRE ──────────────────────────────────
-              GlassContainer(
-                borderRadius: 20,
-                padding: const EdgeInsets.all(18),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _buildActorRow(
-                      LucideIcons.send,
-                      'Expéditeur',
-                      detail.expediteur ?? '—',
-                      detail.expediteurAdresse,
-                      code: detail.expediteurCode,
-                      tel: detail.expediteurTel,
-                    ),
-                    const SizedBox(height: 14),
-                    const Divider(color: Color(0xFFE2E8F0), height: 1),
-                    const SizedBox(height: 14),
-                    _buildActorRow(
-                      LucideIcons.userCheck,
-                      'Destinataire',
-                      detail.destinataire ?? '—',
-                      detail.destinataireAdresse,
-                      code: detail.destinataireCode,
-                      tel: detail.destinataireTel,
-                    ),
-                  ],
-                ),
-              ),
-
-              const SizedBox(height: 24),
-
-              const SizedBox(height: 24),
-
-              // ─── INFORMATIONS COMPLEMENTAIRES ──────────────────────────────
-              // Les champs du contrat API qui n'ont pas leur place ailleurs.
-              // Les valeurs vides sont masquees, pas remplacees par un tiret.
-              Builder(
-                builder: (context) {
-                  final lignes = <MapEntry<String, String>>[
-                    MapEntry('Nature', detail.nature ?? ''),
-                    MapEntry('Sens', detail.sens ?? ''),
-                    MapEntry('Activité', detail.activite ?? ''),
-                    MapEntry('Type de livraison', detail.livraison ?? ''),
-                    MapEntry('BL / Facture', detail.blFact ?? ''),
-                    MapEntry(
-                      'Valeur déclarée',
-                      detail.valeurDeclaree == null
-                          ? ''
-                          : _formatCurrency(detail.valeurDeclaree),
-                    ),
-                    MapEntry('Montant HT', detail.mntHt == null ? '' : _formatCurrency(detail.mntHt)),
-                    MapEntry('Facture en compte', detail.factureEncompte ?? ''),
-                    MapEntry('Date livraison mobile', detail.dateLivMobile ?? ''),
-                    MapEntry('Date encaissement', detail.dateEncaissement ?? ''),
-                  ].where((e) => _renseigne(e.value)).toList();
-
-                  if (lignes.isEmpty) return const SizedBox.shrink();
-
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Row(
-                        children: [
-                          Icon(LucideIcons.info, color: AppTheme.primary, size: 20),
-                          SizedBox(width: 8),
-                          Text(
-                            'Informations complémentaires',
-                            style: TextStyle(
-                              color: Color(0xFF0F172A),
-                              fontSize: 16,
-                              fontWeight: FontWeight.w700,
-                            ),
+                          // Metrics Row (Poids, Colis, TTC, Fond)
+                          Row(
+                            children: [
+                              _tuileChiffre(
+                                'Poids',
+                                '${detail.poids ?? 0} kg',
+                                AppTheme.primary,
+                              ),
+                              const SizedBox(width: 8),
+                              _tuileChiffre(
+                                'Colis',
+                                '${detail.colis ?? 0}',
+                                const Color(0xFF6366F1),
+                              ),
+                              const SizedBox(width: 8),
+                              _tuileChiffre(
+                                'TTC',
+                                _formatCurrency(detail.mntTtc),
+                                AppTheme.statusSuccess,
+                              ),
+                              const SizedBox(width: 8),
+                              _tuileChiffre(
+                                'Fond',
+                                _formatCurrency(detail.fond),
+                                AppTheme.statusWarning,
+                              ),
+                            ],
                           ),
                         ],
                       ),
-                      const SizedBox(height: 10),
-                      GlassContainer(
-                        borderRadius: 18,
-                        padding: const EdgeInsets.all(16),
-                        child: Column(
-                          children: [
-                            for (var i = 0; i < lignes.length; i++) ...[
-                              if (i > 0)
-                                const Padding(
-                                  padding: EdgeInsets.symmetric(vertical: 8),
-                                  child: Divider(
-                                    color: Color(0xFFE2E8F0),
-                                    height: 1,
-                                  ),
-                                ),
-                              Row(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Expanded(
-                                    child: Text(
-                                      lignes[i].key,
-                                      style: const TextStyle(
-                                        color: Color(0xFF64748B),
-                                        fontSize: 12.5,
-                                      ),
-                                    ),
-                                  ),
-                                  const SizedBox(width: 12),
-                                  Flexible(
-                                    child: Text(
-                                      lignes[i].value,
-                                      textAlign: TextAlign.end,
-                                      style: const TextStyle(
-                                        color: Color(0xFF0F172A),
-                                        fontSize: 13,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                  ),
-                                ],
+                    ),
+
+                    const SizedBox(height: 24),
+
+                    // ─── TABLES DE L'EXPEDITION ────────────────────────────────────
+                    // Chaque tableau du contrat API a son bouton ; la liste s'ouvre
+                    // en feuille plutot que d'empiler six sections dans la page.
+                    _grilleTables(detail),
+
+                    const SizedBox(height: 22),
+
+                    // ─── DETAILS & PIECES (carte a 2 panneaux) ─────────────────────
+                    // Panneau 1 : les champs du contrat API qui n'ont pas leur place
+                    // ailleurs. Panneau 2 : les documents GED, toujours affiche —
+                    // vide, il dit qu'il est vide plutot que de disparaitre.
+                    Builder(
+                      builder: (context) {
+                        final lignes = <MapEntry<String, String>>[
+                          MapEntry('Nature', detail.nature ?? ''),
+                          MapEntry('Sens', detail.sens ?? ''),
+                          MapEntry('Activité', detail.activite ?? ''),
+                          MapEntry('Type de livraison', detail.livraison ?? ''),
+                          MapEntry('BL / Facture', detail.blFact ?? ''),
+                          MapEntry(
+                            'Valeur déclarée',
+                            detail.valeurDeclaree == null
+                                ? ''
+                                : _formatCurrency(detail.valeurDeclaree),
+                          ),
+                          MapEntry(
+                            'Montant HT',
+                            detail.mntHt == null
+                                ? ''
+                                : _formatCurrency(detail.mntHt),
+                          ),
+                          MapEntry(
+                            'Facture en compte',
+                            detail.factureEncompte ?? '',
+                          ),
+                          MapEntry(
+                            'Date livraison mobile',
+                            detail.dateLivMobile ?? '',
+                          ),
+                          MapEntry(
+                            'Date encaissement',
+                            detail.dateEncaissement ?? '',
+                          ),
+                          // Renvoye par /trackingExpedition uniquement.
+                          MapEntry('Zone GPS', detail.gpsGeofence ?? ''),
+                          MapEntry(
+                            'Position GPS',
+                            detail.gpsLatitude == null ||
+                                    detail.gpsLongitude == null
+                                ? ''
+                                : '${detail.gpsLatitude}, ${detail.gpsLongitude}',
+                          ),
+                          MapEntry('Relevé GPS le', detail.gpsCapturedAt ?? ''),
+                        ].where((e) => _renseigne(e.value)).toList();
+
+                        if (lignes.isEmpty) return const SizedBox.shrink();
+
+                        return Container(
+                          padding: const EdgeInsets.fromLTRB(14, 4, 14, 4),
+                          decoration: BoxDecoration(
+                            // Un blanc parfaitement plat durcit la carte : le
+                            // degrade lui donne du relief sans la colorer.
+                            gradient: const LinearGradient(
+                              begin: Alignment.topCenter,
+                              end: Alignment.bottomCenter,
+                              colors: [Colors.white, Color(0xFFF7FAFD)],
+                            ),
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(color: const Color(0xFFE8EDF3)),
+                            boxShadow: [
+                              BoxShadow(
+                                color: const Color(
+                                  0xFF0F172A,
+                                ).withValues(alpha: 0.05),
+                                blurRadius: 18,
+                                offset: const Offset(0, 6),
                               ),
                             ],
-                          ],
-                        ),
-                      ),
-                    ],
-                  );
-                },
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              InkWell(
+                                borderRadius: BorderRadius.circular(8),
+                                onTap: () => setState(
+                                  () => _infosOuvertes = !_infosOuvertes,
+                                ),
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 12,
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      Container(
+                                        width: 30,
+                                        height: 30,
+                                        decoration: BoxDecoration(
+                                          color: AppTheme.primary.withValues(
+                                            alpha: 0.10,
+                                          ),
+                                          borderRadius: BorderRadius.circular(
+                                            10,
+                                          ),
+                                        ),
+                                        child: const Icon(
+                                          LucideIcons.info,
+                                          color: AppTheme.primary,
+                                          size: 16,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 10),
+                                      const Expanded(
+                                        child: Text(
+                                          'Informations complémentaires',
+                                          style: TextStyle(
+                                            color: Color(0xFF0F172A),
+                                            fontSize: 14.5,
+                                            fontWeight: FontWeight.w700,
+                                            letterSpacing: -0.1,
+                                          ),
+                                        ),
+                                      ),
+                                      Container(
+                                        width: 26,
+                                        height: 26,
+                                        decoration: const BoxDecoration(
+                                          color: Color(0xFFF1F5F9),
+                                          shape: BoxShape.circle,
+                                        ),
+                                        child: AnimatedRotation(
+                                          duration: const Duration(
+                                            milliseconds: 200,
+                                          ),
+                                          turns: _infosOuvertes ? 0.5 : 0,
+                                          child: const Icon(
+                                            LucideIcons.chevronDown,
+                                            size: 15,
+                                            color: Color(0xFF475569),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              // Depliee a l'ouverture : ce sont les champs que
+                              // l'on vient lire. Le repli reste disponible.
+                              AnimatedCrossFade(
+                                duration: const Duration(milliseconds: 220),
+                                sizeCurve: Curves.easeOut,
+                                crossFadeState: _infosOuvertes
+                                    ? CrossFadeState.showSecond
+                                    : CrossFadeState.showFirst,
+                                firstChild: const SizedBox(
+                                  width: double.infinity,
+                                  height: 0,
+                                ),
+                                secondChild: Padding(
+                                  padding: const EdgeInsets.only(bottom: 12),
+                                  child: Column(
+                                    children: [
+                                      const Divider(
+                                        color: Color(0xFFE8EDF3),
+                                        height: 1,
+                                      ),
+                                      const SizedBox(height: 8),
+                                      // Une ligne sur deux est teintee : plus
+                                      // lisible qu'un filet entre chaque, et
+                                      // l'oeil suit la ligne jusqu'a sa valeur.
+                                      for (var i = 0; i < lignes.length; i++)
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 10,
+                                            vertical: 9,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: i.isEven
+                                                ? const Color(0xFFF6F9FC)
+                                                : Colors.transparent,
+                                            borderRadius: BorderRadius.circular(
+                                              9,
+                                            ),
+                                          ),
+                                          child: Row(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Expanded(
+                                                flex: 5,
+                                                child: Text(
+                                                  lignes[i].key,
+                                                  style: const TextStyle(
+                                                    color: Color(0xFF64748B),
+                                                    fontSize: 12,
+                                                    fontWeight: FontWeight.w500,
+                                                  ),
+                                                ),
+                                              ),
+                                              const SizedBox(width: 10),
+                                              Expanded(
+                                                flex: 6,
+                                                child: Text(
+                                                  lignes[i].value,
+                                                  textAlign: TextAlign.end,
+                                                  style: const TextStyle(
+                                                    color: Color(0xFF0F172A),
+                                                    fontSize: 13,
+                                                    fontWeight: FontWeight.w700,
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+                  ],
+                ),
               ),
+            ),
+            SafeArea(
+              bottom: false,
+              child: Align(
+                alignment: Alignment.topLeft,
+                child: IconButton(
+                  icon: const Icon(LucideIcons.arrowLeft, color: Colors.white),
+                  onPressed: () => Get.back<void>(),
+                ),
+              ),
+            ),
+          ],
+        );
+      }),
+    );
+  }
 
-              // ─── SUIVI PROCESSUS (TIMELINE DE LIVRAISON) ───────────────────
-              const Row(
+  /// Bandeau degrade : retour, titre, numero de declaration et nature du port.
+  Widget _enteteExpedition(ExpeditionDetailModel detail) {
+    return Container(
+      height: 196,
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [Color(0xFF1B7A94), AppTheme.primary, Color(0xFF3FC1D8)],
+        ),
+        borderRadius: BorderRadius.vertical(bottom: Radius.circular(30)),
+      ),
+      child: SafeArea(
+        bottom: false,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(6, 0, 18, 0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
                 children: [
-                  Icon(
-                    LucideIcons.gitCommit,
-                    color: AppTheme.primary,
-                    size: 20,
-                  ),
-                  SizedBox(width: 8),
-                  Text(
-                    'Suivi & Étapes de Livraison',
+                  // Le vrai bouton est pose au-dessus du scroll ; ici on ne
+                  // reserve que sa place pour aligner le titre.
+                  const SizedBox(width: 48, height: 48),
+                  const Text(
+                    'Détail Expédition',
                     style: TextStyle(
-                      color: Color(0xFF0F172A),
+                      color: Colors.white,
                       fontSize: 16.5,
                       fontWeight: FontWeight.w700,
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: 12),
-
-              if (detail.processus.isEmpty)
-                const GlassContainer(
-                  borderRadius: 18,
-                  padding: EdgeInsets.all(18),
-                  child: Center(
-                    child: Text(
-                      'Aucune étape de transport enregistrée',
-                      style: TextStyle(color: Color(0xFF64748B), fontSize: 13),
-                    ),
-                  ),
-                )
-              else
-                ListView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemCount: detail.processus.length,
-                  itemBuilder: (context, idx) {
-                    final step = detail.processus[idx];
-                    final isLast = idx == detail.processus.length - 1;
-
-                    return ScrollReveal(
-                      index: idx,
-                      child: IntrinsicHeight(
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Column(
-                              children: [
-                                if (idx > 0)
-                                  Container(
-                                    width: 2,
-                                    height: 8,
-                                    color: AppTheme.primary.withValues(
-                                      alpha: 0.25,
-                                    ),
-                                  )
-                                else
-                                  const SizedBox(height: 8),
-                                Container(
-                                  width: 28,
-                                  height: 28,
-                                  decoration: BoxDecoration(
-                                    color: isLast
-                                        ? AppTheme.statusSuccess.withValues(
-                                            alpha: 0.15,
-                                          )
-                                        : AppTheme.primary.withValues(
-                                            alpha: 0.12,
-                                          ),
-                                    shape: BoxShape.circle,
-                                    border: Border.all(
-                                      color: isLast
-                                          ? AppTheme.statusSuccess
-                                          : AppTheme.primary,
-                                      width: 2,
-                                    ),
-                                  ),
-                                  child: Center(
-                                    child: Icon(
-                                      isLast
-                                          ? LucideIcons.check
-                                          : LucideIcons.circle,
-                                      size: 14,
-                                      color: isLast
-                                          ? AppTheme.statusSuccess
-                                          : AppTheme.primary,
-                                    ),
-                                  ),
-                                ),
-                                if (!isLast)
-                                  Expanded(
-                                    child: Container(
-                                      width: 2,
-                                      color: AppTheme.primary.withValues(
-                                        alpha: 0.25,
-                                      ),
-                                    ),
-                                  )
-                                else
-                                  const Spacer(),
-                              ],
-                            ),
-                            const SizedBox(width: 14),
-                            Expanded(
-                              child: Padding(
-                                padding: const EdgeInsets.only(bottom: 18.0),
-                                child: GlassContainer(
-                                  borderRadius: 16,
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 14,
-                                    vertical: 12,
-                                  ),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Row(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.center,
-                                        children: [
-                                          Expanded(
-                                            child: Text(
-                                              step.processus,
-                                              maxLines: 2,
-                                              overflow: TextOverflow.ellipsis,
-                                              style: const TextStyle(
-                                                color: Color(0xFF0F172A),
-                                                fontSize: 14.5,
-                                                fontWeight: FontWeight.w700,
-                                              ),
-                                            ),
-                                          ),
-                                          if (step.status != null) ...[
-                                            const SizedBox(width: 8),
-                                            StatusBadge(
-                                              status: step.status!,
-                                              fontSize: 10,
-                                            ),
-                                          ],
-                                        ],
-                                      ),
-                                      const SizedBox(height: 6),
-                                      if (step.dateAction != null)
-                                        Row(
-                                          children: [
-                                            const Icon(
-                                              LucideIcons.clock,
-                                              size: 12,
-                                              color: Color(0xFF94A3B8),
-                                            ),
-                                            const SizedBox(width: 4),
-                                            Text(
-                                              step.dateAction!,
-                                              style: const TextStyle(
-                                                color: Color(0xFF64748B),
-                                                fontSize: 12,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      if (step.faitA != null ||
-                                          step.faitPar != null) ...[
-                                        const SizedBox(height: 4),
-                                        Text(
-                                          'Lieu: ${step.faitA ?? "—"} • Agent: ${step.faitPar ?? "—"}',
-                                          style: const TextStyle(
-                                            color: Color(0xFF64748B),
-                                            fontSize: 11.5,
-                                          ),
-                                        ),
-                                      ],
-                                      if (_renseigne(step.tourneeVoyage)) ...[
-                                        const SizedBox(height: 2),
-                                        Text(
-                                          'Tournée / Voyage: ${step.tourneeVoyage}',
-                                          style: const TextStyle(
-                                            color: Color(0xFF64748B),
-                                            fontSize: 11.5,
-                                          ),
-                                        ),
-                                      ],
-                                      if (step.livreurChauffeur != null) ...[
-                                        const SizedBox(height: 4),
-                                        Text(
-                                          'Chauffeur: ${step.livreurChauffeur}',
-                                          style: const TextStyle(
-                                            color: AppTheme.primary,
-                                            fontSize: 11.5,
-                                            fontWeight: FontWeight.w600,
-                                          ),
-                                        ),
-                                      ],
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
+              const SizedBox(height: 4),
+              Padding(
+                padding: const EdgeInsets.only(left: 12),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 44,
+                      height: 44,
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.18),
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(
+                          color: Colors.white.withValues(alpha: 0.35),
                         ),
                       ),
-                    );
-                  },
-                ),
-
-              const SizedBox(height: 16),
-
-              // ─── DOCUMENTS GED (PDF / IMAGES) ──────────────────────────────
-              if (detail.gedDocuments.isNotEmpty) ...[
-                const Row(
-                  children: [
-                    Icon(
-                      LucideIcons.fileText,
-                      color: AppTheme.primary,
-                      size: 20,
+                      child: const Icon(
+                        LucideIcons.package,
+                        color: Colors.white,
+                        size: 21,
+                      ),
                     ),
-                    SizedBox(width: 8),
-                    Text(
-                      'Documents GED (Preuves / Facturation)',
-                      style: TextStyle(
-                        color: Color(0xFF0F172A),
-                        fontSize: 16,
-                        fontWeight: FontWeight.w700,
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'N° ${detail.numDeclaration}',
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 21,
+                              fontWeight: FontWeight.w800,
+                              letterSpacing: 0.3,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            'Taxée le ${detail.dateTaxation ?? "—"}',
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              color: Colors.white.withValues(alpha: 0.80),
+                              fontSize: 12.5,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 11,
+                        vertical: 5,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.22),
+                        borderRadius: BorderRadius.circular(9),
+                        border: Border.all(
+                          color: Colors.white.withValues(alpha: 0.35),
+                        ),
+                      ),
+                      child: Text(
+                        detail.port ?? 'Standard',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 11.5,
+                          fontWeight: FontWeight.w700,
+                        ),
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 10),
-                ...detail.gedDocuments.map(
-                  (doc) => GlassContainer(
-                    margin: const EdgeInsets.only(bottom: 10),
-                    borderRadius: 16,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 12,
-                    ),
-                    child: Row(
-                      children: [
-                        const Icon(
-                          LucideIcons.fileCode,
-                          color: AppTheme.primary,
-                          size: 24,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// Contenu de la feuille « Suivi & etapes ».
+  List<Widget> _contenuProcessus(ExpeditionDetailModel detail) => [
+    // ─── SUIVI PROCESSUS (TIMELINE DE LIVRAISON) ───────────────────
+    const Row(
+      children: [
+        Icon(LucideIcons.gitCommit, color: AppTheme.primary, size: 20),
+        SizedBox(width: 8),
+        Text(
+          'Suivi & Étapes de Livraison',
+          style: TextStyle(
+            color: Color(0xFF0F172A),
+            fontSize: 16.5,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+      ],
+    ),
+    const SizedBox(height: 12),
+
+    if (detail.processus.isEmpty)
+      const GlassContainer(
+        borderRadius: 18,
+        padding: EdgeInsets.all(18),
+        child: Center(
+          child: Text(
+            'Aucune étape de transport enregistrée',
+            style: TextStyle(color: Color(0xFF64748B), fontSize: 13),
+          ),
+        ),
+      )
+    else
+      ListView.builder(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        itemCount: detail.processus.length,
+        itemBuilder: (context, idx) {
+          final step = detail.processus[idx];
+          final isLast = idx == detail.processus.length - 1;
+
+          return ScrollReveal(
+            index: idx,
+            child: IntrinsicHeight(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Column(
+                    children: [
+                      if (idx > 0)
+                        Container(
+                          width: 2,
+                          height: 8,
+                          color: AppTheme.primary.withValues(alpha: 0.25),
+                        )
+                      else
+                        const SizedBox(height: 8),
+                      Container(
+                        width: 28,
+                        height: 28,
+                        decoration: BoxDecoration(
+                          color: isLast
+                              ? AppTheme.statusSuccess.withValues(alpha: 0.15)
+                              : AppTheme.primary.withValues(alpha: 0.12),
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: isLast
+                                ? AppTheme.statusSuccess
+                                : AppTheme.primary,
+                            width: 2,
+                          ),
                         ),
-                        const SizedBox(width: 12),
+                        child: Center(
+                          child: Icon(
+                            isLast ? LucideIcons.check : LucideIcons.circle,
+                            size: 14,
+                            color: isLast
+                                ? AppTheme.statusSuccess
+                                : AppTheme.primary,
+                          ),
+                        ),
+                      ),
+                      if (!isLast)
                         Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                doc.typeDocument.isNotEmpty
-                                    ? doc.typeDocument
-                                    : 'Document GED',
-                                style: const TextStyle(
-                                  color: Color(0xFF0F172A),
-                                  fontSize: 13.5,
-                                  fontWeight: FontWeight.w600,
+                          child: Container(
+                            width: 2,
+                            color: AppTheme.primary.withValues(alpha: 0.25),
+                          ),
+                        )
+                      else
+                        const Spacer(),
+                    ],
+                  ),
+                  const SizedBox(width: 14),
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.only(bottom: 18.0),
+                      child: GlassContainer(
+                        borderRadius: 16,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 14,
+                          vertical: 12,
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Expanded(
+                                  child: Text(
+                                    step.processus,
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: const TextStyle(
+                                      color: Color(0xFF0F172A),
+                                      fontSize: 14.5,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
                                 ),
+                                if (step.status != null) ...[
+                                  const SizedBox(width: 8),
+                                  StatusBadge(
+                                    status: step.status!,
+                                    fontSize: 10,
+                                  ),
+                                ],
+                              ],
+                            ),
+                            const SizedBox(height: 6),
+                            if (step.dateAction != null)
+                              Row(
+                                children: [
+                                  const Icon(
+                                    LucideIcons.clock,
+                                    size: 12,
+                                    color: Color(0xFF94A3B8),
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    step.dateAction!,
+                                    style: const TextStyle(
+                                      color: Color(0xFF64748B),
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                ],
                               ),
+                            if (step.faitA != null || step.faitPar != null) ...[
+                              const SizedBox(height: 4),
                               Text(
-                                doc.lien,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
+                                'Lieu: ${step.faitA ?? "—"} • Agent: ${step.faitPar ?? "—"}',
                                 style: const TextStyle(
-                                  color: Color(0xFF94A3B8),
+                                  color: Color(0xFF64748B),
                                   fontSize: 11.5,
                                 ),
                               ),
                             ],
-                          ),
-                        ),
-                        IconButton(
-                          icon: const Icon(
-                            LucideIcons.externalLink,
-                            color: AppTheme.primary,
-                            size: 18,
-                          ),
-                          onPressed: () {
-                            Get.snackbar(
-                              'Lien GED',
-                              doc.lien,
-                              snackPosition: SnackPosition.BOTTOM,
-                              backgroundColor: Colors.white,
-                              colorText: const Color(0xFF0F172A),
-                            );
-                          },
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 18),
-              ],
-
-              // ─── RETOURS DE FONDS / BL / CHEQUES ──────────────────────────
-              ..._blocRetours(
-                'Retours Chèques / Traites',
-                LucideIcons.badgePercent,
-                detail.retourCcCt,
-              ),
-              ..._blocRetours(
-                'Retours BL / Factures',
-                LucideIcons.fileText,
-                detail.retourBlFacture,
-              ),
-              ..._blocRetours(
-                'Chèques contre remboursement',
-                LucideIcons.wallet,
-                detail.chequeCr,
-              ),
-
-              // ─── COMMENTAIRES ──────────────────────────────────────────────
-              if (detail.commentaires.isNotEmpty) ...[
-                const Row(
-                  children: [
-                    Icon(
-                      LucideIcons.messageSquare,
-                      color: AppTheme.primary,
-                      size: 20,
-                    ),
-                    SizedBox(width: 8),
-                    Text(
-                      'Commentaires & Réserves',
-                      style: TextStyle(
-                        color: Color(0xFF0F172A),
-                        fontSize: 16,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 10),
-                ...detail.commentaires.map(
-                  (c) => GlassContainer(
-                    margin: const EdgeInsets.only(bottom: 10),
-                    borderRadius: 16,
-                    padding: const EdgeInsets.all(14),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              c.typeComment ?? 'Note',
-                              style: const TextStyle(
-                                color: AppTheme.statusWarning,
-                                fontWeight: FontWeight.w700,
-                                fontSize: 13,
+                            if (_renseigne(step.tourneeVoyage)) ...[
+                              const SizedBox(height: 2),
+                              Text(
+                                'Tournée / Voyage: ${step.tourneeVoyage}',
+                                style: const TextStyle(
+                                  color: Color(0xFF64748B),
+                                  fontSize: 11.5,
+                                ),
                               ),
-                            ),
-                            Text(
-                              c.dateComment ?? '',
-                              style: const TextStyle(
-                                color: Color(0xFF94A3B8),
-                                fontSize: 11,
+                            ],
+                            if (step.livreurChauffeur != null) ...[
+                              const SizedBox(height: 4),
+                              Text(
+                                'Chauffeur: ${step.livreurChauffeur}',
+                                style: const TextStyle(
+                                  color: AppTheme.primary,
+                                  fontSize: 11.5,
+                                  fontWeight: FontWeight.w600,
+                                ),
                               ),
-                            ),
+                            ],
                           ],
                         ),
-                        const SizedBox(height: 4),
-                        Text(
-                          c.libelleComment ?? '',
-                          style: const TextStyle(
-                            color: Color(0xFF334155),
-                            fontSize: 12.5,
-                          ),
-                        ),
-                        if (_renseigne(c.sourceComment)) ...[
-                          const SizedBox(height: 4),
-                          Text(
-                            'Source: ${c.sourceComment}',
-                            style: const TextStyle(
-                              color: Color(0xFF94A3B8),
-                              fontSize: 11,
-                            ),
-                          ),
-                        ],
-                        if (c.agentComment != null) ...[
-                          const SizedBox(height: 2),
-                          Text(
-                            'Par: ${c.agentComment}',
-                            style: const TextStyle(
-                              color: Color(0xFF64748B),
-                              fontSize: 11,
-                            ),
-                          ),
-                        ],
-                      ],
+                      ),
                     ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
+  ];
+
+  /// Contenu de la feuille « Commentaires ».
+  List<Widget> _contenuCommentaires(ExpeditionDetailModel detail) => [
+    // ─── COMMENTAIRES ──────────────────────────────────────────────
+    if (detail.commentaires.isNotEmpty) ...[
+      const Row(
+        children: [
+          Icon(LucideIcons.messageSquare, color: AppTheme.primary, size: 20),
+          SizedBox(width: 8),
+          Text(
+            'Commentaires & Réserves',
+            style: TextStyle(
+              color: Color(0xFF0F172A),
+              fontSize: 16,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ],
+      ),
+      const SizedBox(height: 10),
+      ...detail.commentaires.map(
+        (c) => GlassContainer(
+          margin: const EdgeInsets.only(bottom: 10),
+          borderRadius: 16,
+          padding: const EdgeInsets.all(14),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    c.typeComment ?? 'Note',
+                    style: const TextStyle(
+                      color: AppTheme.statusWarning,
+                      fontWeight: FontWeight.w700,
+                      fontSize: 13,
+                    ),
+                  ),
+                  Text(
+                    c.dateComment ?? '',
+                    style: const TextStyle(
+                      color: Color(0xFF94A3B8),
+                      fontSize: 11,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 4),
+              Text(
+                c.libelleComment ?? '',
+                style: const TextStyle(
+                  color: Color(0xFF334155),
+                  fontSize: 12.5,
+                ),
+              ),
+              if (_renseigne(c.sourceComment)) ...[
+                const SizedBox(height: 4),
+                Text(
+                  'Source: ${c.sourceComment}',
+                  style: const TextStyle(
+                    color: Color(0xFF94A3B8),
+                    fontSize: 11,
                   ),
                 ),
               ],
-
-              const SizedBox(height: 30),
+              if (c.agentComment != null) ...[
+                const SizedBox(height: 2),
+                Text(
+                  'Par: ${c.agentComment}',
+                  style: const TextStyle(
+                    color: Color(0xFF64748B),
+                    fontSize: 11,
+                  ),
+                ),
+              ],
             ],
           ),
-        );
-      }),
-    );
-  }
-
-  Widget _buildRoutePill(IconData icon, String label, String city) {
-    return Column(
-      children: [
-        Icon(icon, color: AppTheme.primary, size: 18),
-        const SizedBox(height: 4),
-        Text(
-          label,
-          style: const TextStyle(color: Color(0xFF64748B), fontSize: 11),
         ),
-        Text(
-          city,
-          style: const TextStyle(
-            color: Color(0xFF0F172A),
-            fontWeight: FontWeight.w700,
-            fontSize: 14,
+      ),
+    ],
+  ];
+
+  /// Contenu de la feuille « Documents GED ».
+  List<Widget> _contenuGed(ExpeditionDetailModel detail) => [
+    Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Row(
+          children: [
+            Icon(LucideIcons.fileText, color: AppTheme.primary, size: 20),
+            SizedBox(width: 8),
+            Text(
+              'Documents GED (Preuves / Facturation)',
+              style: TextStyle(
+                color: Color(0xFF0F172A),
+                fontSize: 16,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 10),
+        if (detail.gedDocuments.isEmpty)
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(vertical: 26),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: const Color(0xFFE2E8F0)),
+            ),
+            child: const Column(
+              children: [
+                Icon(LucideIcons.fileX, size: 26, color: Color(0xFFCBD5E1)),
+                SizedBox(height: 8),
+                Text(
+                  'Aucun document disponible',
+                  style: TextStyle(
+                    color: Color(0xFF64748B),
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                SizedBox(height: 2),
+                Text(
+                  'Les preuves de livraison et les pièces de\nfacturation apparaîtront ici.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(color: Color(0xFF94A3B8), fontSize: 11.5),
+                ),
+              ],
+            ),
+          ),
+        ...detail.gedDocuments.map(
+          (doc) => GlassContainer(
+            onTap: () => ouvrirDocument(context, doc.lien),
+            margin: const EdgeInsets.only(bottom: 10),
+            borderRadius: 16,
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            child: Row(
+              children: [
+                const Icon(
+                  LucideIcons.fileCode,
+                  color: AppTheme.primary,
+                  size: 24,
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        doc.typeDocument.isNotEmpty
+                            ? doc.typeDocument
+                            : 'Document GED',
+                        style: const TextStyle(
+                          color: Color(0xFF0F172A),
+                          fontSize: 13.5,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      Text(
+                        Uri.tryParse(doc.lien)?.pathSegments.last ?? doc.lien,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          color: Color(0xFF94A3B8),
+                          fontSize: 11.5,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(
+                    LucideIcons.externalLink,
+                    color: AppTheme.primary,
+                    size: 18,
+                  ),
+                  onPressed: () => ouvrirDocument(context, doc.lien),
+                ),
+              ],
+            ),
           ),
         ),
       ],
+    ),
+  ];
+
+  Widget _grilleTables(ExpeditionDetailModel detail) {
+    final tables = <_TableExpedition>[
+      _TableExpedition(
+        'Suivi',
+        LucideIcons.gitCommit,
+        AppTheme.primary,
+        detail.processus.length,
+        () => _contenuProcessus(detail),
+      ),
+      _TableExpedition(
+        'Documents',
+        LucideIcons.fileText,
+        const Color(0xFF6366F1),
+        detail.gedDocuments.length,
+        () => _contenuGed(detail),
+      ),
+      _TableExpedition(
+        'Chèques / Traites',
+        LucideIcons.badgePercent,
+        AppTheme.statusWarning,
+        detail.retourCcCt.length,
+        () => const <Widget>[],
+        items: detail.retourCcCt,
+      ),
+      _TableExpedition(
+        'BL / Factures',
+        LucideIcons.receipt,
+        AppTheme.statusSuccess,
+        detail.retourBlFacture.length,
+        () => const <Widget>[],
+        items: detail.retourBlFacture,
+        naturesAttendues: const ['BL', 'FACTURE'],
+      ),
+      _TableExpedition(
+        'C/REMB',
+        LucideIcons.wallet,
+        const Color(0xFFA855F7),
+        detail.chequeCr.length,
+        () => const <Widget>[],
+        items: detail.chequeCr,
+      ),
+      _TableExpedition(
+        'Commentaires',
+        LucideIcons.messageSquare,
+        const Color(0xFFEC4899),
+        detail.commentaires.length,
+        () => _contenuCommentaires(detail),
+      ),
+    ];
+
+    return SizedBox(
+      height: 42,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        padding: EdgeInsets.zero,
+        itemCount: tables.length,
+        separatorBuilder: (_, _) => const SizedBox(width: 9),
+        itemBuilder: (_, i) => _boutonTable(tables[i]),
+      ),
     );
   }
 
-  Widget _buildMetricCol(String label, String value) {
-    return Column(
-      children: [
-        Text(
-          value,
-          style: const TextStyle(
-            color: Color(0xFF0F172A),
-            fontWeight: FontWeight.w800,
-            fontSize: 13.5,
-          ),
-        ),
-        const SizedBox(height: 2),
-        Text(
-          label,
-          style: const TextStyle(color: Color(0xFF64748B), fontSize: 11),
+  Widget _boutonTable(_TableExpedition table) {
+    // La teinte du tableau remplit tout le bouton ; la pastille du compteur
+    // passe en blanc pour rester lisible dessus.
+    return GlassContainer(
+      borderRadius: 14,
+      padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 10),
+      // Verre teinte : la couleur laisse passer le fond que le BackdropFilter
+      // floute, et le liserd blanc donne l'arete lumineuse du verre.
+      color: table.couleur.withValues(alpha: 0.82),
+      blur: 14,
+      border: Border.all(
+        color: Colors.white.withValues(alpha: 0.40),
+        width: 1.2,
+      ),
+      boxShadow: [
+        BoxShadow(
+          color: table.couleur.withValues(alpha: 0.32),
+          blurRadius: 14,
+          offset: const Offset(0, 5),
         ),
       ],
+      onTap: () => _ouvrirTable(table),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            table.libelle,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 12.5,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          const SizedBox(width: 7),
+          Container(
+            constraints: const BoxConstraints(minWidth: 20),
+            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.92),
+              borderRadius: BorderRadius.circular(7),
+            ),
+            child: Text(
+              '${table.nombre}',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: table.couleur,
+                fontSize: 11,
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _ouvrirTable(_TableExpedition table) {
+    Get.to<void>(
+      () => TableExpeditionScreen(
+        titre: table.libelle,
+        icone: table.icone,
+        couleur: table.couleur,
+        items: table.items,
+        contenu: table.items == null ? table.contenu : null,
+        naturesAttendues: table.naturesAttendues,
+      ),
+      transition: Transition.cupertino,
+      duration: const Duration(milliseconds: 360),
+    );
+  }
+
+  Widget _buildRoutePill(
+    IconData icon,
+    String label,
+    String city, {
+    String? societe,
+  }) {
+    return Flexible(
+      child: Column(
+        children: [
+          Icon(icon, color: AppTheme.primary, size: 18),
+          const SizedBox(height: 4),
+          Text(
+            label,
+            style: const TextStyle(color: Color(0xFF64748B), fontSize: 11),
+          ),
+          Text(
+            city,
+            textAlign: TextAlign.center,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(
+              color: Color(0xFF0F172A),
+              fontWeight: FontWeight.w700,
+              fontSize: 14,
+            ),
+          ),
+          if (_renseigne(societe))
+            Text(
+              societe!,
+              textAlign: TextAlign.center,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(
+                color: Color(0xFF64748B),
+                fontSize: 11.5,
+                height: 1.25,
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
+  /// Trait de trajet en pointilles, avec le camion au milieu : un simple
+  /// Divider ne disait rien du deplacement.
+  Widget _traitTrajet() {
+    return SizedBox(
+      height: 22,
+      child: LayoutBuilder(
+        builder: (context, contraintes) {
+          const largeurTiret = 4.0;
+          const espace = 4.0;
+          final nombre = (contraintes.maxWidth / (largeurTiret + espace))
+              .floor()
+              .clamp(2, 60);
+
+          return Stack(
+            alignment: Alignment.center,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: List.generate(
+                  nombre,
+                  (_) => Container(
+                    width: largeurTiret,
+                    height: 1.5,
+                    decoration: BoxDecoration(
+                      color: AppTheme.primary.withValues(alpha: 0.28),
+                      borderRadius: BorderRadius.circular(1),
+                    ),
+                  ),
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.all(5),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: AppTheme.primary.withValues(alpha: 0.25),
+                  ),
+                ),
+                child: const Icon(
+                  LucideIcons.truck,
+                  size: 11,
+                  color: AppTheme.primary,
+                ),
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+
+  /// Un chiffre cle : plus de tuile ni d'icone, la couleur passe sur le texte.
+  Widget _tuileChiffre(String libelle, String valeur, Color couleur) {
+    return Expanded(
+      child: Column(
+        children: [
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Text(
+              valeur,
+              maxLines: 1,
+              style: TextStyle(
+                color: couleur,
+                fontWeight: FontWeight.w800,
+                fontSize: 14,
+              ),
+            ),
+          ),
+          const SizedBox(height: 3),
+          Text(
+            libelle,
+            style: TextStyle(
+              color: couleur.withValues(alpha: 0.70),
+              fontSize: 10.5,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -740,160 +1151,35 @@ class _ExpeditionDetailScreenState extends State<ExpeditionDetailScreen> {
     return t.isNotEmpty && t != '.' && t != '-' && t != '0' && t != 'null';
   }
 
-  /// `date_encaissement` -> `Date encaissement`.
-  static String _libelleChamp(String cle) {
-    final mots = cle.replaceAll('_', ' ').trim();
-
-    return mots.isEmpty ? cle : mots[0].toUpperCase() + mots.substring(1);
-  }
-
   /// Rend une liste de retours en affichant **toutes** les cles renvoyees par
   /// l'API : un champ ajoute cote serveur apparait sans toucher a l'ecran.
-  List<Widget> _blocRetours(
-    String titre,
-    IconData icone,
-    List<Map<String, dynamic>> items,
-  ) {
-    if (items.isEmpty) return const [];
+}
 
-    return [
-      Row(
-        children: [
-          Icon(icone, color: AppTheme.primary, size: 20),
-          const SizedBox(width: 8),
-          Text(
-            titre,
-            style: const TextStyle(
-              color: Color(0xFF0F172A),
-              fontSize: 16,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-        ],
-      ),
-      const SizedBox(height: 10),
-      ...items.map((item) {
-        final entrees = item.entries
-            .where((e) => _renseigne(e.value?.toString()))
-            .toList();
+/// Un tableau du contrat API : son libelle, son icone, son effectif et de quoi
+/// construire sa liste a la demande.
+class _TableExpedition {
+  const _TableExpedition(
+    this.libelle,
+    this.icone,
+    this.couleur,
+    this.nombre,
+    this.contenu, {
+    this.items,
+    this.naturesAttendues = const [],
+  });
 
-        return GlassContainer(
-          margin: const EdgeInsets.only(bottom: 10),
-          borderRadius: 16,
-          padding: const EdgeInsets.all(14),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              for (final e in entrees)
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 4),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Expanded(
-                        child: Text(
-                          _libelleChamp(e.key),
-                          style: const TextStyle(
-                            color: Color(0xFF64748B),
-                            fontSize: 11.5,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Flexible(
-                        child: Text(
-                          e.value is num
-                              ? _formatCurrency(e.value as num)
-                              : e.value.toString(),
-                          textAlign: TextAlign.end,
-                          style: const TextStyle(
-                            color: Color(0xFF0F172A),
-                            fontSize: 12.5,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-            ],
-          ),
-        );
-      }),
-      const SizedBox(height: 18),
-    ];
-  }
+  final String libelle;
+  final IconData icone;
 
-  Widget _buildActorRow(
-    IconData icon,
-    String title,
-    String name,
-    String? address, {
-    String? code,
-    String? tel,
-  }) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Container(
-          padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: AppTheme.primary.withValues(alpha: 0.10),
-            borderRadius: BorderRadius.circular(10),
-          ),
-          child: Icon(icon, color: AppTheme.primary, size: 18),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                title,
-                style: const TextStyle(color: Color(0xFF64748B), fontSize: 11),
-              ),
-              Text(
-                name,
-                style: const TextStyle(
-                  color: Color(0xFF0F172A),
-                  fontWeight: FontWeight.w700,
-                  fontSize: 14,
-                ),
-              ),
-              if (_renseigne(code)) ...[
-                const SizedBox(height: 2),
-                Text(
-                  'Code : $code',
-                  style: const TextStyle(
-                    color: Color(0xFF64748B),
-                    fontSize: 11.5,
-                  ),
-                ),
-              ],
-              if (_renseigne(address)) ...[
-                const SizedBox(height: 2),
-                Text(
-                  address!,
-                  style: const TextStyle(
-                    color: Color(0xFF475569),
-                    fontSize: 11.5,
-                  ),
-                ),
-              ],
-              if (_renseigne(tel)) ...[
-                const SizedBox(height: 2),
-                Text(
-                  'Tél. : $tel',
-                  style: const TextStyle(
-                    color: Color(0xFF475569),
-                    fontSize: 11.5,
-                  ),
-                ),
-              ],
-            ],
-          ),
-        ),
-      ],
-    );
-  }
+  /// Chaque tableau garde sa teinte, plein ou vide : la couleur sert a le
+  /// reconnaitre d'un coup d'oeil, pas a dire s'il contient quelque chose.
+  final Color couleur;
+  final int nombre;
+  final List<Widget> Function() contenu;
+
+  /// Lignes brutes de l'API, quand le tableau se prete au filtrage par nature.
+  final List<Map<String, dynamic>>? items;
+
+  /// Natures du contrat API a toujours proposer au filtre.
+  final List<String> naturesAttendues;
 }
