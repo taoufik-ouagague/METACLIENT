@@ -48,7 +48,7 @@ class ConfigController extends GetxController {
 
   Color get primaryColor => clientConfig.value?.primary ?? AppTheme.primary;
   Color get secondaryColor => clientConfig.value?.secondary ?? AppTheme.primaryIcons;
-  Color get optionalColor => clientConfig.value?.optional ?? const Color(0xFFFDEB03);
+  Color get optionalColor => clientConfig.value?.optional ?? AppTheme.accentCyan;
   Color? get rawOptionalColor => clientConfig.value?.optional;
   String? get logoUrl => clientConfig.value?.logoUrl;
 
@@ -59,30 +59,13 @@ class ConfigController extends GetxController {
     return clientConfig.value?.buttonGradient ?? AppTheme.primaryGradient;
   }
 
-  // 3-color brand gradient (Blue -> Green -> Yellow)
+  // Brand gradient (Theme cyan / blue)
   LinearGradient get brandGradient {
-    if (hasCustomColors) {
-      final p = primaryColor;
-      final s = secondaryColor;
-      final o = optionalColor;
-      return LinearGradient(
-        colors: [p, s, o],
-        begin: Alignment.centerLeft,
-        end: Alignment.centerRight,
-      );
-    }
     return AppTheme.iconGradient;
   }
 
-  // Accent gradient (Green -> Yellow)
+  // Accent gradient (Theme cyan / blue)
   LinearGradient get accentGradient {
-    if (hasCustomColors) {
-      return LinearGradient(
-        colors: [secondaryColor, optionalColor],
-        begin: Alignment.topLeft,
-        end: Alignment.bottomRight,
-      );
-    }
     return AppTheme.iconGradient;
   }
 }

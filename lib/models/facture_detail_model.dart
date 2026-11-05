@@ -16,7 +16,7 @@ class FactureAvoir {
       numAvoir: json['num_avoir']?.toString() ?? '',
       montant: (json['montant'] as num?) ?? 0,
       remarque: json['remarque']?.toString(),
-      dateCreation: json['date_creation']?.toString(),
+      dateCreation: (json['date_creation'] ?? json['date_creaƟon'])?.toString(),
     );
   }
 }
@@ -39,7 +39,7 @@ class FactureReglement {
       refReglement: json['ref_reglement']?.toString() ?? '',
       modeReglement: json['mode_reglement']?.toString() ?? '',
       montant: (json['montant'] as num?) ?? 0,
-      dateCreation: json['date_creation']?.toString(),
+      dateCreation: (json['date_creation'] ?? json['date_creaƟon'])?.toString(),
     );
   }
 }
@@ -48,17 +48,16 @@ class FactureDetailModel {
   final List<FactureAvoir> avoirs;
   final List<FactureReglement> reglements;
 
-  FactureDetailModel({
-    required this.avoirs,
-    required this.reglements,
-  });
+  FactureDetailModel({required this.avoirs, required this.reglements});
 
   factory FactureDetailModel.fromJson(Map<String, dynamic> json) {
     final rawAvoirs = json['avoirs'] as List? ?? [];
     final rawReglements = json['reglements'] as List? ?? [];
 
     return FactureDetailModel(
-      avoirs: rawAvoirs.map((e) => FactureAvoir.fromJson(Map<String, dynamic>.from(e))).toList(),
+      avoirs: rawAvoirs
+          .map((e) => FactureAvoir.fromJson(Map<String, dynamic>.from(e)))
+          .toList(),
       reglements: rawReglements
           .map((e) => FactureReglement.fromJson(Map<String, dynamic>.from(e)))
           .toList(),

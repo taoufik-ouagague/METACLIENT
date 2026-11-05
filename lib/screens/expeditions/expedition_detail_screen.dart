@@ -146,10 +146,7 @@ class _ExpeditionDetailScreenState extends State<ExpeditionDetailScreen> {
                               ),
                               const SizedBox(width: 8),
                               _tuileChiffre(
-                                _libelleOuDefaut(
-                                  detail.typeRemboursementLibelle ?? detail.nature,
-                                  'Fond',
-                                ),
+                                _libelleOuDefaut(detail.nature, 'Fond'),
                                 _formatCurrency(detail.fond),
                                 AppTheme.statusWarning,
                               ),
@@ -191,32 +188,32 @@ class _ExpeditionDetailScreenState extends State<ExpeditionDetailScreen> {
   }
 
   Widget _buildInfoAndGpsSlider(ExpeditionDetailModel detail) {
-    final lignes = <MapEntry<String, String>>[
-      MapEntry('Activité', detail.activite ?? ''),
-      MapEntry('Type de livraison', detail.livraison ?? ''),
-      MapEntry('BL / Facture', detail.blFact ?? ''),
-      MapEntry(
-        'Valeur déclarée',
-        detail.valeurDeclaree == null
-            ? ''
-            : _formatCurrency(detail.valeurDeclaree),
-      ),
-      MapEntry(
-        'Montant HT',
-        detail.mntHt == null ? '' : _formatCurrency(detail.mntHt),
-      ),
-      MapEntry('Facture en compte', detail.factureEncompte ?? ''),
-      MapEntry('Date livraison mobile', detail.dateLivMobile ?? ''),
-      MapEntry('Date encaissement', detail.dateEncaissement ?? ''),
-    ]
-        .where(
-          (e) =>
-              e.key == 'Date livraison mobile' || _renseigne(e.value),
-        )
-        .toList();
+    final lignes =
+        <MapEntry<String, String>>[
+              MapEntry('Activité', detail.activite ?? ''),
+              MapEntry('Type de livraison', detail.livraison ?? ''),
+              MapEntry('BL / Facture', detail.blFact ?? ''),
+              MapEntry(
+                'Valeur déclarée',
+                detail.valeurDeclaree == null
+                    ? ''
+                    : _formatCurrency(detail.valeurDeclaree),
+              ),
+              MapEntry(
+                'Montant HT',
+                detail.mntHt == null ? '' : _formatCurrency(detail.mntHt),
+              ),
+              MapEntry('Facture en compte', detail.factureEncompte ?? ''),
+              MapEntry('Date livraison mobile', detail.dateLivMobile ?? ''),
+              MapEntry('Date encaissement', detail.dateEncaissement ?? ''),
+            ]
+            .where(
+              (e) => e.key == 'Date livraison mobile' || _renseigne(e.value),
+            )
+            .toList();
 
-    final hasGps = detail.latitudeEffective != null &&
-        detail.longitudeEffective != null;
+    final hasGps =
+        detail.latitudeEffective != null && detail.longitudeEffective != null;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,

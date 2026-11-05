@@ -23,6 +23,26 @@ class RetourFondController extends GetxController {
   final RxString filterDu = ''.obs;
   final RxString filterAu = ''.obs;
   final RxString filterNumDeclaration = ''.obs;
+  final RxString filterNumPiece = ''.obs;
+  final RxString filterClient = ''.obs;
+
+  /// '' = tous, 'O' = remis, 'N' = non remis.
+  final RxString filterRemis = ''.obs;
+
+  /// Le parametre `remis` est envoye a l'API, mais celle-ci l'ignore encore :
+  /// on refiltre donc la page recue pour que la bascule ait un effet visible.
+  List<RetourFondModel> _filtrerRemis(List<RetourFondModel> liste) {
+    final remis = filterRemis.value;
+    if (remis.isEmpty) return liste;
+    final veutRemis = remis == 'O';
+
+    return liste
+        .where((r) => ((r.dateRemise ?? '').trim().isNotEmpty) == veutRemis)
+        .toList();
+  }
+
+  List<RetourFondModel> get retoursCCCTAffiches => _filtrerRemis(retoursCCCT);
+  List<RetourFondModel> get retoursBLAffiches => _filtrerRemis(retoursBL);
 
   @override
   void onInit() {
@@ -40,7 +60,16 @@ class RetourFondController extends GetxController {
       isLoading.value = true;
       final du = filterDu.value.isEmpty ? null : filterDu.value;
       final au = filterAu.value.isEmpty ? null : filterAu.value;
-      final numDec = filterNumDeclaration.value.isEmpty ? null : filterNumDeclaration.value.trim();
+      final numDec = filterNumDeclaration.value.isEmpty
+          ? null
+          : filterNumDeclaration.value.trim();
+      final numPiece = filterNumPiece.value.isEmpty
+          ? null
+          : filterNumPiece.value.trim();
+      final client = filterClient.value.isEmpty
+          ? null
+          : filterClient.value.trim();
+      final remis = filterRemis.value.isEmpty ? null : filterRemis.value;
 
       final res = await ApiService.getRetourFondCCCT(
         page: pageCCCT.value,
@@ -48,6 +77,9 @@ class RetourFondController extends GetxController {
         du: du,
         au: au,
         numDeclaration: numDec,
+        numPiece: numPiece,
+        libelleClient: client,
+        remis: remis,
       );
 
       final list = (res['data'] as List? ?? [])
@@ -70,7 +102,16 @@ class RetourFondController extends GetxController {
       isLoading.value = true;
       final du = filterDu.value.isEmpty ? null : filterDu.value;
       final au = filterAu.value.isEmpty ? null : filterAu.value;
-      final numDec = filterNumDeclaration.value.isEmpty ? null : filterNumDeclaration.value.trim();
+      final numDec = filterNumDeclaration.value.isEmpty
+          ? null
+          : filterNumDeclaration.value.trim();
+      final numPiece = filterNumPiece.value.isEmpty
+          ? null
+          : filterNumPiece.value.trim();
+      final client = filterClient.value.isEmpty
+          ? null
+          : filterClient.value.trim();
+      final remis = filterRemis.value.isEmpty ? null : filterRemis.value;
 
       final res = await ApiService.getRetourFondBL(
         page: pageBL.value,
@@ -78,6 +119,9 @@ class RetourFondController extends GetxController {
         du: du,
         au: au,
         numDeclaration: numDec,
+        numPiece: numPiece,
+        libelleClient: client,
+        remis: remis,
       );
 
       final list = (res['data'] as List? ?? [])

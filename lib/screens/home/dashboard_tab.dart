@@ -8,9 +8,6 @@ import '../../controllers/expedition_controller.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/glass_container.dart';
 import '../../widgets/stat_card.dart';
-import '../../widgets/status_badge.dart';
-import '../expeditions/expedition_detail_screen.dart';
-import '../../widgets/scroll_reveal.dart';
 
 class DashboardTab extends StatelessWidget {
   final Function(int)? onNavigateTab;
@@ -21,42 +18,6 @@ class DashboardTab extends StatelessWidget {
     if (amount == null) return '0.00 DH';
     final formatter = NumberFormat('#,##0.00', 'fr_FR');
     return '${formatter.format(amount)} DH';
-  }
-
-  Widget _badgeType(String label, bool isVir) {
-    final Color bg = isVir
-        ? const Color(0xFF0EA5E9).withValues(alpha: 0.12)
-        : const Color(0xFFA855F7).withValues(alpha: 0.12);
-    final Color fg = isVir ? const Color(0xFF0284C7) : const Color(0xFF9333EA);
-    final Color border = isVir
-        ? const Color(0xFF0EA5E9).withValues(alpha: 0.28)
-        : const Color(0xFFA855F7).withValues(alpha: 0.28);
-    final IconData icon = isVir ? LucideIcons.arrowRightLeft : LucideIcons.wallet;
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-      decoration: BoxDecoration(
-        color: bg,
-        borderRadius: BorderRadius.circular(6),
-        border: Border.all(color: border, width: 0.8),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 9.5, color: fg),
-          const SizedBox(width: 3.5),
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 10,
-              fontWeight: FontWeight.w700,
-              color: fg,
-              height: 1.1,
-            ),
-          ),
-        ],
-      ),
-    );
   }
 
   @override
@@ -196,203 +157,64 @@ class DashboardTab extends StatelessWidget {
 
             const SizedBox(height: 24),
 
-            // ─── 4. RECENT EXPEDITIONS SECTION ──────────────────────────────
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Row(
-                  children: [
-                    Icon(
-                      LucideIcons.activity,
-                      color: AppTheme.primaryIcons,
-                      size: 19,
+            // ─── 4. COMPTEURS DES AUTRES ÉCRANS ─────────────────────────────
+            Obx(
+              () => Row(
+                children: [
+                  Expanded(
+                    child: StatCard(
+                      title: 'Chèques / Traites',
+                      value: '${dashCtrl.retoursCcCtCount.value}',
+                      icon: LucideIcons.rotateCcw,
+                      subtitle: 'Retours',
+                      color: const Color(0xFFA855F7),
+                      onTap: () => onNavigateTab?.call(3),
                     ),
-                    SizedBox(width: 8),
-                    Text(
-                      'Dernières Expéditions',
-                      style: TextStyle(
-                        color: Color(0xFF0F172A),
-                        fontSize: 16.5,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                  ],
-                ),
-                TextButton(
-                  onPressed: () => onNavigateTab?.call(1),
-                  child: const Row(
-                    children: [
-                      Text(
-                        'Voir tout',
-                        style: TextStyle(
-                          color: AppTheme.primary,
-                          fontSize: 13,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      SizedBox(width: 4),
-                      Icon(
-                        LucideIcons.chevronRight,
-                        color: AppTheme.primary,
-                        size: 16,
-                      ),
-                    ],
                   ),
-                ),
-              ],
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: StatCard(
+                      title: 'Retours BL / Factures',
+                      value: '${dashCtrl.retoursBlCount.value}',
+                      icon: LucideIcons.receipt,
+                      subtitle: 'Documents',
+                      color: const Color(0xFF0891B2),
+                      onTap: () => onNavigateTab?.call(3),
+                    ),
+                  ),
+                ],
+              ),
             ),
-            const SizedBox(height: 8),
 
-            Obx(() {
-              if (dashCtrl.isLoading.value &&
-                  dashCtrl.recentExpeditions.isEmpty) {
-                return const Center(
-                  child: Padding(
-                    padding: EdgeInsets.all(24.0),
-                    child: CircularProgressIndicator(color: AppTheme.primary),
-                  ),
-                );
-              }
+            const SizedBox(height: 10),
 
-              if (dashCtrl.recentExpeditions.isEmpty) {
-                return GlassContainer(
-                  borderRadius: 18,
-                  padding: const EdgeInsets.all(24),
-                  child: const Center(
-                    child: Text(
-                      'Aucune expédition trouvée',
-                      style: TextStyle(color: Color(0xFF64748B), fontSize: 13),
+            Obx(
+              () => Row(
+                children: [
+                  Expanded(
+                    child: StatCard(
+                      title: 'Chèques encaissés',
+                      value: '${dashCtrl.crbtChequesCount.value}',
+                      icon: LucideIcons.banknote,
+                      subtitle: 'CRBT',
+                      color: const Color(0xFF059669),
+                      onTap: () => onNavigateTab?.call(4),
                     ),
                   ),
-                );
-              }
-
-              return ListView.separated(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: dashCtrl.recentExpeditions.length,
-                separatorBuilder: (_, _) => const SizedBox(height: 10),
-                itemBuilder: (context, index) {
-                  final item = dashCtrl.recentExpeditions[index];
-                  return ScrollReveal(
-                    index: index,
-                    child: GlassContainer(
-                      borderRadius: 18,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 14,
-                      ),
-                      onTap: () {
-                        if (item.idExpedition != null) {
-                          Get.to(
-                            () => ExpeditionDetailScreen(
-                              idExpedition: item.idExpedition!,
-                            ),
-                            transition: Transition.cupertino,
-                            duration: const Duration(milliseconds: 360),
-                          );
-                        }
-                      },
-                      child: Row(
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.all(10),
-                            decoration: BoxDecoration(
-                              color: AppTheme.primaryIcons.withValues(
-                                alpha: 0.12,
-                              ),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: const Icon(
-                              LucideIcons.package,
-                              color: AppTheme.primary,
-                              size: 22,
-                            ),
-                          ),
-                          const SizedBox(width: 14),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      child: Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          Flexible(
-                                            child: Text(
-                                              item.numDeclaration,
-                                              maxLines: 1,
-                                              overflow: TextOverflow.ellipsis,
-                                              style: const TextStyle(
-                                                color: Color(0xFF0F172A),
-                                                fontSize: 14.5,
-                                                fontWeight: FontWeight.w600,
-                                              ),
-                                            ),
-                                          ),
-                                          if (item.typeRemboursementLibelle != null) ...[
-                                            const SizedBox(width: 6),
-                                            _badgeType(
-                                              item.typeRemboursementLibelle!,
-                                              item.isVirement,
-                                            ),
-                                          ],
-                                        ],
-                                      ),
-                                    ),
-                                    const SizedBox(width: 8),
-                                    StatusBadge(
-                                      status:
-                                          item.statut ??
-                                          (item.isLivree
-                                              ? 'Livré'
-                                              : 'En cours'),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 6),
-                                Row(
-                                  children: [
-                                    const Icon(
-                                      LucideIcons.mapPin,
-                                      size: 12,
-                                      color: Color(0xFF94A3B8),
-                                    ),
-                                    const SizedBox(width: 4),
-                                    Expanded(
-                                      child: Text(
-                                        '${item.origine ?? "—"} → ${item.destination ?? "—"}',
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                        style: const TextStyle(
-                                          color: Color(0xFF64748B),
-                                          fontSize: 12.5,
-                                        ),
-                                      ),
-                                    ),
-                                    const SizedBox(width: 8),
-                                    Text(
-                                      _formatCurrency(item.mntTtc),
-                                      style: const TextStyle(
-                                        color: AppTheme.primary,
-                                        fontSize: 13,
-                                        fontWeight: FontWeight.w700,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: StatCard(
+                      title: 'Ordres de virement',
+                      value: '${dashCtrl.crbtVirementsCount.value}',
+                      icon: LucideIcons.arrowUpRight,
+                      subtitle: 'CRBT',
+                      color: const Color(0xFFEC4899),
+                      onTap: () => onNavigateTab?.call(4),
                     ),
-                  );
-                },
-              );
-            }),
+                  ),
+                ],
+              ),
+            ),
 
             const SizedBox(height: 20),
           ],

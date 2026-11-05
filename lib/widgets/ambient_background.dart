@@ -21,7 +21,6 @@ class AmbientBackground extends StatelessWidget {
 
       final pColor = configCtrl?.primaryColor ?? AppTheme.primary;
       final sColor = configCtrl?.secondaryColor ?? AppTheme.primaryIcons;
-      final oColor = configCtrl?.optionalColor ?? const Color(0xFFFDEB03);
       final hasCustom = configCtrl?.hasCustomColors ?? false;
 
       if (!isLight) {
@@ -33,7 +32,7 @@ class AmbientBackground extends StatelessWidget {
                 gradient: AppTheme.backgroundGradient,
               ),
             ),
-            // Top-right: Yellow Orb
+            // Top-right: Cyan Orb
             Positioned(
               top: -50,
               right: -50,
@@ -44,11 +43,11 @@ class AmbientBackground extends StatelessWidget {
                   shape: BoxShape.circle,
                   gradient: RadialGradient(
                     colors: [
-                      (hasCustom ? oColor : AppTheme.primary).withValues(
-                        alpha: 0.24,
+                      AppTheme.primaryIcons.withValues(
+                        alpha: 0.20,
                       ),
-                      (hasCustom ? oColor : AppTheme.primary).withValues(
-                        alpha: 0.06,
+                      AppTheme.primaryIcons.withValues(
+                        alpha: 0.05,
                       ),
                       Colors.transparent,
                     ],
@@ -57,7 +56,7 @@ class AmbientBackground extends StatelessWidget {
                 ),
               ),
             ),
-            // Middle-left: Green Orb
+            // Middle-left: Blue Orb
             Positioned(
               top: 220,
               left: -80,
@@ -68,11 +67,11 @@ class AmbientBackground extends StatelessWidget {
                   shape: BoxShape.circle,
                   gradient: RadialGradient(
                     colors: [
-                      (hasCustom ? sColor : AppTheme.primaryIcons).withValues(
-                        alpha: 0.25,
+                      AppTheme.primary.withValues(
+                        alpha: 0.22,
                       ),
-                      (hasCustom ? sColor : AppTheme.primaryIcons).withValues(
-                        alpha: 0.07,
+                      AppTheme.primary.withValues(
+                        alpha: 0.05,
                       ),
                       Colors.transparent,
                     ],
@@ -130,7 +129,7 @@ class AmbientBackground extends StatelessWidget {
           ),
 
           // 2. Orbes lumineux ambiants adaptatifs
-          // Top-right: Yellow API accent
+          // Top-right: Cyan brand accent
           Positioned(
             top: -60,
             right: -50,
@@ -141,10 +140,10 @@ class AmbientBackground extends StatelessWidget {
                 shape: BoxShape.circle,
                 gradient: RadialGradient(
                   colors: [
-                    (hasCustom ? oColor : AppTheme.primaryIcons).withValues(
-                      alpha: 0.18,
+                    AppTheme.primaryIcons.withValues(
+                      alpha: 0.16,
                     ),
-                    (hasCustom ? oColor : AppTheme.primaryIcons).withValues(
+                    AppTheme.primaryIcons.withValues(
                       alpha: 0.04,
                     ),
                     Colors.transparent,
@@ -155,7 +154,7 @@ class AmbientBackground extends StatelessWidget {
             ),
           ),
 
-          // Top-left: Green accent
+          // Top-left: Blue accent
           Positioned(
             top: 70,
             left: -60,
@@ -166,10 +165,10 @@ class AmbientBackground extends StatelessWidget {
                 shape: BoxShape.circle,
                 gradient: RadialGradient(
                   colors: [
-                    (hasCustom ? sColor : AppTheme.primary).withValues(
+                    AppTheme.primary.withValues(
                       alpha: 0.14,
                     ),
-                    (hasCustom ? sColor : AppTheme.primary).withValues(
+                    AppTheme.primary.withValues(
                       alpha: 0.03,
                     ),
                     Colors.transparent,

@@ -19,142 +19,319 @@ class RetoursScreen extends StatelessWidget {
     return '${formatter.format(amount)} DH';
   }
 
+  /// Champ de saisie du dialogue : libelle au-dessus, icone en tete.
+  Widget _champFiltre(
+    TextEditingController controleur,
+    String libelle,
+    String exemple,
+    IconData icone,
+  ) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          libelle,
+          style: const TextStyle(
+            color: Color(0xFF64748B),
+            fontSize: 11,
+            fontWeight: FontWeight.w600,
+            letterSpacing: 0.2,
+          ),
+        ),
+        const SizedBox(height: 5),
+        TextField(
+          controller: controleur,
+          style: const TextStyle(
+            color: Color(0xFF0F172A),
+            fontSize: 13.5,
+            fontWeight: FontWeight.w600,
+          ),
+          decoration: InputDecoration(
+            hintText: exemple,
+            hintStyle: const TextStyle(
+              color: Color(0xFFB4C0CF),
+              fontSize: 13,
+              fontWeight: FontWeight.w500,
+            ),
+            prefixIcon: Icon(icone, size: 16, color: AppTheme.primary),
+            prefixIconConstraints: const BoxConstraints(
+              minWidth: 36,
+              minHeight: 36,
+            ),
+            isDense: true,
+            filled: true,
+            fillColor: const Color(0xFFF4F8FB),
+            contentPadding: const EdgeInsets.fromLTRB(0, 11, 12, 11),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: const BorderSide(color: Color(0xFFE4EAF1)),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: const BorderSide(color: AppTheme.primary, width: 1.4),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
   void _showFilterDialog(BuildContext context, RetourFondController ctrl) {
     final duCtrl = TextEditingController(text: ctrl.filterDu.value);
     final auCtrl = TextEditingController(text: ctrl.filterAu.value);
+    final declCtrl = TextEditingController(
+      text: ctrl.filterNumDeclaration.value,
+    );
+    final clientCtrl = TextEditingController(text: ctrl.filterClient.value);
+    final pieceCtrl = TextEditingController(text: ctrl.filterNumPiece.value);
+    final remis = ctrl.filterRemis.value.obs;
+
+    void relancer() {
+      ctrl.fetchRetoursCCCT(resetPage: true);
+      ctrl.fetchRetoursBL(resetPage: true);
+      Get.back<void>();
+    }
 
     Get.dialog(
       Dialog(
         backgroundColor: Colors.transparent,
-        child: GlassContainer(
-          borderRadius: 24,
-          padding: const EdgeInsets.all(22),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Row(
-                children: [
-                  Icon(
-                    LucideIcons.slidersHorizontal,
-                    color: AppTheme.primary,
-                    size: 20,
-                  ),
-                  SizedBox(width: 10),
-                  Expanded(
-                    child: Text(
-                      'Filtrer les retours',
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        color: Color(0xFF0F172A),
-                        fontSize: 16.5,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 18),
-              TextField(
-                controller: duCtrl,
-                style: const TextStyle(
-                  color: Color(0xFF0F172A),
-                  fontSize: 13.5,
-                ),
-                decoration: InputDecoration(
-                  labelText: 'Date début (JJ/MM/AAAA)',
-                  labelStyle: const TextStyle(
-                    color: AppTheme.primary,
-                    fontSize: 12,
-                  ),
-                  hintText: '01/01/2026',
-                  hintStyle: const TextStyle(color: Color(0xFF94A3B8)),
-                  filled: true,
-                  fillColor: Colors.white.withValues(alpha: 0.9),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(14),
-                    borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(14),
-                    borderSide: const BorderSide(
-                      color: AppTheme.primary,
-                      width: 1.5,
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 12),
-              TextField(
-                controller: auCtrl,
-                style: const TextStyle(
-                  color: Color(0xFF0F172A),
-                  fontSize: 13.5,
-                ),
-                decoration: InputDecoration(
-                  labelText: 'Date fin (JJ/MM/AAAA)',
-                  labelStyle: const TextStyle(
-                    color: AppTheme.primary,
-                    fontSize: 12,
-                  ),
-                  hintText: '31/12/2026',
-                  hintStyle: const TextStyle(color: Color(0xFF94A3B8)),
-                  filled: true,
-                  fillColor: Colors.white.withValues(alpha: 0.9),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(14),
-                    borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(14),
-                    borderSide: const BorderSide(
-                      color: AppTheme.primary,
-                      width: 1.5,
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 20),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  TextButton(
-                    onPressed: () {
-                      ctrl.filterDu.value = '';
-                      ctrl.filterAu.value = '';
-                      ctrl.fetchRetoursCCCT(resetPage: true);
-                      ctrl.fetchRetoursBL(resetPage: true);
-                      Get.back();
-                    },
-                    child: const Text(
-                      'Réinitialiser',
-                      style: TextStyle(color: Color(0xFF64748B)),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppTheme.primary,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                    onPressed: () {
-                      ctrl.filterDu.value = duCtrl.text.trim();
-                      ctrl.filterAu.value = auCtrl.text.trim();
-                      ctrl.fetchRetoursCCCT(resetPage: true);
-                      ctrl.fetchRetoursBL(resetPage: true);
-                      Get.back();
-                    },
-                    child: const Text(
-                      'Appliquer',
-                      style: TextStyle(color: Colors.white),
-                    ),
-                  ),
-                ],
+        insetPadding: const EdgeInsets.symmetric(horizontal: 22),
+        child: Container(
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [Colors.white, Color(0xFFF4F9FC)],
+            ),
+            borderRadius: BorderRadius.circular(24),
+            border: Border.all(color: Colors.white, width: 1.4),
+            boxShadow: [
+              BoxShadow(
+                color: const Color(0xFF1B3A5B).withValues(alpha: 0.18),
+                blurRadius: 30,
+                offset: const Offset(0, 14),
               ),
             ],
+          ),
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.fromLTRB(20, 18, 20, 18),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      width: 34,
+                      height: 34,
+                      decoration: BoxDecoration(
+                        gradient: AppTheme.primaryGradient,
+                        borderRadius: BorderRadius.circular(11),
+                      ),
+                      child: const Icon(
+                        LucideIcons.filter,
+                        color: Colors.white,
+                        size: 17,
+                      ),
+                    ),
+                    const SizedBox(width: 11),
+                    const Expanded(
+                      child: Text(
+                        'Filtrer les retours',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          color: Color(0xFF0F172A),
+                          fontSize: 16,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                    ),
+                    IconButton(
+                      visualDensity: VisualDensity.compact,
+                      icon: const Icon(
+                        LucideIcons.x,
+                        size: 18,
+                        color: Color(0xFF94A3B8),
+                      ),
+                      onPressed: () => Get.back<void>(),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 14),
+                // Les deux bornes de date tiennent sur une ligne.
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: _champFiltre(
+                        duCtrl,
+                        'DU',
+                        '01/01/2026',
+                        LucideIcons.calendar,
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: _champFiltre(
+                        auCtrl,
+                        'AU',
+                        '31/12/2026',
+                        LucideIcons.calendar,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                _champFiltre(
+                  declCtrl,
+                  'N° DÉCLARATION',
+                  '260029143',
+                  LucideIcons.hash,
+                ),
+                const SizedBox(height: 12),
+                _champFiltre(
+                  clientCtrl,
+                  'CLIENT',
+                  'LUMINEA SANTE',
+                  LucideIcons.building2,
+                ),
+                const SizedBox(height: 12),
+                _champFiltre(
+                  pieceCtrl,
+                  'N° PIÈCE',
+                  '2102282',
+                  LucideIcons.fileText,
+                ),
+                const SizedBox(height: 16),
+                const Text(
+                  'REMISE',
+                  style: TextStyle(
+                    color: Color(0xFF64748B),
+                    fontSize: 11,
+                    fontWeight: FontWeight.w600,
+                    letterSpacing: 0.2,
+                  ),
+                ),
+                const SizedBox(height: 7),
+                Obx(
+                  () => Container(
+                    padding: const EdgeInsets.all(4),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFF4F8FB),
+                      borderRadius: BorderRadius.circular(14),
+                      border: Border.all(color: const Color(0xFFE4EAF1)),
+                    ),
+                    child: Row(
+                      children: [
+                        Expanded(child: _choixRemise(remis, '', 'Tous')),
+                        Expanded(child: _choixRemise(remis, 'O', 'Remis')),
+                        Expanded(child: _choixRemise(remis, 'N', 'Non remis')),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextButton(
+                        style: TextButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 13),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(13),
+                            side: const BorderSide(color: Color(0xFFE4EAF1)),
+                          ),
+                        ),
+                        onPressed: () {
+                          ctrl.filterDu.value = '';
+                          ctrl.filterAu.value = '';
+                          ctrl.filterNumDeclaration.value = '';
+                          ctrl.filterClient.value = '';
+                          ctrl.filterNumPiece.value = '';
+                          ctrl.filterRemis.value = '';
+                          relancer();
+                        },
+                        child: const Text(
+                          'Réinitialiser',
+                          style: TextStyle(
+                            color: Color(0xFF64748B),
+                            fontSize: 13.5,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: () {
+                          ctrl.filterDu.value = duCtrl.text.trim();
+                          ctrl.filterAu.value = auCtrl.text.trim();
+                          ctrl.filterNumDeclaration.value = declCtrl.text
+                              .trim();
+                          ctrl.filterClient.value = clientCtrl.text.trim();
+                          ctrl.filterNumPiece.value = pieceCtrl.text.trim();
+                          ctrl.filterRemis.value = remis.value;
+                          relancer();
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(vertical: 13),
+                          decoration: BoxDecoration(
+                            gradient: AppTheme.primaryGradient,
+                            borderRadius: BorderRadius.circular(13),
+                            boxShadow: [
+                              BoxShadow(
+                                color: AppTheme.primary.withValues(alpha: 0.32),
+                                blurRadius: 12,
+                                offset: const Offset(0, 5),
+                              ),
+                            ],
+                          ),
+                          child: const Center(
+                            child: Text(
+                              'Appliquer',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 13.5,
+                                fontWeight: FontWeight.w800,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// Un des trois choix de la bascule « Remise ».
+  Widget _choixRemise(RxString selection, String valeur, String libelle) {
+    final actif = selection.value == valeur;
+
+    return GestureDetector(
+      onTap: () => selection.value = valeur,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 180),
+        padding: const EdgeInsets.symmetric(vertical: 9),
+        decoration: BoxDecoration(
+          gradient: actif ? AppTheme.primaryGradient : null,
+          borderRadius: BorderRadius.circular(11),
+        ),
+        child: Center(
+          child: Text(
+            libelle,
+            style: TextStyle(
+              color: actif ? Colors.white : const Color(0xFF475569),
+              fontSize: 12.5,
+              fontWeight: FontWeight.w700,
+            ),
           ),
         ),
       ),
@@ -203,24 +380,60 @@ class RetoursScreen extends StatelessWidget {
           ),
         ),
 
-        // ─── FILTER QUICK ROW ──────────────────────────────────────────────
+        // ─── RECHERCHE RAPIDE PAR N° DE DÉCLARATION ───────────────────────
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 2),
+          padding: const EdgeInsets.fromLTRB(18, 2, 18, 2),
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Obx(() {
-                final hasFilter = retourCtrl.filterDu.value.isNotEmpty;
-                return Text(
-                  hasFilter
-                      ? 'Période : ${retourCtrl.filterDu.value} au ${retourCtrl.filterAu.value}'
-                      : 'Tous les retours de documents',
+              Expanded(
+                child: TextField(
+                  controller:
+                      TextEditingController(
+                          text: retourCtrl.filterNumDeclaration.value,
+                        )
+                        ..selection = TextSelection.collapsed(
+                          offset: retourCtrl.filterNumDeclaration.value.length,
+                        ),
                   style: const TextStyle(
-                    color: Color(0xFF64748B),
-                    fontSize: 12,
+                    color: Color(0xFF0F172A),
+                    fontSize: 13.5,
                   ),
-                );
-              }),
+                  textInputAction: TextInputAction.search,
+                  onSubmitted: (v) {
+                    retourCtrl.filterNumDeclaration.value = v.trim();
+                    retourCtrl.fetchRetoursCCCT(resetPage: true);
+                    retourCtrl.fetchRetoursBL(resetPage: true);
+                  },
+                  decoration: InputDecoration(
+                    hintText: 'N° déclaration...',
+                    hintStyle: const TextStyle(
+                      color: Color(0xFF94A3B8),
+                      fontSize: 13.5,
+                    ),
+                    prefixIcon: const Icon(
+                      LucideIcons.search,
+                      color: AppTheme.primary,
+                      size: 18,
+                    ),
+                    isDense: true,
+                    filled: true,
+                    fillColor: Colors.white.withValues(alpha: 0.9),
+                    contentPadding: const EdgeInsets.symmetric(vertical: 12),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(14),
+                      borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(14),
+                      borderSide: const BorderSide(
+                        color: AppTheme.primary,
+                        width: 1.5,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
               IconButton(
                 style: IconButton.styleFrom(
                   backgroundColor: AppTheme.primary.withValues(alpha: 0.08),
@@ -232,7 +445,7 @@ class RetoursScreen extends StatelessWidget {
                   ),
                 ),
                 icon: const Icon(
-                  LucideIcons.calendar,
+                  LucideIcons.filter,
                   color: AppTheme.primary,
                   size: 18,
                 ),
@@ -254,8 +467,8 @@ class RetoursScreen extends StatelessWidget {
             }
 
             final list = retourCtrl.activeTab.value == 0
-                ? retourCtrl.retoursCCCT
-                : retourCtrl.retoursBL;
+                ? retourCtrl.retoursCCCTAffiches
+                : retourCtrl.retoursBLAffiches;
 
             if (list.isEmpty) {
               return Center(
@@ -387,9 +600,18 @@ class RetoursScreen extends StatelessWidget {
                   MapEntry('Date d\'affectation', item.dateAffectation),
                   MapEntry('Date d\'encaissement', item.dateEncaissement),
                   MapEntry('Date de remise', item.dateRemise),
-                  MapEntry('Montant HT', item.mntHt == null ? null : _formatCurrency(item.mntHt)),
-                  MapEntry('Montant TTC', item.mntTtc == null ? null : _formatCurrency(item.mntTtc)),
-                  MapEntry('Fond', item.fond == null ? null : _formatCurrency(item.fond)),
+                  MapEntry(
+                    'Montant HT',
+                    item.mntHt == null ? null : _formatCurrency(item.mntHt),
+                  ),
+                  MapEntry(
+                    'Montant TTC',
+                    item.mntTtc == null ? null : _formatCurrency(item.mntTtc),
+                  ),
+                  MapEntry(
+                    'Fond',
+                    item.fond == null ? null : _formatCurrency(item.fond),
+                  ),
                   MapEntry('N° expédition', item.idExpedition?.toString()),
                 ],
               ),
@@ -439,6 +661,19 @@ class RetoursScreen extends StatelessWidget {
                         fontWeight: FontWeight.w800,
                       ),
                     ),
+                    if (valeurRenseignee(item.numPiece)) ...[
+                      const SizedBox(height: 2),
+                      Text(
+                        'N° pièce: ${item.numPiece}',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          color: Color(0xFF475569),
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
                     if (item.bordereau != null) ...[
                       const SizedBox(height: 2),
                       Text(

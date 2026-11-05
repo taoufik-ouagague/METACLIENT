@@ -54,7 +54,8 @@ class _TableExpeditionScreenState extends State<TableExpeditionScreen> {
   }
 
   static String? _extraireTypeRemboursement(Map<String, dynamic> item) {
-    final val = item['typeRemboursement'] ??
+    final val =
+        item['typeRemboursement'] ??
         item['type_remboursement'] ??
         item['typeRemb'] ??
         item['type_remb'] ??
@@ -377,23 +378,23 @@ class _TableExpeditionScreenState extends State<TableExpeditionScreen> {
   static const Map<String, Color> _couleurEtape = {
     'date_validation': Color(0xFF10B981), // Emerald green
     'datevalidation': Color(0xFF10B981),
-    'date_edition': Color(0xFF6366F1),   // Indigo
+    'date_edition': Color(0xFF6366F1), // Indigo
     'dateedition': Color(0xFF6366F1),
-    'date_emission': Color(0xFF0EA5E9),  // Sky blue
+    'date_emission': Color(0xFF0EA5E9), // Sky blue
     'dateemission': Color(0xFF0EA5E9),
     'date_encaissement': Color(0xFF059669),
     'dateencaissement': Color(0xFF059669),
     'date_affectation': Color(0xFF8B5CF6), // Violet
     'dateaffectation': Color(0xFF8B5CF6),
-    'date_reception': Color(0xFFF59E0B),  // Amber
+    'date_reception': Color(0xFFF59E0B), // Amber
     'datereception': Color(0xFFF59E0B),
-    'date_remise': Color(0xFFA855F7),     // Purple
+    'date_remise': Color(0xFFA855F7), // Purple
     'dateremise': Color(0xFFA855F7),
-    'date_livraison': Color(0xFF0284C7),  // Blue
+    'date_livraison': Color(0xFF0284C7), // Blue
     'datelivraison': Color(0xFF0284C7),
-    'date_depot': Color(0xFFEC4899),      // Pink
+    'date_depot': Color(0xFFEC4899), // Pink
     'datedepot': Color(0xFFEC4899),
-    'date_taxation': Color(0xFFF97316),   // Orange
+    'date_taxation': Color(0xFFF97316), // Orange
     'datetaxation': Color(0xFFF97316),
   };
 
@@ -401,11 +402,13 @@ class _TableExpeditionScreenState extends State<TableExpeditionScreen> {
   Widget _celluleDate(MapEntry<String, dynamic> date) {
     final k = date.key.toLowerCase().replaceAll(RegExp(r'[^a-z0-9]'), '');
     final kNorm = date.key.toLowerCase();
-    final libelle = _libelleEtape[date.key] ??
+    final libelle =
+        _libelleEtape[date.key] ??
         _libelleEtape[kNorm] ??
         _libelleEtape[k] ??
         '${_libelleCourt(date.key)} le';
-    final couleur = _couleurEtape[date.key] ??
+    final couleur =
+        _couleurEtape[date.key] ??
         _couleurEtape[kNorm] ??
         _couleurEtape[k] ??
         const Color(0xFF64748B);
@@ -482,7 +485,9 @@ class _TableExpeditionScreenState extends State<TableExpeditionScreen> {
       fg = const Color(0xFF475569);
       border = const Color(0xFF64748B).withValues(alpha: 0.22);
       icon = LucideIcons.receipt;
-      label = type.isEmpty ? 'C/REMB' : type[0].toUpperCase() + type.substring(1);
+      label = type.isEmpty
+          ? 'C/REMB'
+          : type[0].toUpperCase() + type.substring(1);
     }
 
     return Container(
@@ -602,7 +607,11 @@ class _TableExpeditionScreenState extends State<TableExpeditionScreen> {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Icon(LucideIcons.landmark, size: 11.5, color: Color(0xFF475569)),
+          const Icon(
+            LucideIcons.landmark,
+            size: 11.5,
+            color: Color(0xFF475569),
+          ),
           const SizedBox(width: 4),
           Flexible(
             child: Text(
@@ -640,7 +649,7 @@ class _TableExpeditionScreenState extends State<TableExpeditionScreen> {
     final typeRemb = _extraireTypeRemboursement(item);
     final nature = montrerNature
         ? (item['nature']?.toString() ??
-            (typeRemb != null ? _formaterTypeRemb(typeRemb) : null))
+              (typeRemb != null ? _formaterTypeRemb(typeRemb) : null))
         : null;
     final montant = item['fond'] ?? item['montant'];
 
@@ -686,6 +695,12 @@ class _TableExpeditionScreenState extends State<TableExpeditionScreen> {
     final titre = champTitre?.value.toString();
     final suite = candidatsTitre.where((e) => e != champTitre).toList();
 
+    // Une date de remise renseignee signe la fin du circuit de la piece.
+    final remise = dates.any(
+      (d) =>
+          d.key.toLowerCase().contains('remise') && valeurRenseignee(d.value),
+    );
+
     return CarteListe(
       margin: const EdgeInsets.only(bottom: 12),
       child: Column(
@@ -695,19 +710,9 @@ class _TableExpeditionScreenState extends State<TableExpeditionScreen> {
           Row(
             children: [
               Expanded(
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Flexible(
-                      child: _badgeTitre(titre, nature, typeRemb),
-                    ),
-                    if (banque != null && banque.trim().isNotEmpty) ...[
-                      const SizedBox(width: 6),
-                      Flexible(
-                        child: _badgeBanque(banque),
-                      ),
-                    ],
-                  ],
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: _badgeTitre(titre, nature, typeRemb),
                 ),
               ),
               const SizedBox(width: 8),
@@ -743,8 +748,20 @@ class _TableExpeditionScreenState extends State<TableExpeditionScreen> {
                 const SizedBox(width: 8),
                 _badgeTypeRemboursement(typeRemb),
               ],
+              if (remise) ...[
+                const SizedBox(width: 6),
+                Icon(
+                  LucideIcons.checkCircle,
+                  size: 17,
+                  color: AppTheme.statusSuccess,
+                ),
+              ],
             ],
           ),
+          if (banque != null && banque.trim().isNotEmpty) ...[
+            const SizedBox(height: 6),
+            Align(alignment: Alignment.centerLeft, child: _badgeBanque(banque)),
+          ],
           if (dates.isNotEmpty) ...[
             const Padding(
               padding: EdgeInsets.symmetric(vertical: 9),

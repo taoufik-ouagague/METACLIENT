@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../../controllers/auth_controller.dart';
+import '../notifications/notifications_screen.dart';
 import '../expeditions/tracking_screen.dart';
 import '../../controllers/config_controller.dart';
 import '../../theme/app_theme.dart';
@@ -49,42 +50,50 @@ class _HomeScreenState extends State<HomeScreen> {
   bool _correspond(String label) =>
       _filtreMenu.isEmpty || label.toLowerCase().contains(_filtreMenu);
 
-  List<({IconData icone, String label, Widget page, bool barre})>
+  List<
+    ({IconData icone, String label, String labelMenu, Widget page, bool barre})
+  >
   _getOnglets() {
     return [
       (
         icone: LucideIcons.home,
         label: 'Accueil',
+        labelMenu: 'Accueil',
         page: DashboardTab(onNavigateTab: (target) => _changerOnglet(target)),
         barre: true,
       ),
       (
         icone: LucideIcons.truck,
         label: 'Expéditions',
+        labelMenu: 'Expéditions',
         page: const ExpeditionsScreen(),
         barre: true,
       ),
       (
         icone: LucideIcons.fileText,
         label: 'Factures',
+        labelMenu: 'Factures',
         page: const FacturesScreen(),
         barre: true,
       ),
       (
         icone: LucideIcons.rotateCcw,
-        label: 'Retours',
+        label: 'CT/BL',
+        labelMenu: 'R/FOND/DOC',
         page: const RetoursScreen(),
         barre: true,
       ),
       (
         icone: LucideIcons.banknote,
         label: 'CRBT',
+        labelMenu: 'CRBT',
         page: const CrbtScreen(),
         barre: true,
       ),
       (
         icone: LucideIcons.user,
         label: 'Profil',
+        labelMenu: 'Profil',
         page: const ProfileScreen(),
         barre: false,
       ),
@@ -254,6 +263,16 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
         const SizedBox(width: 8),
+        // Bouton Notifications
+        _appBarGlassButton(
+          icon: LucideIcons.bell,
+          onTap: () => Get.to<void>(
+            () => const NotificationsScreen(),
+            transition: Transition.cupertino,
+            duration: const Duration(milliseconds: 360),
+          ),
+        ),
+        const SizedBox(width: 8),
         // Bouton Profil
         _boutonProfil(),
         const SizedBox(width: 14),
@@ -321,9 +340,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       LucideIcons.user,
                       size: 19,
                       semanticLabel: nom.isNotEmpty ? nom : 'Profil',
-                      color: isProfileActive
-                          ? AppTheme.primary
-                          : Colors.white,
+                      color: isProfileActive ? AppTheme.primary : Colors.white,
                     ),
                   ),
           ),
@@ -407,7 +424,16 @@ class _HomeScreenState extends State<HomeScreen> {
 
   // ==================== BARRE DE NAVIGATION FLOTTANTE (GLASSMORPHISM STYLE META FLEET) ====================
   Widget _pillBottomBar(
-    List<({IconData icone, String label, Widget page, bool barre})> onglets,
+    List<
+      ({
+        IconData icone,
+        String label,
+        String labelMenu,
+        Widget page,
+        bool barre,
+      })
+    >
+    onglets,
   ) {
     final bottomPadding = MediaQuery.of(context).padding.bottom;
 
@@ -473,9 +499,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _navItem(int idx, IconData icon, String label) {
     final active = _index == idx;
-    final configCtrl = Get.isRegistered<ConfigController>()
-        ? Get.find<ConfigController>()
-        : null;
 
     return GestureDetector(
       onTap: () => _changerOnglet(idx),
@@ -495,15 +518,11 @@ class _HomeScreenState extends State<HomeScreen> {
                 height: active ? 36 : 26,
                 decoration: active
                     ? BoxDecoration(
-                        gradient:
-                            configCtrl?.buttonGradient ??
-                            AppTheme.primaryGradient,
+                        gradient: AppTheme.primaryGradient,
                         borderRadius: BorderRadius.circular(12),
                         boxShadow: [
                           BoxShadow(
-                            color:
-                                (configCtrl?.primaryColor ?? AppTheme.primary)
-                                    .withValues(alpha: 0.35),
+                            color: AppTheme.primary.withValues(alpha: 0.35),
                             blurRadius: 8,
                             offset: const Offset(0, 3),
                           ),
@@ -536,7 +555,16 @@ class _HomeScreenState extends State<HomeScreen> {
 
   // ==================== MENU VERTICAL LATÉRAL (DRAWER STYLE META FLEET) ====================
   Widget _menuLateral(
-    List<({IconData icone, String label, Widget page, bool barre})> onglets,
+    List<
+      ({
+        IconData icone,
+        String label,
+        String labelMenu,
+        Widget page,
+        bool barre,
+      })
+    >
+    onglets,
   ) {
     return Drawer(
       backgroundColor: Colors.transparent,
@@ -565,10 +593,10 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
                 for (var i = 0; i < onglets.length; i++)
-                  if (_correspond(onglets[i].label))
+                  if (_correspond(onglets[i].labelMenu))
                     _ligneMenu(
                       icone: onglets[i].icone,
-                      label: onglets[i].label,
+                      label: onglets[i].labelMenu,
                       actif: _index == i,
                       onTap: () {
                         _changerOnglet(i);
