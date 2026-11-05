@@ -216,10 +216,7 @@ class _VirementDetailScreenState extends State<VirementDetailScreen> {
                           return const Center(
                             child: Padding(
                               padding: EdgeInsets.symmetric(vertical: 40),
-                              child: ColisLoader(
-                                size: 64,
-                                message: 'Chargement des colis rattachés...',
-                              ),
+                              child: ColisLoader(size: 96),
                             ),
                           );
                         }

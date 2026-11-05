@@ -250,10 +250,7 @@ class RetoursScreen extends StatelessWidget {
           child: Obx(() {
             if (retourCtrl.isLoading.value) {
               return const Center(
-                child: ColisLoader(
-                  size: 64,
-                  message: 'Chargement des retours...',
-                ),
+                child: ColisLoader(size: 96),
               );
             }
 

@@ -203,10 +203,7 @@ class _FactureDetailScreenState extends State<FactureDetailScreen> {
                       return const Center(
                         child: Padding(
                           padding: EdgeInsets.symmetric(vertical: 36),
-                          child: ColisLoader(
-                            size: 64,
-                            message: 'Chargement des règlements...',
-                          ),
+                          child: ColisLoader(size: 96),
                         ),
                       );
                     }

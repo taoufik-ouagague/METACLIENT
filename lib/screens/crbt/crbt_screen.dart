@@ -93,10 +93,7 @@ class CrbtScreen extends StatelessWidget {
           child: Obx(() {
             if (crbtCtrl.isLoading.value) {
               return const Center(
-                child: ColisLoader(
-                  size: 64,
-                  message: 'Chargement des règlements...',
-                ),
+                child: ColisLoader(size: 96),
               );
             }
 

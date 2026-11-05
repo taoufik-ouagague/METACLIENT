@@ -25,7 +25,7 @@ enum ColisStyle {
 class ColisLoader extends StatefulWidget {
   const ColisLoader({
     super.key,
-    this.size = 64,
+    this.size = 90,
     this.message,
     this.style = ColisStyle.kraft,
     this.showOrbit = true,
@@ -197,11 +197,11 @@ class _ColisPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final double cx = size.width / 2;
     // La base du sol est positionnée vers le bas du canvas
-    final double groundY = size.height * 0.78;
+    final double groundY = size.height * 0.82;
 
-    // Rayon / demi-arête du cube isométrique
-    final double cubeS = size.width * 0.22;
-    final double jumpHeight = cubeS * 0.95;
+    // Rayon / demi-arête du cube isométrique (plus imposant et détaillé)
+    final double cubeS = size.width * 0.28;
+    final double jumpHeight = cubeS * 0.85;
 
     // ─── 1. Calcul du Rebond & Squash/Stretch ─────────────────────────
     // Phase 0.0 -> 0.45 : Montée avec amorti
@@ -284,8 +284,8 @@ class _ColisPainter extends CustomPainter {
         canvas: canvas,
         cx: cx,
         cy: groundY - cubeS * 1.1 + dy,
-        radiusX: cubeS * 1.65,
-        radiusY: cubeS * 0.58,
+        radiusX: cubeS * 1.55,
+        radiusY: cubeS * 0.52,
         progress: orbitProgress,
         isBack: true,
       );
@@ -315,8 +315,8 @@ class _ColisPainter extends CustomPainter {
         canvas: canvas,
         cx: cx,
         cy: groundY - cubeS * 1.1 + dy,
-        radiusX: cubeS * 1.65,
-        radiusY: cubeS * 0.58,
+        radiusX: cubeS * 1.55,
+        radiusY: cubeS * 0.52,
         progress: orbitProgress,
         isBack: false,
       );

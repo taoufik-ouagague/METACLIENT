@@ -292,10 +292,7 @@ class ExpeditionsScreen extends StatelessWidget {
           child: Obx(() {
             if (expCtrl.isLoading.value) {
               return const Center(
-                child: ColisLoader(
-                  size: 64,
-                  message: 'Chargement des expéditions...',
-                ),
+                child: ColisLoader(size: 96),
               );
             }
 

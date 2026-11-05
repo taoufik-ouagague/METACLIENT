@@ -63,10 +63,7 @@ class _ExpeditionDetailScreenState extends State<ExpeditionDetailScreen> {
       body: Obx(() {
         if (_controller.isLoadingDetail.value) {
           return const Center(
-            child: ColisLoader(
-              size: 72,
-              message: 'Chargement des détails de l\'expédition...',
-            ),
+            child: ColisLoader(size: 96),
           );
         }
 

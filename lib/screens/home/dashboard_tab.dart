@@ -250,10 +250,7 @@ class DashboardTab extends StatelessWidget {
                 return const Center(
                   child: Padding(
                     padding: EdgeInsets.all(24.0),
-                    child: ColisLoader(
-                      size: 56,
-                      message: 'Chargement des données...',
-                    ),
+                    child: ColisLoader(size: 80),
                   ),
                 );
               }

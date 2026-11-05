@@ -98,10 +98,7 @@ class FacturesScreen extends StatelessWidget {
           child: Obx(() {
             if (factureCtrl.isLoading.value) {
               return const Center(
-                child: ColisLoader(
-                  size: 64,
-                  message: 'Chargement des factures...',
-                ),
+                child: ColisLoader(size: 96),
               );
             }
 
