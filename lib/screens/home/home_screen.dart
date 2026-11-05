@@ -277,8 +277,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
       final nom = client?.raisonSociale.isNotEmpty == true
           ? client!.raisonSociale
-          : (user?.libelle ?? 'C');
-      final lettre = nom.isNotEmpty ? nom[0].toUpperCase() : 'C';
+          : (user?.libelle ?? '');
 
       void ouvrir() => _changerOnglet(5);
 
@@ -318,15 +317,13 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   )
                 : Center(
-                    child: Text(
-                      lettre,
-                      style: GoogleFonts.poppins(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w700,
-                        color: isProfileActive
-                            ? AppTheme.primary
-                            : Colors.white,
-                      ),
+                    child: Icon(
+                      LucideIcons.user,
+                      size: 19,
+                      semanticLabel: nom.isNotEmpty ? nom : 'Profil',
+                      color: isProfileActive
+                          ? AppTheme.primary
+                          : Colors.white,
                     ),
                   ),
           ),
