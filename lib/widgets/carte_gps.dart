@@ -141,30 +141,26 @@ class _CarteGpsState extends State<CarteGps> with SingleTickerProviderStateMixin
         children: [
           // ─── ENTÊTE CARTE GPS ─────────────────────────────────────────────
           Padding(
-            padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
+            padding: const EdgeInsets.fromLTRB(14, 10, 14, 8),
             child: Row(
               children: [
-                // Icone GPS ronde avec pulsation douce
+                // Icone GPS ronde compacte
                 Container(
-                  width: 38,
-                  height: 38,
+                  width: 30,
+                  height: 30,
                   decoration: BoxDecoration(
-                    color: AppTheme.primary.withValues(alpha: 0.1),
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      color: AppTheme.primary.withValues(alpha: 0.25),
-                      width: 1.5,
-                    ),
+                    color: AppTheme.primary.withValues(alpha: 0.10),
+                    borderRadius: BorderRadius.circular(10),
                   ),
                   child: const Center(
                     child: Icon(
                       LucideIcons.mapPin,
                       color: AppTheme.primary,
-                      size: 20,
+                      size: 16,
                     ),
                   ),
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: 10),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -175,9 +171,9 @@ class _CarteGpsState extends State<CarteGps> with SingleTickerProviderStateMixin
                             widget.titre ?? 'Position GPS',
                             style: const TextStyle(
                               color: Color(0xFF0F172A),
-                              fontSize: 15,
+                              fontSize: 14,
                               fontWeight: FontWeight.w700,
-                              letterSpacing: -0.2,
+                              letterSpacing: -0.1,
                             ),
                           ),
                           if (widget.geofence != null &&
@@ -186,8 +182,8 @@ class _CarteGpsState extends State<CarteGps> with SingleTickerProviderStateMixin
                             Flexible(
                               child: Container(
                                 padding: const EdgeInsets.symmetric(
-                                  horizontal: 8,
-                                  vertical: 2.5,
+                                  horizontal: 7,
+                                  vertical: 2,
                                 ),
                                 decoration: BoxDecoration(
                                   color: const Color(0xFF10B981).withValues(alpha: 0.12),
@@ -203,7 +199,7 @@ class _CarteGpsState extends State<CarteGps> with SingleTickerProviderStateMixin
                                   overflow: TextOverflow.ellipsis,
                                   style: const TextStyle(
                                     color: Color(0xFF047857),
-                                    fontSize: 11,
+                                    fontSize: 10.5,
                                     fontWeight: FontWeight.w700,
                                   ),
                                 ),
@@ -212,14 +208,14 @@ class _CarteGpsState extends State<CarteGps> with SingleTickerProviderStateMixin
                           ],
                         ],
                       ),
-                      const SizedBox(height: 2),
+                      const SizedBox(height: 1),
                       Text(
                         widget.capturedAt != null && widget.capturedAt!.trim().isNotEmpty
                             ? 'Relevé le ${widget.capturedAt}'
                             : coordsStr,
                         style: const TextStyle(
                           color: Color(0xFF64748B),
-                          fontSize: 12,
+                          fontSize: 11.5,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
@@ -229,9 +225,11 @@ class _CarteGpsState extends State<CarteGps> with SingleTickerProviderStateMixin
                 // Bouton copier
                 IconButton(
                   tooltip: 'Copier les coordonnées',
+                  padding: const EdgeInsets.all(6),
+                  constraints: const BoxConstraints(),
                   icon: const Icon(
                     LucideIcons.copy,
-                    size: 18,
+                    size: 16,
                     color: Color(0xFF64748B),
                   ),
                   onPressed: _copierCoordonnees,

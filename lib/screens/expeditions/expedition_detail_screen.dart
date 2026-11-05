@@ -435,52 +435,34 @@ class _ExpeditionDetailScreenState extends State<ExpeditionDetailScreen> {
         children: [
           // Entête carte informations
           Padding(
-            padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
             child: Row(
               children: [
                 Container(
-                  width: 38,
-                  height: 38,
+                  width: 30,
+                  height: 30,
                   decoration: BoxDecoration(
-                    color: AppTheme.primary.withValues(alpha: 0.1),
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      color: AppTheme.primary.withValues(alpha: 0.25),
-                      width: 1.5,
-                    ),
+                    color: AppTheme.primary.withValues(alpha: 0.10),
+                    borderRadius: BorderRadius.circular(10),
                   ),
                   child: const Center(
                     child: Icon(
                       LucideIcons.info,
                       color: AppTheme.primary,
-                      size: 20,
+                      size: 16,
                     ),
                   ),
                 ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        'Informations complémentaires',
-                        style: TextStyle(
-                          color: Color(0xFF0F172A),
-                          fontSize: 15,
-                          fontWeight: FontWeight.w700,
-                          letterSpacing: -0.2,
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        '${lignes.length} détails enregistrés',
-                        style: const TextStyle(
-                          color: Color(0xFF64748B),
-                          fontSize: 12,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ],
+                const SizedBox(width: 10),
+                const Expanded(
+                  child: Text(
+                    'Informations complémentaires',
+                    style: TextStyle(
+                      color: Color(0xFF0F172A),
+                      fontSize: 14,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: -0.1,
+                    ),
                   ),
                 ),
               ],
@@ -575,52 +557,34 @@ class _ExpeditionDetailScreenState extends State<ExpeditionDetailScreen> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Padding(
-            padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
             child: Row(
               children: [
                 Container(
-                  width: 38,
-                  height: 38,
+                  width: 30,
+                  height: 30,
                   decoration: BoxDecoration(
                     color: const Color(0xFF94A3B8).withValues(alpha: 0.12),
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      color: const Color(0xFF94A3B8).withValues(alpha: 0.25),
-                      width: 1.5,
-                    ),
+                    borderRadius: BorderRadius.circular(10),
                   ),
                   child: const Center(
                     child: Icon(
                       LucideIcons.mapPinOff,
                       color: Color(0xFF64748B),
-                      size: 20,
+                      size: 16,
                     ),
                   ),
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: 10),
                 const Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Position GPS',
-                        style: TextStyle(
-                          color: Color(0xFF0F172A),
-                          fontSize: 15,
-                          fontWeight: FontWeight.w700,
-                          letterSpacing: -0.2,
-                        ),
-                      ),
-                      SizedBox(height: 2),
-                      Text(
-                        'Non disponible',
-                        style: TextStyle(
-                          color: Color(0xFF64748B),
-                          fontSize: 12,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ],
+                  child: Text(
+                    'Position GPS',
+                    style: TextStyle(
+                      color: Color(0xFF0F172A),
+                      fontSize: 14,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: -0.1,
+                    ),
                   ),
                 ),
               ],
