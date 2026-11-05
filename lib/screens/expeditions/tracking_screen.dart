@@ -224,7 +224,7 @@ class _TrackingScreenState extends State<TrackingScreen> {
                   onPressed: () => Get.back<void>(),
                 ),
                 const Text(
-                  'Suivre une expédition',
+                  'Tracking',
                   style: TextStyle(
                     color: Color(0xFF0F172A),
                     fontSize: 17,
@@ -264,7 +264,7 @@ class _TrackingScreenState extends State<TrackingScreen> {
                             const SizedBox(width: 11),
                             const Expanded(
                               child: Text(
-                                'Où est mon colis ?',
+                                'Suivre une expédition',
                                 style: TextStyle(
                                   color: Color(0xFF0F172A),
                                   fontSize: 14.5,
