@@ -8,6 +8,7 @@ import '../../theme/app_theme.dart';
 import '../../widgets/info_rows_card.dart';
 import '../../widgets/carte_liste.dart';
 import '../../widgets/scroll_reveal.dart';
+import '../../widgets/colis_loader.dart';
 
 class VirementDetailScreen extends StatefulWidget {
   final VirementCrbtModel virement;
@@ -215,8 +216,9 @@ class _VirementDetailScreenState extends State<VirementDetailScreen> {
                           return const Center(
                             child: Padding(
                               padding: EdgeInsets.symmetric(vertical: 40),
-                              child: CircularProgressIndicator(
-                                color: AppTheme.primary,
+                              child: ColisLoader(
+                                size: 64,
+                                message: 'Chargement des colis rattachés...',
                               ),
                             ),
                           );

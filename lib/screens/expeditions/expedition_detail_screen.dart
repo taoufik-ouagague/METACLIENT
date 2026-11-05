@@ -12,6 +12,7 @@ import 'table_expedition_screen.dart';
 import '../../widgets/visionneuse_document.dart';
 import '../../widgets/status_badge.dart';
 import '../../widgets/scroll_reveal.dart';
+import '../../widgets/colis_loader.dart';
 
 class ExpeditionDetailScreen extends StatefulWidget {
   final int idExpedition;
@@ -62,7 +63,10 @@ class _ExpeditionDetailScreenState extends State<ExpeditionDetailScreen> {
       body: Obx(() {
         if (_controller.isLoadingDetail.value) {
           return const Center(
-            child: CircularProgressIndicator(color: AppTheme.primary),
+            child: ColisLoader(
+              size: 72,
+              message: 'Chargement des détails de l\'expédition...',
+            ),
           );
         }
 

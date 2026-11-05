@@ -8,6 +8,7 @@ import '../../theme/app_theme.dart';
 import '../../widgets/info_rows_card.dart';
 import '../../widgets/carte_liste.dart';
 import '../../widgets/scroll_reveal.dart';
+import '../../widgets/colis_loader.dart';
 
 class FactureDetailScreen extends StatefulWidget {
   final FactureModel facture;
@@ -200,8 +201,12 @@ class _FactureDetailScreenState extends State<FactureDetailScreen> {
                   Obx(() {
                     if (_controller.isLoadingDetail.value) {
                       return const Center(
-                        child: CircularProgressIndicator(
-                          color: AppTheme.primaryIcons,
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(vertical: 36),
+                          child: ColisLoader(
+                            size: 64,
+                            message: 'Chargement des règlements...',
+                          ),
                         ),
                       );
                     }
