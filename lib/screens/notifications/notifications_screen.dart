@@ -4,6 +4,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../theme/app_theme.dart';
 import '../../widgets/carte_liste.dart';
+import '../../widgets/scroll_reveal.dart';
 
 /// Les notifications du client.
 ///
@@ -65,30 +66,33 @@ class NotificationsScreen extends StatelessWidget {
             child: Padding(
               padding: const EdgeInsets.fromLTRB(18, 78, 18, 24),
               child: Center(
-                child: CarteListe(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 32,
-                  ),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        LucideIcons.bellOff,
-                        size: 34,
-                        color: AppTheme.primary.withValues(alpha: 0.45),
-                      ),
-                      const SizedBox(height: 12),
-                      const Text(
-                        'Aucune notification',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          color: Color(0xFF64748B),
-                          fontSize: 13.5,
-                          fontWeight: FontWeight.w600,
+                child: ScrollReveal.grille(
+                  index: 0,
+                  child: CarteListe(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 32,
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          LucideIcons.bellOff,
+                          size: 34,
+                          color: AppTheme.primary.withValues(alpha: 0.45),
                         ),
-                      ),
-                    ],
+                        const SizedBox(height: 12),
+                        const Text(
+                          'Aucune notification',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: Color(0xFF64748B),
+                            fontSize: 13.5,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),

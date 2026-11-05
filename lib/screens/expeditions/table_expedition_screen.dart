@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../../theme/app_theme.dart';
+import '../../widgets/scroll_reveal.dart';
 import '../../widgets/carte_liste.dart';
 import '../../widgets/info_rows_card.dart';
 
@@ -267,7 +268,10 @@ class _TableExpeditionScreenState extends State<TableExpeditionScreen> {
     return ListView.builder(
       padding: const EdgeInsets.fromLTRB(14, 14, 14, 24),
       itemCount: lignes.length,
-      itemBuilder: (_, i) => _fiche(lignes[i], montrerNature: !_avecFiltres),
+      itemBuilder: (_, i) => ScrollReveal(
+        index: i,
+        child: _fiche(lignes[i], montrerNature: !_avecFiltres),
+      ),
     );
   }
 

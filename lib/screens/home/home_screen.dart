@@ -8,7 +8,6 @@ import 'package:lucide_icons/lucide_icons.dart';
 import '../../controllers/auth_controller.dart';
 import '../notifications/notifications_screen.dart';
 import '../expeditions/tracking_screen.dart';
-import '../../controllers/config_controller.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/ambient_background.dart';
 import '../crbt/crbt_screen.dart';
@@ -126,36 +125,38 @@ class _HomeScreenState extends State<HomeScreen> {
             right: 0,
             height: 330,
             child: IgnorePointer(
-              child: DecoratedBox(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      const Color(0xFF1B7A94),
-                      AppTheme.primary,
-                      const Color(0xFF3FC1D8),
-                      AppTheme.accentCyan.withValues(alpha: 0),
-                    ],
-                    stops: const [0.0, 0.20, 0.40, 1.0],
+              child: RepaintBoundary(
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        const Color(0xFF1B7A94),
+                        AppTheme.primary,
+                        const Color(0xFF3FC1D8),
+                        AppTheme.accentCyan.withValues(alpha: 0),
+                      ],
+                      stops: const [0.0, 0.20, 0.40, 1.0],
+                    ),
                   ),
-                ),
-                child: Stack(
-                  children: [
-                    Positioned(
-                      left: -60,
-                      top: -70,
-                      child: _halo(220, Colors.white.withValues(alpha: 0.18)),
-                    ),
-                    Positioned(
-                      right: -80,
-                      top: 10,
-                      child: _halo(
-                        240,
-                        AppTheme.accentCyan.withValues(alpha: 0.30),
+                  child: Stack(
+                    children: [
+                      Positioned(
+                        left: -60,
+                        top: -70,
+                        child: _halo(220, Colors.white.withValues(alpha: 0.18)),
                       ),
-                    ),
-                  ],
+                      Positioned(
+                        right: -80,
+                        top: 10,
+                        child: _halo(
+                          240,
+                          AppTheme.accentCyan.withValues(alpha: 0.30),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -572,49 +573,103 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Stack(
         fit: StackFit.expand,
         children: [
+          // Le tiroir prolonge la page : le meme bandeau degrade qu'en haut
+          // de l'accueil, qui s'eteint dans le fond clair du corps. Un bleu
+          // nuit plein se lisait comme une autre application.
           const AmbientBackground(),
-          SafeArea(
-            child: ListView(
-              padding: const EdgeInsets.fromLTRB(14, 14, 14, 24),
-              children: [
-                _enteteMenu(),
-                const SizedBox(height: 14),
-                _champRechercheMenu(),
-                const SizedBox(height: 14),
-                Padding(
-                  padding: const EdgeInsets.only(left: 6, bottom: 8),
-                  child: Text(
-                    'Raccourcis',
-                    style: GoogleFonts.poppins(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                      color: const Color(0xFF94A3B8),
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            height: 300,
+            child: IgnorePointer(
+              child: RepaintBoundary(
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        const Color(0xFF1B7A94),
+                        AppTheme.primary,
+                        const Color(0xFF3FC1D8),
+                        AppTheme.accentCyan.withValues(alpha: 0),
+                      ],
+                      stops: const [0.0, 0.22, 0.45, 1.0],
                     ),
                   ),
+                  child: Stack(
+                    children: [
+                      Positioned(
+                        left: -70,
+                        top: -60,
+                        child: _halo(200, Colors.white.withValues(alpha: 0.16)),
+                      ),
+                      Positioned(
+                        right: -70,
+                        top: 20,
+                        child: _halo(
+                          210,
+                          AppTheme.accentCyan.withValues(alpha: 0.28),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-                for (var i = 0; i < onglets.length; i++)
-                  if (_correspond(onglets[i].labelMenu))
-                    _ligneMenu(
-                      icone: onglets[i].icone,
-                      label: onglets[i].labelMenu,
-                      actif: _index == i,
-                      onTap: () {
-                        _changerOnglet(i);
-                        Navigator.of(context).pop();
-                      },
-                    ),
-                const SizedBox(height: 14),
-                const Divider(color: Color(0xFFE2E8F0), height: 1),
-                const SizedBox(height: 14),
+              ),
+            ),
+          ),
+          SafeArea(
+            // La deconnexion ne defile plus avec les raccourcis : elle est
+            // ancree en bas, ou on la cherche, quel que soit le nombre
+            // d'entrees ou le filtre de recherche.
+            child: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(14, 14, 14, 0),
+                  child: Column(
+                    children: [
+                      _enteteMenu(),
+                      const SizedBox(height: 14),
+                      _champRechercheMenu(),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Expanded(
+                  child: ListView(
+                    padding: const EdgeInsets.fromLTRB(14, 0, 14, 8),
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(left: 6, bottom: 8),
+                        child: Text(
+                          'Raccourcis',
+                          style: GoogleFonts.poppins(
+                            fontSize: 11.5,
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: 0.4,
+                            color: const Color(0xFF8CA0B6),
+                          ),
+                        ),
+                      ),
+                      for (var i = 0; i < onglets.length; i++)
+                        if (_correspond(onglets[i].labelMenu))
+                          _ligneMenu(
+                            icone: onglets[i].icone,
+                            label: onglets[i].labelMenu,
+                            actif: _index == i,
+                            onTap: () {
+                              _changerOnglet(i);
+                              Navigator.of(context).pop();
+                            },
+                          ),
+                    ],
+                  ),
+                ),
                 if (_correspond('Déconnexion'))
-                  _ligneMenu(
-                    icone: LucideIcons.logOut,
-                    label: 'Déconnexion',
-                    couleur: const Color(0xFFDC2626),
-                    onTap: () {
-                      Navigator.of(context).pop();
-                      _authController.logout();
-                    },
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(14, 8, 14, 16),
+                    child: _ligneDeconnexion(),
                   ),
               ],
             ),
@@ -654,16 +709,19 @@ class _HomeScreenState extends State<HomeScreen> {
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
                 colors: [
-                  Colors.white.withValues(alpha: 0.92),
-                  Colors.white.withValues(alpha: 0.70),
+                  Colors.white.withValues(alpha: 0.95),
+                  Colors.white.withValues(alpha: 0.80),
                 ],
               ),
-              border: Border.all(color: Colors.white.withValues(alpha: 0.95)),
+              border: Border.all(
+                color: Colors.white.withValues(alpha: 0.95),
+                width: 1.2,
+              ),
               boxShadow: [
                 BoxShadow(
-                  color: AppTheme.primary.withValues(alpha: 0.08),
-                  blurRadius: 14,
-                  offset: const Offset(0, 4),
+                  color: AppTheme.primaryIcons.withValues(alpha: 0.12),
+                  blurRadius: 16,
+                  offset: const Offset(0, 6),
                 ),
               ],
             ),
@@ -673,11 +731,12 @@ class _HomeScreenState extends State<HomeScreen> {
                   width: 46,
                   height: 46,
                   decoration: BoxDecoration(
-                    gradient: (Get.isRegistered<ConfigController>()
-                        ? Get.find<ConfigController>().buttonGradient
-                        : AppTheme.primaryGradient),
+                    gradient: AppTheme.iconGradient,
                     shape: BoxShape.circle,
-                    border: Border.all(color: Colors.white, width: 1.5),
+                    border: Border.all(
+                      color: Colors.white.withValues(alpha: 0.6),
+                      width: 1.5,
+                    ),
                   ),
                   alignment: Alignment.center,
                   child: Text(
@@ -732,19 +791,12 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _champRechercheMenu() {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.85),
+        color: Colors.white.withValues(alpha: 0.92),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: Colors.white.withValues(alpha: 0.95),
           width: 1.2,
         ),
-        boxShadow: [
-          BoxShadow(
-            color: AppTheme.primary.withValues(alpha: 0.05),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
-          ),
-        ],
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(16),
@@ -767,7 +819,7 @@ class _HomeScreenState extends State<HomeScreen> {
               child: Icon(
                 LucideIcons.search,
                 size: 18,
-                color: AppTheme.primary,
+                color: AppTheme.primaryIcons,
               ),
             ),
             prefixIconConstraints: const BoxConstraints(
@@ -800,48 +852,105 @@ class _HomeScreenState extends State<HomeScreen> {
     required String label,
     required VoidCallback onTap,
     bool actif = false,
-    Color? couleur,
   }) {
-    final configCtrl = Get.isRegistered<ConfigController>()
-        ? Get.find<ConfigController>()
-        : null;
-    final teinte = couleur ?? (configCtrl?.primaryColor ?? AppTheme.primary);
-
     return Padding(
-      padding: const EdgeInsets.only(bottom: 6),
+      padding: const EdgeInsets.only(bottom: 7),
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          // Entree courante : le cyan du logo, comme sur l'ecran de connexion.
+          gradient: actif ? AppTheme.iconGradient : null,
+          color: actif ? null : Colors.white.withValues(alpha: 0.80),
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(
+            color: Colors.white.withValues(alpha: actif ? 0.55 : 0.95),
+            width: 1.2,
+          ),
+          boxShadow: actif
+              ? [
+                  BoxShadow(
+                    color: AppTheme.primaryIcons.withValues(alpha: 0.35),
+                    blurRadius: 16,
+                    offset: const Offset(0, 6),
+                  ),
+                ]
+              : null,
+        ),
+        child: Material(
+          color: Colors.transparent,
+          borderRadius: BorderRadius.circular(14),
+          child: InkWell(
+            onTap: onTap,
+            borderRadius: BorderRadius.circular(14),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+              child: Row(
+                children: [
+                  Icon(
+                    icone,
+                    size: 19,
+                    color: actif ? Colors.white : AppTheme.primaryIcons,
+                  ),
+                  const SizedBox(width: 13),
+                  Expanded(
+                    child: Text(
+                      label,
+                      style: GoogleFonts.poppins(
+                        fontSize: 13.5,
+                        fontWeight: actif ? FontWeight.w700 : FontWeight.w600,
+                        color: actif ? Colors.white : const Color(0xFF28394D),
+                      ),
+                    ),
+                  ),
+                  if (actif)
+                    const Icon(
+                      LucideIcons.chevronRight,
+                      size: 16,
+                      color: Colors.white,
+                    ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// Deconnexion : meme dessin que les raccourcis, en rouge assume.
+  Widget _ligneDeconnexion() {
+    const rouge = Color(0xFFDC2626);
+
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: const Color(0xFFFEF2F2).withValues(alpha: 0.92),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: const Color(0xFFFBD5D5), width: 1.2),
+      ),
       child: Material(
-        color: actif
-            ? teinte.withValues(alpha: 0.12)
-            : Colors.white.withValues(alpha: 0.60),
+        color: Colors.transparent,
         borderRadius: BorderRadius.circular(14),
         child: InkWell(
-          onTap: onTap,
+          onTap: () {
+            Navigator.of(context).pop();
+            _authController.logout();
+          },
           borderRadius: BorderRadius.circular(14),
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 13),
             child: Row(
               children: [
-                Icon(icone, size: 19, color: teinte),
+                const Icon(LucideIcons.logOut, size: 19, color: rouge),
                 const SizedBox(width: 13),
                 Expanded(
                   child: Text(
-                    label,
+                    'Déconnexion',
                     style: GoogleFonts.poppins(
                       fontSize: 13.5,
-                      fontWeight: actif ? FontWeight.w700 : FontWeight.w600,
-                      color: couleur ?? const Color(0xFF0F172A),
+                      fontWeight: FontWeight.w700,
+                      color: rouge,
                     ),
                   ),
                 ),
-                if (actif)
-                  Container(
-                    width: 6,
-                    height: 6,
-                    decoration: BoxDecoration(
-                      color: teinte,
-                      shape: BoxShape.circle,
-                    ),
-                  ),
               ],
             ),
           ),

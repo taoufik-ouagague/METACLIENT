@@ -8,6 +8,7 @@ import '../../models/facture_model.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/info_rows_card.dart';
 import '../../widgets/carte_liste.dart';
+import '../../widgets/scroll_reveal.dart';
 
 class FactureDetailScreen extends StatefulWidget {
   final FactureModel facture;
@@ -343,57 +344,60 @@ class _FactureDetailScreenState extends State<FactureDetailScreen> {
       itemBuilder: (context, i) {
         final av = avoirs[i];
 
-        return CarteListe(
-          margin: const EdgeInsets.only(bottom: 10),
-          borderRadius: 16,
-          padding: const EdgeInsets.all(14),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Avoir N° ${av.numAvoir}',
-                      style: const TextStyle(
-                        color: Color(0xFF0F172A),
-                        fontSize: 13.5,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      'Créé le : ${av.dateCreation ?? "—"}',
-                      style: const TextStyle(
-                        color: Color(0xFF64748B),
-                        fontSize: 11.5,
-                      ),
-                    ),
-                    if (valeurRenseignee(av.remarque)) ...[
-                      const SizedBox(height: 2),
+        return ScrollReveal(
+          index: i,
+          child: CarteListe(
+            margin: const EdgeInsets.only(bottom: 10),
+            borderRadius: 16,
+            padding: const EdgeInsets.all(14),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
                       Text(
-                        av.remarque!,
+                        'Avoir N° ${av.numAvoir}',
                         style: const TextStyle(
-                          color: Color(0xFF475569),
-                          fontSize: 11.5,
-                          fontStyle: FontStyle.italic,
+                          color: Color(0xFF0F172A),
+                          fontSize: 13.5,
+                          fontWeight: FontWeight.w700,
                         ),
                       ),
+                      const SizedBox(height: 2),
+                      Text(
+                        'Créé le : ${av.dateCreation ?? "—"}',
+                        style: const TextStyle(
+                          color: Color(0xFF64748B),
+                          fontSize: 11.5,
+                        ),
+                      ),
+                      if (valeurRenseignee(av.remarque)) ...[
+                        const SizedBox(height: 2),
+                        Text(
+                          av.remarque!,
+                          style: const TextStyle(
+                            color: Color(0xFF475569),
+                            fontSize: 11.5,
+                            fontStyle: FontStyle.italic,
+                          ),
+                        ),
+                      ],
                     ],
-                  ],
+                  ),
                 ),
-              ),
-              const SizedBox(width: 10),
-              Text(
-                '- ${_formatCurrency(av.montant)}',
-                style: const TextStyle(
-                  color: AppTheme.statusWarning,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w700,
+                const SizedBox(width: 10),
+                Text(
+                  '- ${_formatCurrency(av.montant)}',
+                  style: const TextStyle(
+                    color: AppTheme.statusWarning,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         );
       },
@@ -416,67 +420,70 @@ class _FactureDetailScreenState extends State<FactureDetailScreen> {
       itemBuilder: (context, i) {
         final reg = reglements[i];
 
-        return CarteListe(
-          margin: const EdgeInsets.only(bottom: 10),
-          borderRadius: 16,
-          padding: const EdgeInsets.all(15),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(
-                child: Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: AppTheme.statusSuccess.withValues(alpha: 0.12),
-                        borderRadius: BorderRadius.circular(10),
+        return ScrollReveal(
+          index: i,
+          child: CarteListe(
+            margin: const EdgeInsets.only(bottom: 10),
+            borderRadius: 16,
+            padding: const EdgeInsets.all(15),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: AppTheme.statusSuccess.withValues(alpha: 0.12),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: const Icon(
+                          LucideIcons.badgeCheck,
+                          color: AppTheme.statusSuccess,
+                          size: 20,
+                        ),
                       ),
-                      child: const Icon(
-                        LucideIcons.badgeCheck,
-                        color: AppTheme.statusSuccess,
-                        size: 20,
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            reg.modeReglement,
-                            style: const TextStyle(
-                              color: Color(0xFF0F172A),
-                              fontSize: 14,
-                              fontWeight: FontWeight.w700,
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              reg.modeReglement,
+                              style: const TextStyle(
+                                color: Color(0xFF0F172A),
+                                fontSize: 14,
+                                fontWeight: FontWeight.w700,
+                              ),
                             ),
-                          ),
-                          const SizedBox(height: 2),
-                          Text(
-                            'Réf: ${reg.refReglement} • Date: ${reg.dateCreation ?? "—"}',
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
-                              color: Color(0xFF64748B),
-                              fontSize: 11.5,
+                            const SizedBox(height: 2),
+                            Text(
+                              'Réf: ${reg.refReglement} • Date: ${reg.dateCreation ?? "—"}',
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                color: Color(0xFF64748B),
+                                fontSize: 11.5,
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-              const SizedBox(width: 10),
-              Text(
-                _formatCurrency(reg.montant),
-                style: const TextStyle(
-                  color: AppTheme.statusSuccess,
-                  fontSize: 14.5,
-                  fontWeight: FontWeight.w800,
+                const SizedBox(width: 10),
+                Text(
+                  _formatCurrency(reg.montant),
+                  style: const TextStyle(
+                    color: AppTheme.statusSuccess,
+                    fontSize: 14.5,
+                    fontWeight: FontWeight.w800,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         );
       },

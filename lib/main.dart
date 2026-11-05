@@ -57,6 +57,8 @@ class MetaClientApp extends StatelessWidget {
           name: '/login',
           page: () => const LoginScreen(),
           transition: Transition.fadeIn,
+          transitionDuration: const Duration(milliseconds: 650),
+          curve: Curves.easeOutCubic,
         ),
         GetPage(
           name: '/home',

@@ -64,23 +64,33 @@ class GlassContainer extends StatelessWidget {
                 ),
               ]);
 
+    Widget boite = Container(
+      width: width,
+      height: height,
+      padding: padding ?? const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: effectiveColor,
+        borderRadius: BorderRadius.circular(borderRadius),
+        border: effectiveBorder,
+        boxShadow: effectiveShadow,
+      ),
+      child: child,
+    );
+
+    // Un BackdropFilter coute un saveLayer plein ecran par carte : on ne le
+    // pose que si un flou est reellement demande. Sur un fond fixe et sous un
+    // remplissage deja opaque, il ne se voyait pas et plombait les frames
+    // (le tableau de bord en empilait neuf).
+    if (blur > 0) {
+      boite = BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: blur, sigmaY: blur),
+        child: boite,
+      );
+    }
+
     Widget content = ClipRRect(
       borderRadius: BorderRadius.circular(borderRadius),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: blur, sigmaY: blur),
-        child: Container(
-          width: width,
-          height: height,
-          padding: padding ?? const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: effectiveColor,
-            borderRadius: BorderRadius.circular(borderRadius),
-            border: effectiveBorder,
-            boxShadow: effectiveShadow,
-          ),
-          child: child,
-        ),
-      ),
+      child: boite,
     );
 
     if (margin != null) {

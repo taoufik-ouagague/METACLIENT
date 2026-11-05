@@ -6,6 +6,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import '../../controllers/expedition_controller.dart';
 import '../../models/expedition_detail_model.dart';
 import '../../theme/app_theme.dart';
+import '../../widgets/scroll_reveal.dart';
 import '../../widgets/glass_button.dart';
 import '../../widgets/glass_container.dart';
 import '../../widgets/glass_scaffold.dart';
@@ -93,7 +94,8 @@ class _TrackingScreenState extends State<TrackingScreen> {
 
   Widget _badgeTypeRemboursement(ExpeditionDetailModel exp) {
     final bool isVir = exp.aVirementCr;
-    final String label = exp.typeRemboursementLibelle ?? (isVir ? 'Virement' : 'Chèque');
+    final String label =
+        exp.typeRemboursementLibelle ?? (isVir ? 'Virement' : 'Chèque');
 
     final Color bg = isVir
         ? const Color(0xFF0EA5E9).withValues(alpha: 0.12)
@@ -102,7 +104,9 @@ class _TrackingScreenState extends State<TrackingScreen> {
     final Color border = isVir
         ? const Color(0xFF0EA5E9).withValues(alpha: 0.28)
         : const Color(0xFFA855F7).withValues(alpha: 0.28);
-    final IconData icon = isVir ? LucideIcons.arrowRightLeft : LucideIcons.wallet;
+    final IconData icon = isVir
+        ? LucideIcons.arrowRightLeft
+        : LucideIcons.wallet;
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
@@ -290,105 +294,108 @@ class _TrackingScreenState extends State<TrackingScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  GlassContainer(
-                    borderRadius: 20,
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            Container(
-                              width: 36,
-                              height: 36,
-                              decoration: BoxDecoration(
-                                gradient: AppTheme.iconGradient,
-                                borderRadius: BorderRadius.circular(11),
-                              ),
-                              child: const Icon(
-                                LucideIcons.packageSearch,
-                                color: Colors.white,
-                                size: 18,
-                              ),
-                            ),
-                            const SizedBox(width: 11),
-                            const Expanded(
-                              child: Text(
-                                'Suivre une expédition',
-                                style: TextStyle(
-                                  color: Color(0xFF0F172A),
-                                  fontSize: 14.5,
-                                  fontWeight: FontWeight.w800,
+                  ScrollReveal.grille(
+                    index: 0,
+                    child: GlassContainer(
+                      borderRadius: 20,
+                      padding: const EdgeInsets.all(16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Container(
+                                width: 36,
+                                height: 36,
+                                decoration: BoxDecoration(
+                                  gradient: AppTheme.iconGradient,
+                                  borderRadius: BorderRadius.circular(11),
+                                ),
+                                child: const Icon(
+                                  LucideIcons.packageSearch,
+                                  color: Colors.white,
+                                  size: 18,
                                 ),
                               ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 13),
-                        TextField(
-                          controller: _saisie,
-                          focusNode: _focus,
-                          keyboardType: TextInputType.text,
-                          textInputAction: TextInputAction.search,
-                          autocorrect: false,
-                          style: const TextStyle(
-                            color: Color(0xFF0F172A),
-                            fontSize: 15,
-                            fontWeight: FontWeight.w600,
-                            letterSpacing: 0.3,
-                          ),
-                          // Le numero est alphanumerique sans espaces : on evite
-                          // les copier-coller qui trainent un espace et font
-                          // repondre « introuvable » a un numero correct.
-                          inputFormatters: [
-                            FilteringTextInputFormatter.deny(RegExp(r'\s')),
-                          ],
-                          onSubmitted: (_) => _lancerRecherche(),
-                          onChanged: (_) => setState(() {}),
-                          decoration: InputDecoration(
-                            hintText: 'N° de déclaration',
-                            hintStyle: const TextStyle(
-                              color: Color(0xFF94A3B8),
-                              fontSize: 14.5,
-                              fontWeight: FontWeight.w500,
-                              letterSpacing: 0,
-                            ),
-                            prefixIcon: const Icon(
-                              LucideIcons.search,
-                              size: 18,
-                              color: AppTheme.primary,
-                            ),
-                            suffixIcon: _saisie.text.isEmpty
-                                ? null
-                                : IconButton(
-                                    tooltip: 'Effacer',
-                                    icon: const Icon(
-                                      LucideIcons.x,
-                                      size: 16,
-                                      color: Color(0xFF94A3B8),
-                                    ),
-                                    onPressed: () => setState(_saisie.clear),
+                              const SizedBox(width: 11),
+                              const Expanded(
+                                child: Text(
+                                  'Suivre une expédition',
+                                  style: TextStyle(
+                                    color: Color(0xFF0F172A),
+                                    fontSize: 14.5,
+                                    fontWeight: FontWeight.w800,
                                   ),
-                            filled: true,
-                            fillColor: const Color(0xFFF8FAFC),
-                            contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 14,
-                              vertical: 12,
-                            ),
-                            border: _bordure(const Color(0xFFE2E8F0)),
-                            enabledBorder: _bordure(const Color(0xFFE2E8F0)),
-                            focusedBorder: _bordure(AppTheme.primary, 1.4),
+                                ),
+                              ),
+                            ],
                           ),
-                        ),
-                        const SizedBox(height: 12),
-                        GlassButton(
-                          text: _recherche ? 'Recherche...' : 'Suivre',
-                          icon: LucideIcons.search,
-                          isLoading: _recherche,
-                          height: 46,
-                          onPressed: _recherche ? null : _lancerRecherche,
-                        ),
-                      ],
+                          const SizedBox(height: 13),
+                          TextField(
+                            controller: _saisie,
+                            focusNode: _focus,
+                            keyboardType: TextInputType.text,
+                            textInputAction: TextInputAction.search,
+                            autocorrect: false,
+                            style: const TextStyle(
+                              color: Color(0xFF0F172A),
+                              fontSize: 15,
+                              fontWeight: FontWeight.w600,
+                              letterSpacing: 0.3,
+                            ),
+                            // Le numero est alphanumerique sans espaces : on evite
+                            // les copier-coller qui trainent un espace et font
+                            // repondre « introuvable » a un numero correct.
+                            inputFormatters: [
+                              FilteringTextInputFormatter.deny(RegExp(r'\s')),
+                            ],
+                            onSubmitted: (_) => _lancerRecherche(),
+                            onChanged: (_) => setState(() {}),
+                            decoration: InputDecoration(
+                              hintText: 'N° de déclaration',
+                              hintStyle: const TextStyle(
+                                color: Color(0xFF94A3B8),
+                                fontSize: 14.5,
+                                fontWeight: FontWeight.w500,
+                                letterSpacing: 0,
+                              ),
+                              prefixIcon: const Icon(
+                                LucideIcons.search,
+                                size: 18,
+                                color: AppTheme.primary,
+                              ),
+                              suffixIcon: _saisie.text.isEmpty
+                                  ? null
+                                  : IconButton(
+                                      tooltip: 'Effacer',
+                                      icon: const Icon(
+                                        LucideIcons.x,
+                                        size: 16,
+                                        color: Color(0xFF94A3B8),
+                                      ),
+                                      onPressed: () => setState(_saisie.clear),
+                                    ),
+                              filled: true,
+                              fillColor: const Color(0xFFF8FAFC),
+                              contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 14,
+                                vertical: 12,
+                              ),
+                              border: _bordure(const Color(0xFFE2E8F0)),
+                              enabledBorder: _bordure(const Color(0xFFE2E8F0)),
+                              focusedBorder: _bordure(AppTheme.primary, 1.4),
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          GlassButton(
+                            text: _recherche ? 'Recherche...' : 'Suivre',
+                            icon: LucideIcons.search,
+                            isLoading: _recherche,
+                            height: 46,
+                            onPressed: _recherche ? null : _lancerRecherche,
+                          ),
+                        ],
+                      ),
                     ),
                   ),
 
@@ -414,7 +421,13 @@ class _TrackingScreenState extends State<TrackingScreen> {
                           ),
                         ),
                         const SizedBox(height: 10),
-                        ...resultats.map(_carteResultat),
+                        // Chaque resultat se revele a son tour.
+                        ...resultats.indexed.map(
+                          (e) => ScrollReveal(
+                            index: e.$1,
+                            child: _carteResultat(e.$2),
+                          ),
+                        ),
                       ],
                     );
                   }),

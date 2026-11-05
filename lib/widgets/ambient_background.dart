@@ -43,12 +43,8 @@ class AmbientBackground extends StatelessWidget {
                   shape: BoxShape.circle,
                   gradient: RadialGradient(
                     colors: [
-                      AppTheme.primaryIcons.withValues(
-                        alpha: 0.20,
-                      ),
-                      AppTheme.primaryIcons.withValues(
-                        alpha: 0.05,
-                      ),
+                      AppTheme.primaryIcons.withValues(alpha: 0.20),
+                      AppTheme.primaryIcons.withValues(alpha: 0.05),
                       Colors.transparent,
                     ],
                     stops: const [0.0, 0.50, 1.0],
@@ -67,12 +63,8 @@ class AmbientBackground extends StatelessWidget {
                   shape: BoxShape.circle,
                   gradient: RadialGradient(
                     colors: [
-                      AppTheme.primary.withValues(
-                        alpha: 0.22,
-                      ),
-                      AppTheme.primary.withValues(
-                        alpha: 0.05,
-                      ),
+                      AppTheme.primary.withValues(alpha: 0.22),
+                      AppTheme.primary.withValues(alpha: 0.05),
                       Colors.transparent,
                     ],
                     stops: const [0.0, 0.50, 1.0],
@@ -140,12 +132,8 @@ class AmbientBackground extends StatelessWidget {
                 shape: BoxShape.circle,
                 gradient: RadialGradient(
                   colors: [
-                    AppTheme.primaryIcons.withValues(
-                      alpha: 0.16,
-                    ),
-                    AppTheme.primaryIcons.withValues(
-                      alpha: 0.04,
-                    ),
+                    AppTheme.primaryIcons.withValues(alpha: 0.16),
+                    AppTheme.primaryIcons.withValues(alpha: 0.04),
                     Colors.transparent,
                   ],
                   stops: const [0.0, 0.45, 1.0],
@@ -165,12 +153,8 @@ class AmbientBackground extends StatelessWidget {
                 shape: BoxShape.circle,
                 gradient: RadialGradient(
                   colors: [
-                    AppTheme.primary.withValues(
-                      alpha: 0.14,
-                    ),
-                    AppTheme.primary.withValues(
-                      alpha: 0.03,
-                    ),
+                    AppTheme.primary.withValues(alpha: 0.14),
+                    AppTheme.primary.withValues(alpha: 0.03),
                     Colors.transparent,
                   ],
                   stops: const [0.0, 0.50, 1.0],
@@ -232,9 +216,10 @@ class AmbientBackground extends StatelessWidget {
       );
     }
 
+    // Fond fixe : isole des repeints du contenu qui defile au-dessus.
     if (Get.isRegistered<ConfigController>()) {
-      return Obx(() => buildBackground());
+      return RepaintBoundary(child: Obx(() => buildBackground()));
     }
-    return buildBackground();
+    return RepaintBoundary(child: buildBackground());
   }
 }

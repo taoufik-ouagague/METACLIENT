@@ -7,6 +7,7 @@ import '../../controllers/dashboard_controller.dart';
 import '../../controllers/expedition_controller.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/glass_container.dart';
+import '../../widgets/scroll_reveal.dart';
 import '../../widgets/stat_card.dart';
 
 class DashboardTab extends StatelessWidget {
@@ -41,56 +42,63 @@ class DashboardTab extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // ─── QUICK DECLARATION SEARCH BAR ─────────────────────────────
-            GlassContainer(
-              borderRadius: 18,
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
-              child: Row(
-                children: [
-                  const Icon(
-                    LucideIcons.search,
-                    color: AppTheme.primaryIcons,
-                    size: 20,
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: TextField(
-                      controller: searchCtrl,
-                      style: const TextStyle(
-                        color: Color(0xFF0F172A),
-                        fontSize: 13.5,
-                      ),
-                      decoration: const InputDecoration(
-                        hintText: 'Rechercher N° déclaration (ex: F644759)...',
-                        hintStyle: TextStyle(
-                          color: Color(0xFF94A3B8),
-                          fontSize: 13,
+            ScrollReveal.grille(
+              index: 0,
+              child: GlassContainer(
+                borderRadius: 18,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 4,
+                ),
+                child: Row(
+                  children: [
+                    const Icon(
+                      LucideIcons.search,
+                      color: AppTheme.primaryIcons,
+                      size: 20,
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: TextField(
+                        controller: searchCtrl,
+                        style: const TextStyle(
+                          color: Color(0xFF0F172A),
+                          fontSize: 13.5,
                         ),
-                        border: InputBorder.none,
+                        decoration: const InputDecoration(
+                          hintText:
+                              'Rechercher N° déclaration (ex: F644759)...',
+                          hintStyle: TextStyle(
+                            color: Color(0xFF94A3B8),
+                            fontSize: 13,
+                          ),
+                          border: InputBorder.none,
+                        ),
+                        onSubmitted: (query) {
+                          if (query.trim().isNotEmpty) {
+                            expCtrl.searchQuery.value = query.trim();
+                            expCtrl.fetchAllExpeditions(resetPage: true);
+                            onNavigateTab?.call(1);
+                          }
+                        },
                       ),
-                      onSubmitted: (query) {
-                        if (query.trim().isNotEmpty) {
-                          expCtrl.searchQuery.value = query.trim();
+                    ),
+                    IconButton(
+                      icon: const Icon(
+                        LucideIcons.arrowRightCircle,
+                        color: AppTheme.primaryIcons,
+                        size: 22,
+                      ),
+                      onPressed: () {
+                        if (searchCtrl.text.trim().isNotEmpty) {
+                          expCtrl.searchQuery.value = searchCtrl.text.trim();
                           expCtrl.fetchAllExpeditions(resetPage: true);
                           onNavigateTab?.call(1);
                         }
                       },
                     ),
-                  ),
-                  IconButton(
-                    icon: const Icon(
-                      LucideIcons.arrowRightCircle,
-                      color: AppTheme.primaryIcons,
-                      size: 22,
-                    ),
-                    onPressed: () {
-                      if (searchCtrl.text.trim().isNotEmpty) {
-                        expCtrl.searchQuery.value = searchCtrl.text.trim();
-                        expCtrl.fetchAllExpeditions(resetPage: true);
-                        onNavigateTab?.call(1);
-                      }
-                    },
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
 
@@ -103,24 +111,32 @@ class DashboardTab extends StatelessWidget {
                   Row(
                     children: [
                       Expanded(
-                        child: StatCard(
-                          title: 'En cours de livraison',
-                          value: '${dashCtrl.expeditionsEncoursCount.value}',
-                          icon: LucideIcons.truck,
-                          subtitle: 'En temps réel',
-                          color: const Color(0xFF0284C7),
-                          onTap: () => onNavigateTab?.call(1),
+                        child: ScrollReveal.grille(
+                          index: 0,
+                          child: StatCard(
+                            chargement: dashCtrl.isLoading.value,
+                            title: 'En cours de livraison',
+                            value: '${dashCtrl.expeditionsEncoursCount.value}',
+                            icon: LucideIcons.truck,
+                            subtitle: 'En temps réel',
+                            color: const Color(0xFF0284C7),
+                            onTap: () => onNavigateTab?.call(1),
+                          ),
                         ),
                       ),
                       const SizedBox(width: 10),
                       Expanded(
-                        child: StatCard(
-                          title: 'Total Expéditions',
-                          value: '${dashCtrl.totalExpeditionsCount.value}',
-                          icon: LucideIcons.packageCheck,
-                          subtitle: 'Historique',
-                          color: const Color(0xFF6366F1),
-                          onTap: () => onNavigateTab?.call(1),
+                        child: ScrollReveal.grille(
+                          index: 1,
+                          child: StatCard(
+                            chargement: dashCtrl.isLoading.value,
+                            title: 'Total Expéditions',
+                            value: '${dashCtrl.totalExpeditionsCount.value}',
+                            icon: LucideIcons.packageCheck,
+                            subtitle: 'Historique',
+                            color: const Color(0xFF6366F1),
+                            onTap: () => onNavigateTab?.call(1),
+                          ),
                         ),
                       ),
                     ],
@@ -129,24 +145,32 @@ class DashboardTab extends StatelessWidget {
                   Row(
                     children: [
                       Expanded(
-                        child: StatCard(
-                          title: 'Factures en instances',
-                          value: '${dashCtrl.facturesInstancesCount.value}',
-                          icon: LucideIcons.fileWarning,
-                          subtitle: 'À régler',
-                          color: const Color(0xFFD97706),
-                          onTap: () => onNavigateTab?.call(2),
+                        child: ScrollReveal.grille(
+                          index: 2,
+                          child: StatCard(
+                            chargement: dashCtrl.isLoading.value,
+                            title: 'Factures en instances',
+                            value: '${dashCtrl.facturesInstancesCount.value}',
+                            icon: LucideIcons.fileWarning,
+                            subtitle: 'À régler',
+                            color: const Color(0xFFD97706),
+                            onTap: () => onNavigateTab?.call(2),
+                          ),
                         ),
                       ),
                       const SizedBox(width: 10),
                       Expanded(
-                        child: StatCard(
-                          title: 'Solde dû total',
-                          value: _formatCurrency(dashCtrl.totalSoldeDu.value),
-                          icon: LucideIcons.wallet,
-                          subtitle: 'Impayé',
-                          color: const Color(0xFFE11D48),
-                          onTap: () => onNavigateTab?.call(2),
+                        child: ScrollReveal.grille(
+                          index: 3,
+                          child: StatCard(
+                            chargement: dashCtrl.isLoading.value,
+                            title: 'Solde dû total',
+                            value: _formatCurrency(dashCtrl.totalSoldeDu.value),
+                            icon: LucideIcons.wallet,
+                            subtitle: 'Impayé',
+                            color: const Color(0xFFE11D48),
+                            onTap: () => onNavigateTab?.call(2),
+                          ),
                         ),
                       ),
                     ],
@@ -162,24 +186,32 @@ class DashboardTab extends StatelessWidget {
               () => Row(
                 children: [
                   Expanded(
-                    child: StatCard(
-                      title: 'Chèques / Traites',
-                      value: '${dashCtrl.retoursCcCtCount.value}',
-                      icon: LucideIcons.rotateCcw,
-                      subtitle: 'Retours',
-                      color: const Color(0xFFA855F7),
-                      onTap: () => onNavigateTab?.call(3),
+                    child: ScrollReveal.grille(
+                      index: 4,
+                      child: StatCard(
+                        chargement: dashCtrl.isLoading.value,
+                        title: 'Chèques / Traites',
+                        value: '${dashCtrl.retoursCcCtCount.value}',
+                        icon: LucideIcons.rotateCcw,
+                        subtitle: 'Retours',
+                        color: const Color(0xFFA855F7),
+                        onTap: () => onNavigateTab?.call(3),
+                      ),
                     ),
                   ),
                   const SizedBox(width: 10),
                   Expanded(
-                    child: StatCard(
-                      title: 'Retours BL / Factures',
-                      value: '${dashCtrl.retoursBlCount.value}',
-                      icon: LucideIcons.receipt,
-                      subtitle: 'Documents',
-                      color: const Color(0xFF0891B2),
-                      onTap: () => onNavigateTab?.call(3),
+                    child: ScrollReveal.grille(
+                      index: 5,
+                      child: StatCard(
+                        chargement: dashCtrl.isLoading.value,
+                        title: 'Retours BL / Factures',
+                        value: '${dashCtrl.retoursBlCount.value}',
+                        icon: LucideIcons.receipt,
+                        subtitle: 'Documents',
+                        color: const Color(0xFF0891B2),
+                        onTap: () => onNavigateTab?.call(3),
+                      ),
                     ),
                   ),
                 ],
@@ -192,24 +224,32 @@ class DashboardTab extends StatelessWidget {
               () => Row(
                 children: [
                   Expanded(
-                    child: StatCard(
-                      title: 'Chèques encaissés',
-                      value: '${dashCtrl.crbtChequesCount.value}',
-                      icon: LucideIcons.banknote,
-                      subtitle: 'CRBT',
-                      color: const Color(0xFF059669),
-                      onTap: () => onNavigateTab?.call(4),
+                    child: ScrollReveal.grille(
+                      index: 6,
+                      child: StatCard(
+                        chargement: dashCtrl.isLoading.value,
+                        title: 'Chèques encaissés',
+                        value: '${dashCtrl.crbtChequesCount.value}',
+                        icon: LucideIcons.banknote,
+                        subtitle: 'CRBT',
+                        color: const Color(0xFF059669),
+                        onTap: () => onNavigateTab?.call(4),
+                      ),
                     ),
                   ),
                   const SizedBox(width: 10),
                   Expanded(
-                    child: StatCard(
-                      title: 'Ordres de virement',
-                      value: '${dashCtrl.crbtVirementsCount.value}',
-                      icon: LucideIcons.arrowUpRight,
-                      subtitle: 'CRBT',
-                      color: const Color(0xFFEC4899),
-                      onTap: () => onNavigateTab?.call(4),
+                    child: ScrollReveal.grille(
+                      index: 7,
+                      child: StatCard(
+                        chargement: dashCtrl.isLoading.value,
+                        title: 'Ordres de virement',
+                        value: '${dashCtrl.crbtVirementsCount.value}',
+                        icon: LucideIcons.arrowUpRight,
+                        subtitle: 'CRBT',
+                        color: const Color(0xFFEC4899),
+                        onTap: () => onNavigateTab?.call(4),
+                      ),
                     ),
                   ),
                 ],

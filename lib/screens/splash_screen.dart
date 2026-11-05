@@ -17,6 +17,8 @@ class _SplashScreenState extends State<SplashScreen>
   late final Animation<double> _scaleAnimation;
   late final Animation<double> _fadeAnimation;
 
+  bool _sortie = false;
+
   static const String _splashAssetWebp =
       'assets/img/splash_screen_metaclient.webp';
   static const String _splashAssetPng =
@@ -45,9 +47,10 @@ class _SplashScreenState extends State<SplashScreen>
       CurvedAnimation(parent: _animController, curve: Curves.easeOutCubic),
     );
 
-    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _animController, curve: Curves.easeIn),
-    );
+    _fadeAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _animController, curve: Curves.easeIn));
 
     _animController.forward();
     _checkNavigation();
@@ -56,6 +59,13 @@ class _SplashScreenState extends State<SplashScreen>
   Future<void> _checkNavigation() async {
     // Laisser le temps à l'utilisateur d'apprécier le splash screen
     await Future.delayed(const Duration(milliseconds: 2400));
+    if (!mounted) return;
+
+    // L'illustration s'ouvre vers l'avant pendant que la page suivante arrive
+    // en fondu par-dessus. Elle reste opaque : la faire disparaitre d'abord
+    // laissait voir le fond nu du Scaffold entre les deux ecrans.
+    setState(() => _sortie = true);
+    await Future.delayed(const Duration(milliseconds: 140));
     if (!mounted) return;
 
     final hasToken = StorageService.hasToken();
@@ -84,47 +94,29 @@ class _SplashScreenState extends State<SplashScreen>
           children: [
             // ─── Illustration 3D Splash Complète ────────────────────────────
             Center(
-              child: FadeTransition(
-                opacity: _fadeAnimation,
-                child: ScaleTransition(
-                  scale: _scaleAnimation,
-                  child: Image.asset(
-                    _splashAssetWebp,
-                    fit: BoxFit.contain,
-                    width: double.infinity,
-                    height: double.infinity,
-                    filterQuality: FilterQuality.high,
-                    errorBuilder: (context, error, stackTrace) {
-                      return Image.asset(
-                        _splashAssetPng,
-                        fit: BoxFit.contain,
-                        width: double.infinity,
-                        height: double.infinity,
-                        filterQuality: FilterQuality.high,
-                      );
-                    },
-                  ),
-                ),
-              ),
-            ),
-
-            // ─── Indicateur de Chargement Discret en Bas ───────────────────
-            Positioned(
-              left: 0,
-              right: 0,
-              bottom: 22,
-              child: FadeTransition(
-                opacity: _fadeAnimation,
-                child: Center(
-                  child: SizedBox(
-                    width: 22,
-                    height: 22,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2.2,
-                      valueColor: const AlwaysStoppedAnimation<Color>(
-                        AppTheme.primaryIcons,
-                      ),
-                      backgroundColor: Colors.white.withValues(alpha: 0.08),
+              child: AnimatedScale(
+                scale: _sortie ? 1.12 : 1.0,
+                duration: const Duration(milliseconds: 800),
+                curve: Curves.easeInCubic,
+                child: FadeTransition(
+                  opacity: _fadeAnimation,
+                  child: ScaleTransition(
+                    scale: _scaleAnimation,
+                    child: Image.asset(
+                      _splashAssetWebp,
+                      fit: BoxFit.contain,
+                      width: double.infinity,
+                      height: double.infinity,
+                      filterQuality: FilterQuality.high,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Image.asset(
+                          _splashAssetPng,
+                          fit: BoxFit.contain,
+                          width: double.infinity,
+                          height: double.infinity,
+                          filterQuality: FilterQuality.high,
+                        );
+                      },
                     ),
                   ),
                 ),

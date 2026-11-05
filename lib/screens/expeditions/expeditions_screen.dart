@@ -5,6 +5,8 @@ import 'package:lucide_icons/lucide_icons.dart';
 import '../../controllers/expedition_controller.dart';
 import '../../models/expedition_model.dart';
 import '../../theme/app_theme.dart';
+import '../../widgets/barre_segments.dart';
+import '../../widgets/carte_filtres.dart';
 import '../../widgets/glass_container.dart';
 import '../../widgets/status_badge.dart';
 import 'expedition_detail_screen.dart';
@@ -23,143 +25,138 @@ class ExpeditionsScreen extends StatelessWidget {
   void _showFilterDialog(BuildContext context, ExpeditionController ctrl) {
     final duCtrl = TextEditingController(text: ctrl.filterDu.value);
     final auCtrl = TextEditingController(text: ctrl.filterAu.value);
+    final declCtrl = TextEditingController(text: ctrl.searchQuery.value);
+    final clientCtrl = TextEditingController(
+      text: ctrl.filterNumeroClient.value,
+    );
+    final colisCtrl = TextEditingController(text: ctrl.filterColis.value);
+    final fondCtrl = TextEditingController(text: ctrl.filterMntFond.value);
+    final livre = ctrl.filterLivre.value.obs;
+
+    void relancer() {
+      ctrl.fetchAllExpeditions(resetPage: true);
+      Get.back<void>();
+    }
 
     Get.dialog(
-      Dialog(
-        backgroundColor: Colors.transparent,
-        child: GlassContainer(
-          borderRadius: 24,
-          padding: const EdgeInsets.all(22),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
+      CarteFiltres(
+        titre: 'Filtrer les expéditions',
+        contenu: [
+          // Les deux bornes de date tiennent sur une ligne.
+          Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Row(
-                children: [
-                  Icon(
-                    LucideIcons.slidersHorizontal,
-                    color: AppTheme.primary,
-                    size: 20,
-                  ),
-                  SizedBox(width: 10),
-                  Expanded(
-                    child: Text(
-                      'Filtrer les expéditions',
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        color: Color(0xFF0F172A),
-                        fontSize: 16.5,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 18),
-              TextField(
-                controller: duCtrl,
-                style: const TextStyle(
-                  color: Color(0xFF0F172A),
-                  fontSize: 13.5,
-                ),
-                decoration: InputDecoration(
-                  labelText: 'Date début (JJ/MM/AAAA)',
-                  labelStyle: const TextStyle(
-                    color: AppTheme.primary,
-                    fontSize: 12,
-                  ),
-                  hintText: '01/01/2026',
-                  hintStyle: const TextStyle(color: Color(0xFF94A3B8)),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(14),
-                    borderSide: const BorderSide(color: Color(0xFFCBD5E1)),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(14),
-                    borderSide: const BorderSide(
-                      color: AppTheme.primary,
-                      width: 1.5,
-                    ),
-                  ),
+              Expanded(
+                child: ChampFiltre(
+                  controleur: duCtrl,
+                  libelle: 'DU',
+                  exemple: '01/01/2026',
+                  icone: LucideIcons.calendar,
                 ),
               ),
-              const SizedBox(height: 12),
-              TextField(
-                controller: auCtrl,
-                style: const TextStyle(
-                  color: Color(0xFF0F172A),
-                  fontSize: 13.5,
+              const SizedBox(width: 10),
+              Expanded(
+                child: ChampFiltre(
+                  controleur: auCtrl,
+                  libelle: 'AU',
+                  exemple: '31/12/2026',
+                  icone: LucideIcons.calendar,
                 ),
-                decoration: InputDecoration(
-                  labelText: 'Date fin (JJ/MM/AAAA)',
-                  labelStyle: const TextStyle(
-                    color: AppTheme.primary,
-                    fontSize: 12,
-                  ),
-                  hintText: '31/12/2026',
-                  hintStyle: const TextStyle(color: Color(0xFF94A3B8)),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(14),
-                    borderSide: const BorderSide(color: Color(0xFFCBD5E1)),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(14),
-                    borderSide: const BorderSide(
-                      color: AppTheme.primary,
-                      width: 1.5,
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 20),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  TextButton(
-                    onPressed: () {
-                      ctrl.filterDu.value = '';
-                      ctrl.filterAu.value = '';
-                      ctrl.fetchAllExpeditions(resetPage: true);
-                      Get.back();
-                    },
-                    child: const Text(
-                      'Réinitialiser',
-                      style: TextStyle(color: Color(0xFF64748B)),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppTheme.primary,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                    onPressed: () {
-                      ctrl.filterDu.value = duCtrl.text.trim();
-                      ctrl.filterAu.value = auCtrl.text.trim();
-                      ctrl.fetchAllExpeditions(resetPage: true);
-                      Get.back();
-                    },
-                    child: const Text(
-                      'Appliquer',
-                      style: TextStyle(color: Colors.white),
-                    ),
-                  ),
-                ],
               ),
             ],
           ),
-        ),
+          const SizedBox(height: 12),
+          ChampFiltre(
+            controleur: declCtrl,
+            libelle: 'N° DÉCLARATION',
+            exemple: '260006839',
+            icone: LucideIcons.hash,
+          ),
+          const SizedBox(height: 12),
+          ChampFiltre(
+            controleur: clientCtrl,
+            libelle: 'N° CLIENT',
+            exemple: '06891D',
+            icone: LucideIcons.building2,
+          ),
+          const SizedBox(height: 12),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: ChampFiltre(
+                  controleur: colisCtrl,
+                  libelle: 'COLIS',
+                  exemple: '1',
+                  icone: LucideIcons.package,
+                  clavier: TextInputType.number,
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: ChampFiltre(
+                  controleur: fondCtrl,
+                  libelle: 'MONTANT FOND',
+                  exemple: '0',
+                  icone: LucideIcons.wallet,
+                  clavier: const TextInputType.numberWithOptions(decimal: true),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          const LibelleFiltre('LIVRAISON'),
+          const SizedBox(height: 7),
+          Obx(
+            () => RailSegments(
+              choix: [
+                ChoixSegment(
+                  actif: livre.value == 'tous',
+                  libelle: 'Toutes',
+                  onTap: () => livre.value = 'tous',
+                ),
+                ChoixSegment(
+                  actif: livre.value == 'oui',
+                  libelle: 'Livrées',
+                  onTap: () => livre.value = 'oui',
+                ),
+                ChoixSegment(
+                  actif: livre.value == 'non',
+                  libelle: 'Non livrées',
+                  onTap: () => livre.value = 'non',
+                ),
+              ],
+            ),
+          ),
+        ],
+        onReinitialiser: () {
+          ctrl.filterDu.value = '';
+          ctrl.filterAu.value = '';
+          ctrl.searchQuery.value = '';
+          ctrl.filterNumeroClient.value = '';
+          ctrl.filterColis.value = '';
+          ctrl.filterMntFond.value = '';
+          ctrl.filterLivre.value = 'tous';
+          relancer();
+        },
+        onAppliquer: () {
+          ctrl.filterDu.value = duCtrl.text.trim();
+          ctrl.filterAu.value = auCtrl.text.trim();
+          ctrl.searchQuery.value = declCtrl.text.trim();
+          ctrl.filterNumeroClient.value = clientCtrl.text.trim();
+          ctrl.filterColis.value = colisCtrl.text.trim();
+          ctrl.filterMntFond.value = fondCtrl.text.trim();
+          ctrl.filterLivre.value = livre.value;
+          relancer();
+        },
       ),
+      barrierColor: voileFiltres,
     );
   }
 
   @override
   Widget build(BuildContext context) {
     final expCtrl = Get.find<ExpeditionController>();
-    final searchCtrl = TextEditingController(text: expCtrl.searchQuery.value);
 
     return Column(
       children: [
@@ -182,105 +179,135 @@ class ExpeditionsScreen extends StatelessWidget {
                   ),
                 ],
               ),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: _buildSegmentButton(
-                      title: 'En cours (${expCtrl.expeditionsEncours.length})',
-                      isSelected: expCtrl.activeTab.value == 0,
-                      onTap: () => expCtrl.activeTab.value = 0,
-                    ),
-                  ),
-                  Expanded(
-                    child: _buildSegmentButton(
-                      title: 'Toutes (${expCtrl.totalElements.value})',
-                      isSelected: expCtrl.activeTab.value == 1,
-                      onTap: () => expCtrl.activeTab.value = 1,
-                    ),
-                  ),
+              child: BarreSegments(
+                libelles: [
+                  'En cours (${expCtrl.expeditionsEncours.length})',
+                  'Toutes (${expCtrl.totalElements.value})',
                 ],
+                index: expCtrl.activeTab.value,
+                onChange: (i) => expCtrl.activeTab.value = i,
+                tailleTexte: 13,
               ),
             ),
           ),
         ),
 
         // ─── SEARCH & FILTER BAR ───────────────────────────────────────────
+        // Sous Obx : le dialogue de filtres ecrit dans `searchQuery`, le champ
+        // et la croix d'effacement doivent suivre.
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 4),
-          child: Row(
-            children: [
-              Expanded(
-                child: GlassContainer(
-                  borderRadius: 16,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 2,
-                  ),
-                  child: Row(
-                    children: [
-                      const Icon(
-                        LucideIcons.search,
-                        color: AppTheme.primaryIcons,
-                        size: 18,
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: TextField(
-                          controller: searchCtrl,
-                          style: const TextStyle(
-                            color: Color(0xFF0F172A),
-                            fontSize: 13,
-                          ),
-                          decoration: const InputDecoration(
-                            hintText: 'N° déclaration...',
-                            hintStyle: TextStyle(
-                              color: Color(0xFF94A3B8),
-                              fontSize: 12.5,
+          child: Obx(
+            () => Row(
+              children: [
+                Expanded(
+                  child: GlassContainer(
+                    borderRadius: 16,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 2,
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(
+                          LucideIcons.search,
+                          color: AppTheme.primaryIcons,
+                          size: 18,
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: TextField(
+                            controller:
+                                TextEditingController(
+                                    text: expCtrl.searchQuery.value,
+                                  )
+                                  ..selection = TextSelection.collapsed(
+                                    offset: expCtrl.searchQuery.value.length,
+                                  ),
+                            style: const TextStyle(
+                              color: Color(0xFF0F172A),
+                              fontSize: 13,
                             ),
-                            border: InputBorder.none,
+                            decoration: const InputDecoration(
+                              hintText: 'N° déclaration...',
+                              hintStyle: TextStyle(
+                                color: Color(0xFF94A3B8),
+                                fontSize: 12.5,
+                              ),
+                              border: InputBorder.none,
+                            ),
+                            onSubmitted: (v) {
+                              expCtrl.searchQuery.value = v.trim();
+                              expCtrl.fetchAllExpeditions(resetPage: true);
+                            },
                           ),
-                          onSubmitted: (v) {
-                            expCtrl.searchQuery.value = v.trim();
-                            expCtrl.fetchAllExpeditions(resetPage: true);
-                          },
                         ),
-                      ),
-                      if (expCtrl.searchQuery.value.isNotEmpty)
-                        IconButton(
-                          icon: const Icon(
-                            LucideIcons.x,
-                            color: Color(0xFF94A3B8),
-                            size: 16,
+                        if (expCtrl.searchQuery.value.isNotEmpty)
+                          IconButton(
+                            icon: const Icon(
+                              LucideIcons.x,
+                              color: Color(0xFF94A3B8),
+                              size: 16,
+                            ),
+                            onPressed: () {
+                              expCtrl.searchQuery.value = '';
+                              expCtrl.fetchAllExpeditions(resetPage: true);
+                            },
                           ),
-                          onPressed: () {
-                            searchCtrl.clear();
-                            expCtrl.searchQuery.value = '';
-                            expCtrl.fetchAllExpeditions(resetPage: true);
-                          },
-                        ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
-              ),
-              const SizedBox(width: 10),
-              IconButton(
-                style: IconButton.styleFrom(
-                  backgroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(14),
-                    side: const BorderSide(color: Color(0xFFE2E8F0)),
+                const SizedBox(width: 10),
+                // Bouton plein, comme la pastille de l'onglet : en creux et
+                // teinte, il se confondait avec le champ de recherche.
+                GestureDetector(
+                  onTap: () => _showFilterDialog(context, expCtrl),
+                  child: Container(
+                    width: 46,
+                    height: 46,
+                    decoration: BoxDecoration(
+                      gradient: AppTheme.primaryGradient,
+                      borderRadius: BorderRadius.circular(14),
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppTheme.primary.withValues(alpha: 0.32),
+                          blurRadius: 12,
+                          offset: const Offset(0, 5),
+                        ),
+                      ],
+                    ),
+                    child: Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        const Icon(
+                          LucideIcons.filter,
+                          color: Colors.white,
+                          size: 19,
+                        ),
+                        if (expCtrl.filtresActifs)
+                          Positioned(
+                            top: 9,
+                            right: 9,
+                            child: Container(
+                              width: 8,
+                              height: 8,
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                  color: AppTheme.primary,
+                                  width: 1.4,
+                                ),
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
                   ),
-                  shadowColor: const Color(0xFF0F172A).withValues(alpha: 0.06),
-                  elevation: 2,
                 ),
-                icon: const Icon(
-                  LucideIcons.slidersHorizontal,
-                  color: AppTheme.primary,
-                  size: 18,
-                ),
-                onPressed: () => _showFilterDialog(context, expCtrl),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
 
@@ -330,6 +357,8 @@ class ExpeditionsScreen extends StatelessWidget {
                 }
               },
               child: ListView.separated(
+                // Nouvelle cle a chaque onglet : la revelation rejoue.
+                key: ValueKey<int>(expCtrl.activeTab.value),
                 padding: const EdgeInsets.symmetric(
                   horizontal: 18,
                   vertical: 8,
@@ -397,34 +426,6 @@ class ExpeditionsScreen extends StatelessWidget {
           return const SizedBox.shrink();
         }),
       ],
-    );
-  }
-
-  Widget _buildSegmentButton({
-    required String title,
-    required bool isSelected,
-    required VoidCallback onTap,
-  }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12),
-          gradient: isSelected ? AppTheme.primaryGradient : null,
-          color: isSelected ? null : Colors.transparent,
-        ),
-        child: Center(
-          child: Text(
-            title,
-            style: TextStyle(
-              color: isSelected ? Colors.white : const Color(0xFF64748B),
-              fontSize: 13,
-              fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-            ),
-          ),
-        ),
-      ),
     );
   }
 

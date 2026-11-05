@@ -5,6 +5,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import '../../controllers/facture_controller.dart';
 import '../../models/facture_model.dart';
 import '../../theme/app_theme.dart';
+import '../../widgets/barre_segments.dart';
 import '../../widgets/carte_liste.dart';
 import '../../widgets/status_badge.dart';
 import 'facture_detail_screen.dart';
@@ -44,24 +45,14 @@ class FacturesScreen extends StatelessWidget {
                   ),
                 ],
               ),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: _buildSegmentButton(
-                      title:
-                          'En instances (${factureCtrl.facturesInstances.length})',
-                      isSelected: factureCtrl.activeTab.value == 0,
-                      onTap: () => factureCtrl.activeTab.value = 0,
-                    ),
-                  ),
-                  Expanded(
-                    child: _buildSegmentButton(
-                      title: 'Toutes (${factureCtrl.totalElements.value})',
-                      isSelected: factureCtrl.activeTab.value == 1,
-                      onTap: () => factureCtrl.activeTab.value = 1,
-                    ),
-                  ),
+              child: BarreSegments(
+                libelles: [
+                  'En instances (${factureCtrl.facturesInstances.length})',
+                  'Toutes (${factureCtrl.totalElements.value})',
                 ],
+                index: factureCtrl.activeTab.value,
+                onChange: (i) => factureCtrl.activeTab.value = i,
+                tailleTexte: 13,
               ),
             ),
           ),
@@ -141,6 +132,8 @@ class FacturesScreen extends StatelessWidget {
                 }
               },
               child: ListView.separated(
+                // Nouvelle cle a chaque onglet : la revelation rejoue.
+                key: ValueKey<int>(factureCtrl.activeTab.value),
                 padding: const EdgeInsets.symmetric(
                   horizontal: 18,
                   vertical: 8,
@@ -210,43 +203,6 @@ class FacturesScreen extends StatelessWidget {
           return const SizedBox.shrink();
         }),
       ],
-    );
-  }
-
-  Widget _buildSegmentButton({
-    required String title,
-    required bool isSelected,
-    required VoidCallback onTap,
-  }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12),
-          gradient: isSelected ? AppTheme.primaryGradient : null,
-          color: isSelected ? null : Colors.transparent,
-          boxShadow: isSelected
-              ? [
-                  BoxShadow(
-                    color: AppTheme.primary.withValues(alpha: 0.28),
-                    blurRadius: 10,
-                    offset: const Offset(0, 4),
-                  ),
-                ]
-              : null,
-        ),
-        child: Center(
-          child: Text(
-            title,
-            style: TextStyle(
-              color: isSelected ? Colors.white : const Color(0xFF64748B),
-              fontSize: 13,
-              fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-            ),
-          ),
-        ),
-      ),
     );
   }
 

@@ -9,6 +9,7 @@ import '../../controllers/auth_controller.dart';
 import '../../models/client_info_model.dart';
 import '../../services/api_service.dart';
 import '../../theme/app_theme.dart';
+import '../../widgets/scroll_reveal.dart';
 import '../../widgets/glass_container.dart';
 import '../../widgets/glass_text_field.dart';
 
@@ -504,189 +505,203 @@ class _ProfileScreenState extends State<ProfileScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // ─── 1. EN-TÊTE PROFIL (PHOTO DE PROFIL META FLEET) ────────────
-              Center(
-                child: Column(
-                  children: [
-                    Stack(
-                      children: [
-                        Container(
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            border: Border.all(color: Colors.white, width: 3.5),
-                            boxShadow: [
-                              BoxShadow(
-                                color: AppTheme.primaryIcons.withValues(
-                                  alpha: 0.20,
-                                ),
-                                blurRadius: 18,
-                                offset: const Offset(0, 6),
+              ScrollReveal.grille(
+                index: 0,
+                child: Center(
+                  child: Column(
+                    children: [
+                      Stack(
+                        children: [
+                          Container(
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                color: Colors.white,
+                                width: 3.5,
                               ),
-                            ],
-                          ),
-                          child: CircleAvatar(
-                            radius: 42,
-                            backgroundColor: AppTheme.primary,
-                            backgroundImage: photoBytes != null
-                                ? MemoryImage(photoBytes)
-                                : null,
-                            child: photoBytes == null
-                                ? Text(
-                                    displayName.isNotEmpty
-                                        ? displayName[0].toUpperCase()
-                                        : 'C',
-                                    style: const TextStyle(
-                                      fontSize: 32,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white,
-                                    ),
-                                  )
-                                : null,
-                          ),
-                        ),
-                        Positioned(
-                          bottom: 0,
-                          right: 0,
-                          child: GestureDetector(
-                            onTap: _isUpdatingPhoto
-                                ? null
-                                : _pickAndUploadPhoto,
-                            child: Container(
-                              width: 34,
-                              height: 34,
-                              decoration: BoxDecoration(
-                                gradient: AppTheme.iconGradient,
-                                shape: BoxShape.circle,
-                                border: Border.all(
-                                  color: Colors.white,
-                                  width: 2.2,
-                                ),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black.withValues(alpha: 0.20),
-                                    blurRadius: 6,
-                                    offset: const Offset(0, 2),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: AppTheme.primaryIcons.withValues(
+                                    alpha: 0.20,
                                   ),
-                                ],
-                              ),
-                              child: _isUpdatingPhoto
-                                  ? const Padding(
-                                      padding: EdgeInsets.all(8),
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 2,
-                                        valueColor:
-                                            AlwaysStoppedAnimation<Color>(
-                                              Colors.white,
-                                            ),
+                                  blurRadius: 18,
+                                  offset: const Offset(0, 6),
+                                ),
+                              ],
+                            ),
+                            child: CircleAvatar(
+                              radius: 42,
+                              backgroundColor: AppTheme.primary,
+                              backgroundImage: photoBytes != null
+                                  ? MemoryImage(photoBytes)
+                                  : null,
+                              child: photoBytes == null
+                                  ? Text(
+                                      displayName.isNotEmpty
+                                          ? displayName[0].toUpperCase()
+                                          : 'C',
+                                      style: const TextStyle(
+                                        fontSize: 32,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white,
                                       ),
                                     )
-                                  : const Icon(
-                                      LucideIcons.camera,
-                                      size: 16,
-                                      color: Colors.white,
-                                    ),
+                                  : null,
                             ),
                           ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 12),
-                    Text(
-                      displayName,
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w700,
-                        color: Color(0xFF0F172A),
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 5,
-                      ),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFEFF6FF),
-                        borderRadius: BorderRadius.circular(10),
-                        border: Border.all(
-                          color: const Color(0xFFBFDBFE),
-                          width: 1,
-                        ),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const Icon(
-                            LucideIcons.shieldCheck,
-                            size: 14,
-                            color: Color(0xFF2563EB),
-                          ),
-                          const SizedBox(width: 6),
-                          Text(
-                            'Code Client : $code',
-                            style: const TextStyle(
-                              fontSize: 11.5,
-                              fontWeight: FontWeight.w600,
-                              color: Color(0xFF1E40AF),
+                          Positioned(
+                            bottom: 0,
+                            right: 0,
+                            child: GestureDetector(
+                              onTap: _isUpdatingPhoto
+                                  ? null
+                                  : _pickAndUploadPhoto,
+                              child: Container(
+                                width: 34,
+                                height: 34,
+                                decoration: BoxDecoration(
+                                  gradient: AppTheme.iconGradient,
+                                  shape: BoxShape.circle,
+                                  border: Border.all(
+                                    color: Colors.white,
+                                    width: 2.2,
+                                  ),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withValues(
+                                        alpha: 0.20,
+                                      ),
+                                      blurRadius: 6,
+                                      offset: const Offset(0, 2),
+                                    ),
+                                  ],
+                                ),
+                                child: _isUpdatingPhoto
+                                    ? const Padding(
+                                        padding: EdgeInsets.all(8),
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                          valueColor:
+                                              AlwaysStoppedAnimation<Color>(
+                                                Colors.white,
+                                              ),
+                                        ),
+                                      )
+                                    : const Icon(
+                                        LucideIcons.camera,
+                                        size: 16,
+                                        color: Colors.white,
+                                      ),
+                              ),
                             ),
                           ),
                         ],
                       ),
-                    ),
-                  ],
+                      const SizedBox(height: 12),
+                      Text(
+                        displayName,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w700,
+                          color: Color(0xFF0F172A),
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 5,
+                        ),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFEFF6FF),
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(
+                            color: const Color(0xFFBFDBFE),
+                            width: 1,
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(
+                              LucideIcons.shieldCheck,
+                              size: 14,
+                              color: Color(0xFF2563EB),
+                            ),
+                            const SizedBox(width: 6),
+                            Text(
+                              'Code Client : $code',
+                              style: const TextStyle(
+                                fontSize: 11.5,
+                                fontWeight: FontWeight.w600,
+                                color: Color(0xFF1E40AF),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
 
               const SizedBox(height: 22),
 
               // ─── 2. SLIDER INFORMATIONS (STYLE META FLEET) ────────────────
-              _buildDetailsSlider(client: client),
+              ScrollReveal.grille(
+                index: 1,
+                child: _buildDetailsSlider(client: client),
+              ),
 
               const SizedBox(height: 20),
 
               // ─── 3. BOUTON DECONNEXION ─────────────────────────────────────
-              Container(
-                width: double.infinity,
-                height: 48,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(16),
-                  boxShadow: [
-                    BoxShadow(
-                      color: const Color(0xFFDC2626).withValues(alpha: 0.08),
-                      blurRadius: 16,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(16),
-                  child: BackdropFilter(
-                    filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-                    child: OutlinedButton.icon(
-                      onPressed: _confirmLogout,
-                      icon: const Icon(
-                        LucideIcons.logOut,
-                        size: 18,
-                        color: Color(0xFFDC2626),
+              ScrollReveal.grille(
+                index: 2,
+                child: Container(
+                  width: double.infinity,
+                  height: 48,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(16),
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xFFDC2626).withValues(alpha: 0.08),
+                        blurRadius: 16,
+                        offset: const Offset(0, 4),
                       ),
-                      label: const Text(
-                        'Se déconnecter',
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
+                    ],
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(16),
+                    child: BackdropFilter(
+                      filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+                      child: OutlinedButton.icon(
+                        onPressed: _confirmLogout,
+                        icon: const Icon(
+                          LucideIcons.logOut,
+                          size: 18,
                           color: Color(0xFFDC2626),
                         ),
-                      ),
-                      style: OutlinedButton.styleFrom(
-                        backgroundColor: const Color(
-                          0xFFFEF2F2,
-                        ).withValues(alpha: 0.85),
-                        side: const BorderSide(
-                          color: Color(0xFFFECACA),
-                          width: 1.5,
+                        label: const Text(
+                          'Se déconnecter',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            color: Color(0xFFDC2626),
+                          ),
                         ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
+                        style: OutlinedButton.styleFrom(
+                          backgroundColor: const Color(
+                            0xFFFEF2F2,
+                          ).withValues(alpha: 0.85),
+                          side: const BorderSide(
+                            color: Color(0xFFFECACA),
+                            width: 1.5,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
                         ),
                       ),
                     ),

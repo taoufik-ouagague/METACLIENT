@@ -119,6 +119,8 @@ class ApiService {
     String? numDeclaration,
     String? livre,
     String? numeroClient,
+    int? colis,
+    num? mntFond,
   }) async {
     final url = Uri.parse('$baseUrl/api/clientmobile/expeditions?page=$page&pageSize=$pageSize');
     final currentYear = DateTime.now().year;
@@ -128,8 +130,8 @@ class ApiService {
       'numDeclaration': (numDeclaration != null && numDeclaration.trim().isNotEmpty) ? numDeclaration.trim() : null,
       'numeroClient': (numeroClient != null && numeroClient.trim().isNotEmpty) ? numeroClient.trim() : null,
       'livre': (livre != null && livre.trim().isNotEmpty) ? livre.trim() : null,
-      'colis': null,
-      'mntFond': null,
+      'colis': colis,
+      'mntFond': mntFond,
     });
 
     final response = await http.post(url, headers: _buildHeaders(), body: body);

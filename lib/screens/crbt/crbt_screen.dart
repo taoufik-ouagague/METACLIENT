@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../../controllers/crbt_controller.dart';
 import '../../models/crbt_model.dart';
+import '../../widgets/barre_segments.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/info_rows_card.dart';
 import '../../widgets/glass_container.dart';
@@ -56,30 +57,15 @@ class CrbtScreen extends StatelessWidget {
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(color: const Color(0xFFE2E8F0)),
               ),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: _buildSegmentButton(
-                      title: 'Expéditions (${crbtCtrl.expeditionsCrbt.length})',
-                      isSelected: crbtCtrl.activeTab.value == 0,
-                      onTap: () => crbtCtrl.activeTab.value = 0,
-                    ),
-                  ),
-                  Expanded(
-                    child: _buildSegmentButton(
-                      title: 'Chèques (${crbtCtrl.chequesCrbt.length})',
-                      isSelected: crbtCtrl.activeTab.value == 1,
-                      onTap: () => crbtCtrl.activeTab.value = 1,
-                    ),
-                  ),
-                  Expanded(
-                    child: _buildSegmentButton(
-                      title: 'Virements (${crbtCtrl.virementsCrbt.length})',
-                      isSelected: crbtCtrl.activeTab.value == 2,
-                      onTap: () => crbtCtrl.activeTab.value = 2,
-                    ),
-                  ),
+              child: BarreSegments(
+                libelles: [
+                  'Expéditions (${crbtCtrl.expeditionsCrbt.length})',
+                  'Chèques (${crbtCtrl.chequesCrbt.length})',
+                  'Virements (${crbtCtrl.virementsCrbt.length})',
                 ],
+                index: crbtCtrl.activeTab.value,
+                onChange: (i) => crbtCtrl.activeTab.value = i,
+                tailleTexte: 11.5,
               ),
             ),
           ),
@@ -109,36 +95,6 @@ class CrbtScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildSegmentButton({
-    required String title,
-    required bool isSelected,
-    required VoidCallback onTap,
-  }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12),
-          gradient: isSelected ? AppTheme.primaryGradient : null,
-          color: isSelected ? null : Colors.transparent,
-        ),
-        child: Center(
-          child: Text(
-            title,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: TextStyle(
-              color: isSelected ? Colors.white : const Color(0xFF64748B),
-              fontSize: 11.5,
-              fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
   Widget _buildExpeditionsList(CrbtController ctrl) {
     if (ctrl.expeditionsCrbt.isEmpty) {
       return const Center(
@@ -150,6 +106,8 @@ class CrbtScreen extends StatelessWidget {
     }
 
     return ListView.separated(
+      // Nouvelle cle a chaque onglet : la revelation rejoue.
+      key: const ValueKey<String>('expeditionsCrbt'),
       padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
       itemCount: ctrl.expeditionsCrbt.length,
       separatorBuilder: (_, _) => const SizedBox(height: 10),
@@ -265,6 +223,8 @@ class CrbtScreen extends StatelessWidget {
     }
 
     return ListView.separated(
+      // Nouvelle cle a chaque onglet : la revelation rejoue.
+      key: const ValueKey<String>('chequesCrbt'),
       padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
       itemCount: ctrl.chequesCrbt.length,
       separatorBuilder: (_, _) => const SizedBox(height: 10),
@@ -300,7 +260,9 @@ class CrbtScreen extends StatelessWidget {
                           Flexible(
                             child: Text(
                               (item.typeRemboursement != null &&
-                                      item.typeRemboursement!.toLowerCase().contains('vir'))
+                                      item.typeRemboursement!
+                                          .toLowerCase()
+                                          .contains('vir'))
                                   ? 'Virement N° ${item.numCheque}'
                                   : 'Chèque N° ${item.numCheque}',
                               maxLines: 1,
@@ -371,6 +333,8 @@ class CrbtScreen extends StatelessWidget {
     }
 
     return ListView.separated(
+      // Nouvelle cle a chaque onglet : la revelation rejoue.
+      key: const ValueKey<String>('virementsCrbt'),
       padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
       itemCount: ctrl.virementsCrbt.length,
       separatorBuilder: (_, _) => const SizedBox(height: 10),
