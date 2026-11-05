@@ -12,6 +12,7 @@ import '../../widgets/status_badge.dart';
 import 'cheque_detail_screen.dart';
 import 'virement_detail_screen.dart';
 import '../../widgets/scroll_reveal.dart';
+import '../../widgets/colis_loader.dart';
 
 class CrbtScreen extends StatelessWidget {
   const CrbtScreen({super.key});
@@ -92,7 +93,10 @@ class CrbtScreen extends StatelessWidget {
           child: Obx(() {
             if (crbtCtrl.isLoading.value) {
               return const Center(
-                child: CircularProgressIndicator(color: AppTheme.primary),
+                child: ColisLoader(
+                  size: 64,
+                  message: 'Chargement des règlements...',
+                ),
               );
             }
 

@@ -10,6 +10,7 @@ import '../../widgets/status_badge.dart';
 import 'expedition_detail_screen.dart';
 import '../../widgets/scroll_reveal.dart';
 import '../../widgets/info_rows_card.dart';
+import '../../widgets/colis_loader.dart';
 
 class ExpeditionsScreen extends StatelessWidget {
   const ExpeditionsScreen({super.key});
@@ -291,7 +292,10 @@ class ExpeditionsScreen extends StatelessWidget {
           child: Obx(() {
             if (expCtrl.isLoading.value) {
               return const Center(
-                child: CircularProgressIndicator(color: AppTheme.primary),
+                child: ColisLoader(
+                  size: 64,
+                  message: 'Chargement des expéditions...',
+                ),
               );
             }
 
