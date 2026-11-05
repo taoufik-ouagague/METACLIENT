@@ -585,6 +585,44 @@ class _TableExpeditionScreenState extends State<TableExpeditionScreen> {
     );
   }
 
+  Widget _badgeBanque(String banque) {
+    final b = banque.trim();
+    final lower = b.toLowerCase();
+    final label = (lower.contains('banque') || lower.contains('bank'))
+        ? b
+        : 'Banque $b';
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3.5),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF1F5F9),
+        borderRadius: BorderRadius.circular(7),
+        border: Border.all(color: const Color(0xFFCBD5E1), width: 0.8),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Icon(LucideIcons.landmark, size: 11.5, color: Color(0xFF475569)),
+          const SizedBox(width: 4),
+          Flexible(
+            child: Text(
+              label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: GoogleFonts.poppins(
+                fontSize: 11.5,
+                fontWeight: FontWeight.w600,
+                color: const Color(0xFF334155),
+                letterSpacing: 0.2,
+                height: 1.15,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   /// Carte de liste reprise de META FLEET mobile : verre blanc, bande de
   /// couleur de 4 px a gauche, rayon 18. Compacte — trois lignes au plus.
   Widget _fiche(Map<String, dynamic> item, {required bool montrerNature}) {
@@ -616,9 +654,21 @@ class _TableExpeditionScreenState extends State<TableExpeditionScreen> {
         .where((e) => !_formatDate.hasMatch(e.value.toString().trim()))
         .toList();
 
+    // Extraction du champ Banque (ex: BP, ATTIJARI...) pour le placer a cote du numero
+    MapEntry<String, dynamic>? champBanque;
+    for (final e in autres) {
+      final k = e.key.toLowerCase();
+      if (k.contains('banque') || k == 'bank') {
+        champBanque = e;
+        break;
+      }
+    }
+    final banque = champBanque?.value?.toString();
+    final candidatsTitre = autres.where((e) => e != champBanque).toList();
+
     // On cherche d'abord un champ qui identifie la pièce / référence
     MapEntry<String, dynamic>? champTitre;
-    for (final e in autres) {
+    for (final e in candidatsTitre) {
       final k = e.key.toLowerCase();
       if (k.contains('piece') ||
           k.contains('cheque') ||
@@ -631,10 +681,10 @@ class _TableExpeditionScreenState extends State<TableExpeditionScreen> {
         break;
       }
     }
-    champTitre ??= (autres.isNotEmpty ? autres.first : null);
+    champTitre ??= (candidatsTitre.isNotEmpty ? candidatsTitre.first : null);
 
     final titre = champTitre?.value.toString();
-    final suite = autres.where((e) => e != champTitre).toList();
+    final suite = candidatsTitre.where((e) => e != champTitre).toList();
 
     return CarteListe(
       margin: const EdgeInsets.only(bottom: 12),
@@ -645,9 +695,19 @@ class _TableExpeditionScreenState extends State<TableExpeditionScreen> {
           Row(
             children: [
               Expanded(
-                child: Align(
-                  alignment: Alignment.centerLeft,
-                  child: _badgeTitre(titre, nature, typeRemb),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Flexible(
+                      child: _badgeTitre(titre, nature, typeRemb),
+                    ),
+                    if (banque != null && banque.trim().isNotEmpty) ...[
+                      const SizedBox(width: 6),
+                      Flexible(
+                        child: _badgeBanque(banque),
+                      ),
+                    ],
+                  ],
                 ),
               ),
               const SizedBox(width: 8),
