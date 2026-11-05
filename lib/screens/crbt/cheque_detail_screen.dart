@@ -9,7 +9,6 @@ import '../../widgets/info_rows_card.dart';
 import '../../widgets/glass_container.dart';
 import '../../widgets/glass_scaffold.dart';
 import '../../widgets/scroll_reveal.dart';
-import '../../widgets/colis_loader.dart';
 
 class ChequeDetailScreen extends StatefulWidget {
   final ChequeCrbtModel cheque;
@@ -274,7 +273,7 @@ class _ChequeDetailScreenState extends State<ChequeDetailScreen> {
                 return const Center(
                   child: Padding(
                     padding: EdgeInsets.symmetric(vertical: 40),
-                    child: ColisLoader(size: 96),
+                    child: CircularProgressIndicator(color: AppTheme.primary),
                   ),
                 );
               }

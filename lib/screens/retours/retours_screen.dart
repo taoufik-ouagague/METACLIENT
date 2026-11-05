@@ -9,7 +9,6 @@ import '../../widgets/glass_container.dart';
 import '../../widgets/status_badge.dart';
 import '../../widgets/scroll_reveal.dart';
 import '../../widgets/info_rows_card.dart';
-import '../../widgets/colis_loader.dart';
 
 class RetoursScreen extends StatelessWidget {
   const RetoursScreen({super.key});
@@ -250,7 +249,7 @@ class RetoursScreen extends StatelessWidget {
           child: Obx(() {
             if (retourCtrl.isLoading.value) {
               return const Center(
-                child: ColisLoader(size: 96),
+                child: CircularProgressIndicator(color: AppTheme.primary),
               );
             }
 

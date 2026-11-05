@@ -11,7 +11,6 @@ import '../../widgets/stat_card.dart';
 import '../../widgets/status_badge.dart';
 import '../expeditions/expedition_detail_screen.dart';
 import '../../widgets/scroll_reveal.dart';
-import '../../widgets/colis_loader.dart';
 
 class DashboardTab extends StatelessWidget {
   final Function(int)? onNavigateTab;
@@ -250,7 +249,7 @@ class DashboardTab extends StatelessWidget {
                 return const Center(
                   child: Padding(
                     padding: EdgeInsets.all(24.0),
-                    child: ColisLoader(size: 80),
+                    child: CircularProgressIndicator(color: AppTheme.primary),
                   ),
                 );
               }
