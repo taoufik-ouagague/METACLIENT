@@ -324,8 +324,8 @@ class _HomeScreenState extends State<HomeScreen> {
                         fontSize: 15,
                         fontWeight: FontWeight.w700,
                         color: isProfileActive
-                            ? Colors.white
-                            : AppTheme.primary,
+                            ? AppTheme.primary
+                            : Colors.white,
                       ),
                     ),
                   ),
