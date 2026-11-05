@@ -178,7 +178,10 @@ class CrbtScreen extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(width: 8),
-                    StatusBadge(status: item.nature ?? 'CRBT'),
+                    if (item.typeRemboursementLibelle != null)
+                      _badgeType(item.typeRemboursementLibelle!)
+                    else
+                      StatusBadge(status: item.nature ?? 'CRBT'),
                   ],
                 ),
                 const SizedBox(height: 8),

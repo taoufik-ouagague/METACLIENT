@@ -146,7 +146,10 @@ class _ExpeditionDetailScreenState extends State<ExpeditionDetailScreen> {
                               ),
                               const SizedBox(width: 8),
                               _tuileChiffre(
-                                _libelleOuDefaut(detail.nature, 'Fond'),
+                                _libelleOuDefaut(
+                                  detail.typeRemboursementLibelle ?? detail.nature,
+                                  'Fond',
+                                ),
                                 _formatCurrency(detail.fond),
                                 AppTheme.statusWarning,
                               ),

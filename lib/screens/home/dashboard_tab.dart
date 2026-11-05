@@ -23,6 +23,42 @@ class DashboardTab extends StatelessWidget {
     return '${formatter.format(amount)} DH';
   }
 
+  Widget _badgeType(String label, bool isVir) {
+    final Color bg = isVir
+        ? const Color(0xFF0EA5E9).withValues(alpha: 0.12)
+        : const Color(0xFFA855F7).withValues(alpha: 0.12);
+    final Color fg = isVir ? const Color(0xFF0284C7) : const Color(0xFF9333EA);
+    final Color border = isVir
+        ? const Color(0xFF0EA5E9).withValues(alpha: 0.28)
+        : const Color(0xFFA855F7).withValues(alpha: 0.28);
+    final IconData icon = isVir ? LucideIcons.arrowRightLeft : LucideIcons.wallet;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      decoration: BoxDecoration(
+        color: bg,
+        borderRadius: BorderRadius.circular(6),
+        border: Border.all(color: border, width: 0.8),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 9.5, color: fg),
+          const SizedBox(width: 3.5),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 10,
+              fontWeight: FontWeight.w700,
+              color: fg,
+              height: 1.1,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final authCtrl = Get.find<AuthController>();
@@ -281,15 +317,29 @@ class DashboardTab extends StatelessWidget {
                                 Row(
                                   children: [
                                     Expanded(
-                                      child: Text(
-                                        item.numDeclaration,
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                        style: const TextStyle(
-                                          color: Color(0xFF0F172A),
-                                          fontSize: 14.5,
-                                          fontWeight: FontWeight.w700,
-                                        ),
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Flexible(
+                                            child: Text(
+                                              item.numDeclaration,
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                              style: const TextStyle(
+                                                color: Color(0xFF0F172A),
+                                                fontSize: 14.5,
+                                                fontWeight: FontWeight.w700,
+                                              ),
+                                            ),
+                                          ),
+                                          if (item.typeRemboursementLibelle != null) ...[
+                                            const SizedBox(width: 6),
+                                            _badgeType(
+                                              item.typeRemboursementLibelle!,
+                                              item.isVirement,
+                                            ),
+                                          ],
+                                        ],
                                       ),
                                     ),
                                     const SizedBox(width: 8),

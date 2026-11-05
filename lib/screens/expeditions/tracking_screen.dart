@@ -91,6 +91,45 @@ class _TrackingScreenState extends State<TrackingScreen> {
   String _montant(num? v) =>
       '${NumberFormat('#,##0.00', 'fr_FR').format(v ?? 0)} DH';
 
+  Widget _badgeTypeRemboursement(ExpeditionDetailModel exp) {
+    final bool isVir = exp.aVirementCr;
+    final String label = exp.typeRemboursementLibelle ?? (isVir ? 'Virement' : 'Chèque');
+
+    final Color bg = isVir
+        ? const Color(0xFF0EA5E9).withValues(alpha: 0.12)
+        : const Color(0xFFA855F7).withValues(alpha: 0.12);
+    final Color fg = isVir ? const Color(0xFF0284C7) : const Color(0xFF9333EA);
+    final Color border = isVir
+        ? const Color(0xFF0EA5E9).withValues(alpha: 0.28)
+        : const Color(0xFFA855F7).withValues(alpha: 0.28);
+    final IconData icon = isVir ? LucideIcons.arrowRightLeft : LucideIcons.wallet;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      decoration: BoxDecoration(
+        color: bg,
+        borderRadius: BorderRadius.circular(6),
+        border: Border.all(color: border, width: 0.8),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 9.5, color: fg),
+          const SizedBox(width: 3.5),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 10,
+              fontWeight: FontWeight.w700,
+              color: fg,
+              height: 1.1,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _carteResultat(ExpeditionDetailModel exp) {
     // « E » = envoi, « R » = retour : c'est ce qui distingue les deux lignes
     // d'un meme numero, donc l'information passe en tete de carte.
@@ -127,14 +166,25 @@ class _TrackingScreenState extends State<TrackingScreen> {
               ),
               const SizedBox(width: 8),
               Expanded(
-                child: Text(
-                  exp.nature ?? '—',
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    color: Color(0xFF64748B),
-                    fontSize: 12,
-                  ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Flexible(
+                      child: Text(
+                        exp.typeRemboursementLibelle ?? exp.nature ?? '—',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          color: Color(0xFF64748B),
+                          fontSize: 12,
+                        ),
+                      ),
+                    ),
+                    if (exp.typeRemboursementLibelle != null) ...[
+                      const SizedBox(width: 6),
+                      _badgeTypeRemboursement(exp),
+                    ],
+                  ],
                 ),
               ),
               const Icon(

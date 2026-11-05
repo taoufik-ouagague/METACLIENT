@@ -213,11 +213,25 @@ class ExpeditionDetailModel {
 
   /// Vrai si au moins un remboursement est par virement
   bool get aVirementCr =>
-      chequeCrItems.any((e) => e.isVirement);
+      chequeCrItems.any((e) => e.isVirement) ||
+      (nature ?? '').toLowerCase().contains('vir') ||
+      (nature ?? '').toLowerCase() == 'c.rmb';
 
   /// Vrai si au moins un remboursement est par chèque
   bool get aChequeSeulCr =>
-      chequeCrItems.any((e) => e.isCheque);
+      chequeCrItems.any((e) => e.isCheque) ||
+      (nature ?? '').toLowerCase().contains('ch');
+
+  String? get typeRemboursementLibelle {
+    if (aVirementCr) return 'Virement';
+    if (aChequeSeulCr) return 'Chèque';
+    if (chequeCrItems.isNotEmpty) return chequeCrItems.first.typeLibelle;
+    final n = (nature ?? '').trim();
+    if (n.toLowerCase().contains('ch')) return 'Chèque';
+    if (n.toLowerCase().contains('rmb')) return 'Virement';
+    if (n.isNotEmpty && n.toLowerCase() != 'smpl') return n;
+    return null;
+  }
 
   ExpeditionDetailModel({
     this.idExpedition,
