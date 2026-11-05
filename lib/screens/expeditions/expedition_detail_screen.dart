@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../controllers/expedition_controller.dart';
 import '../../models/expedition_detail_model.dart';
 import '../../theme/app_theme.dart';
+import '../../widgets/carte_gps.dart';
 import '../../widgets/carte_liste.dart';
 import '../../widgets/glass_container.dart';
 import 'table_expedition_screen.dart';
@@ -203,10 +205,7 @@ class _ExpeditionDetailScreenState extends State<ExpeditionDetailScreen> {
                                   ),
                                   MapEntry(
                                     'Position GPS',
-                                    detail.gpsLatitude == null ||
-                                            detail.gpsLongitude == null
-                                        ? ''
-                                        : '${detail.gpsLatitude}, ${detail.gpsLongitude}',
+                                    detail.positionGpsTexte,
                                   ),
                                   MapEntry(
                                     'Relevé GPS le',
@@ -366,13 +365,48 @@ class _ExpeditionDetailScreenState extends State<ExpeditionDetailScreen> {
                                               const SizedBox(width: 10),
                                               Expanded(
                                                 flex: 6,
-                                                child: Text(
-                                                  lignes[i].value,
-                                                  textAlign: TextAlign.end,
-                                                  style: const TextStyle(
-                                                    color: Color(0xFF0F172A),
-                                                    fontSize: 13,
-                                                    fontWeight: FontWeight.w700,
+                                                child: InkWell(
+                                                  onTap: lignes[i].key == 'Position GPS' &&
+                                                          detail.latitudeEffective != null &&
+                                                          detail.longitudeEffective != null
+                                                      ? () {
+                                                          final lat = detail.latitudeEffective;
+                                                          final lng = detail.longitudeEffective;
+                                                          if (lat != null && lng != null) {
+                                                            launchUrl(
+                                                              Uri.parse(
+                                                                'https://www.google.com/maps/search/?api=1&query=$lat,$lng',
+                                                              ),
+                                                              mode: LaunchMode.externalApplication,
+                                                            );
+                                                          }
+                                                        }
+                                                      : null,
+                                                  child: Row(
+                                                    mainAxisAlignment: MainAxisAlignment.end,
+                                                    children: [
+                                                      Flexible(
+                                                        child: Text(
+                                                          lignes[i].value,
+                                                          textAlign: TextAlign.end,
+                                                          style: TextStyle(
+                                                            color: lignes[i].key == 'Position GPS'
+                                                                ? AppTheme.primary
+                                                                : const Color(0xFF0F172A),
+                                                            fontSize: 13,
+                                                            fontWeight: FontWeight.w700,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      if (lignes[i].key == 'Position GPS') ...[
+                                                        const SizedBox(width: 4),
+                                                        const Icon(
+                                                          LucideIcons.mapPin,
+                                                          size: 14,
+                                                          color: AppTheme.primary,
+                                                        ),
+                                                      ],
+                                                    ],
                                                   ),
                                                 ),
                                               ),
@@ -388,6 +422,19 @@ class _ExpeditionDetailScreenState extends State<ExpeditionDetailScreen> {
                         );
                       },
                     ),
+
+                    // ─── CARTE & LOCALISATION GPS ──────────────────────────────
+                    if (detail.latitudeEffective != null &&
+                        detail.longitudeEffective != null) ...[
+                      const SizedBox(height: 20),
+                      CarteGps(
+                        latitude: detail.latitudeEffective!,
+                        longitude: detail.longitudeEffective!,
+                        geofence: detail.gpsGeofence,
+                        capturedAt: detail.gpsCapturedAt,
+                        numDeclaration: detail.numDeclaration,
+                      ),
+                    ],
                   ],
                 ),
               ),

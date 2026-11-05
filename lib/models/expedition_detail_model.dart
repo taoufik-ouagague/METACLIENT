@@ -109,6 +109,38 @@ class ExpeditionDetailModel {
   final double? gpsLongitude;
   final String? gpsGeofence;
   final String? gpsCapturedAt;
+  final String? coordoneesGps;
+
+  bool get aGps =>
+      (gpsLatitude != null && gpsLongitude != null) ||
+      (coordoneesGps != null && coordoneesGps!.trim().isNotEmpty);
+
+  double? get latitudeEffective {
+    if (gpsLatitude != null) return gpsLatitude;
+    if (coordoneesGps != null) {
+      final parts = coordoneesGps!.split(RegExp(r'[,;]'));
+      if (parts.length >= 2) return double.tryParse(parts[0].trim());
+    }
+    return null;
+  }
+
+  double? get longitudeEffective {
+    if (gpsLongitude != null) return gpsLongitude;
+    if (coordoneesGps != null) {
+      final parts = coordoneesGps!.split(RegExp(r'[,;]'));
+      if (parts.length >= 2) return double.tryParse(parts[1].trim());
+    }
+    return null;
+  }
+
+  String get positionGpsTexte {
+    final lat = latitudeEffective;
+    final lng = longitudeEffective;
+    if (lat != null && lng != null) {
+      return '${lat.toStringAsFixed(4)}, ${lng.toStringAsFixed(4)}';
+    }
+    return coordoneesGps ?? '';
+  }
 
   ExpeditionDetailModel({
     this.idExpedition,
@@ -149,6 +181,7 @@ class ExpeditionDetailModel {
     this.gpsLongitude,
     this.gpsGeofence,
     this.gpsCapturedAt,
+    this.coordoneesGps,
   });
 
   static Map<String, dynamic> _geo(Map<String, dynamic> json) =>
@@ -166,6 +199,40 @@ class ExpeditionDetailModel {
     final rawCcCt = json['retour_cc_ct'] as List? ?? [];
     final rawBl = json['retour_bl_facture'] as List? ?? [];
     final rawCheque = json['cheque_cr'] as List? ?? [];
+
+    final geoMap = _geo(json);
+    double? lat = _nombre(geoMap['gpsLatitude']) ??
+        _nombre(json['latitude']) ??
+        _nombre(json['gps_latitude']) ??
+        _nombre(json['lat']);
+    double? lng = _nombre(geoMap['gpsLongitude']) ??
+        _nombre(json['longitude']) ??
+        _nombre(json['gps_longitude']) ??
+        _nombre(json['lng']);
+
+    final rawCoord = json['coordonees_gps']?.toString() ??
+        json['coordonnees_gps']?.toString() ??
+        json['coordonee_gps']?.toString() ??
+        json['coordonnee_gps']?.toString() ??
+        geoMap['coordonees_gps']?.toString() ??
+        geoMap['coordonnees_gps']?.toString();
+
+    if ((lat == null || lng == null) && rawCoord != null && rawCoord.contains(',')) {
+      final parts = rawCoord.split(RegExp(r'[,;]'));
+      if (parts.length >= 2) {
+        lat ??= double.tryParse(parts[0].trim());
+        lng ??= double.tryParse(parts[1].trim());
+      }
+    }
+
+    final geofence = geoMap['gpsGeofence']?.toString() ??
+        json['gps_geofence']?.toString() ??
+        (json['geofence'] is String ? json['geofence']?.toString() : null) ??
+        json['zone_gps']?.toString();
+
+    final capturedAt = geoMap['gpsCapturedAt']?.toString() ??
+        json['gps_captured_at']?.toString() ??
+        json['date_gps']?.toString();
 
     return ExpeditionDetailModel(
       idExpedition: json['id_expedition'] as int?,
@@ -202,11 +269,11 @@ class ExpeditionDetailModel {
       destinataireCode: json['destinataire_code']?.toString(),
       destinataireAdresse: json['destinataire_adresse']?.toString(),
       destinataireTel: json['destinataire_tel']?.toString(),
-      // Presente uniquement sur /trackingExpedition.
-      gpsLatitude: _nombre(_geo(json)['gpsLatitude']),
-      gpsLongitude: _nombre(_geo(json)['gpsLongitude']),
-      gpsGeofence: _geo(json)['gpsGeofence']?.toString(),
-      gpsCapturedAt: _geo(json)['gpsCapturedAt']?.toString(),
+      gpsLatitude: lat,
+      gpsLongitude: lng,
+      gpsGeofence: geofence,
+      gpsCapturedAt: capturedAt,
+      coordoneesGps: rawCoord ?? (lat != null && lng != null ? '$lat, $lng' : null),
     );
   }
 }
