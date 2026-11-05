@@ -234,8 +234,8 @@ class _TableExpeditionScreenState extends State<TableExpeditionScreen> {
                   '$nombre',
                   style: const TextStyle(
                     color: Colors.white,
-                    fontSize: 12.5,
-                    fontWeight: FontWeight.w800,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
               ),
@@ -351,28 +351,64 @@ class _TableExpeditionScreenState extends State<TableExpeditionScreen> {
   /// Libelle lisible de chaque etape datee ; une cle inconnue retombe sur
   /// `<Champ> le`.
   static const Map<String, String> _libelleEtape = {
+    'date_validation': 'Validation le',
+    'datevalidation': 'Validation le',
+    'date_edition': 'Édition le',
+    'dateedition': 'Édition le',
+    'date_emission': 'Émission le',
+    'dateemission': 'Émission le',
     'date_encaissement': 'Encaissé le',
+    'dateencaissement': 'Encaissé le',
     'date_affectation': 'Affecté le',
+    'dateaffectation': 'Affecté le',
     'date_reception': 'Reçu le',
+    'datereception': 'Reçu le',
     'date_remise': 'Remis le',
+    'dateremise': 'Remis le',
     'date_livraison': 'Livré le',
+    'datelivraison': 'Livré le',
     'date_depot': 'Déposé le',
+    'datedepot': 'Déposé le',
+    'date_taxation': 'Taxé le',
+    'datetaxation': 'Taxé le',
   };
 
   /// Une teinte par etape : la couleur suffit a reperer la date cherchee.
   static const Map<String, Color> _couleurEtape = {
-    'date_encaissement': Color(0xFF10B981),
-    'date_affectation': Color(0xFF6366F1),
-    'date_reception': Color(0xFFF59E0B),
-    'date_remise': Color(0xFFA855F7),
-    'date_livraison': Color(0xFF0EA5E9),
-    'date_depot': Color(0xFFEC4899),
+    'date_validation': Color(0xFF10B981), // Emerald green
+    'datevalidation': Color(0xFF10B981),
+    'date_edition': Color(0xFF6366F1),   // Indigo
+    'dateedition': Color(0xFF6366F1),
+    'date_emission': Color(0xFF0EA5E9),  // Sky blue
+    'dateemission': Color(0xFF0EA5E9),
+    'date_encaissement': Color(0xFF059669),
+    'dateencaissement': Color(0xFF059669),
+    'date_affectation': Color(0xFF8B5CF6), // Violet
+    'dateaffectation': Color(0xFF8B5CF6),
+    'date_reception': Color(0xFFF59E0B),  // Amber
+    'datereception': Color(0xFFF59E0B),
+    'date_remise': Color(0xFFA855F7),     // Purple
+    'dateremise': Color(0xFFA855F7),
+    'date_livraison': Color(0xFF0284C7),  // Blue
+    'datelivraison': Color(0xFF0284C7),
+    'date_depot': Color(0xFFEC4899),      // Pink
+    'datedepot': Color(0xFFEC4899),
+    'date_taxation': Color(0xFFF97316),   // Orange
+    'datetaxation': Color(0xFFF97316),
   };
 
   /// Une etape datee : pastille de couleur, libelle teinte, date en gras.
   Widget _celluleDate(MapEntry<String, dynamic> date) {
-    final libelle = _libelleEtape[date.key] ?? '${_libelleCourt(date.key)} le';
-    final couleur = _couleurEtape[date.key] ?? const Color(0xFF64748B);
+    final k = date.key.toLowerCase().replaceAll(RegExp(r'[^a-z0-9]'), '');
+    final kNorm = date.key.toLowerCase();
+    final libelle = _libelleEtape[date.key] ??
+        _libelleEtape[kNorm] ??
+        _libelleEtape[k] ??
+        '${_libelleCourt(date.key)} le';
+    final couleur = _couleurEtape[date.key] ??
+        _couleurEtape[kNorm] ??
+        _couleurEtape[k] ??
+        const Color(0xFF64748B);
 
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -394,20 +430,21 @@ class _TableExpeditionScreenState extends State<TableExpeditionScreen> {
                 overflow: TextOverflow.ellipsis,
                 style: GoogleFonts.poppins(
                   color: couleur,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
+                  fontSize: 11.5,
+                  fontWeight: FontWeight.w500,
                   letterSpacing: 0.1,
                   height: 1.3,
                 ),
               ),
+              const SizedBox(height: 1),
               Text(
                 date.value.toString(),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: const TextStyle(
-                  color: Color(0xFF0F172A),
-                  fontSize: 15,
-                  fontWeight: FontWeight.w700,
+                  color: Color(0xFF334155),
+                  fontSize: 13,
+                  fontWeight: FontWeight.w500,
                 ),
               ),
             ],
@@ -467,6 +504,80 @@ class _TableExpeditionScreenState extends State<TableExpeditionScreen> {
               fontWeight: FontWeight.w700,
               color: fg,
               height: 1.1,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _badgeTitre(String? titre, String? nature, String? typeRemb) {
+    final String label;
+    final bool hasTitre = titre != null && titre.trim().isNotEmpty;
+    if (hasTitre) {
+      final t = titre.trim();
+      label = t.toUpperCase().startsWith('N°') ? t : 'N° $t';
+    } else if (nature != null && nature.trim().isNotEmpty) {
+      label = nature.trim();
+    } else if (typeRemb != null && typeRemb.trim().isNotEmpty) {
+      label = _formaterTypeRemb(typeRemb);
+    } else {
+      label = '—';
+    }
+
+    final upper = label.toUpperCase();
+    final isOv = upper.contains('OV');
+    final isCheque = upper.contains('CH');
+
+    final Color bg;
+    final Color fg;
+    final Color border;
+    final IconData icon;
+
+    if (isOv) {
+      // Ordre de Virement (OV) : Teinte Indigo / Violet moderne
+      bg = const Color(0xFF6366F1).withValues(alpha: 0.10);
+      fg = const Color(0xFF4F46E5);
+      border = const Color(0xFF6366F1).withValues(alpha: 0.28);
+      icon = LucideIcons.fileCheck;
+    } else if (isCheque) {
+      // Chèque : Teinte Rose / Pourpre élégant
+      bg = const Color(0xFFEC4899).withValues(alpha: 0.10);
+      fg = const Color(0xFFDB2777);
+      border = const Color(0xFFEC4899).withValues(alpha: 0.28);
+      icon = LucideIcons.receipt;
+    } else {
+      // Standard / Pièce : Teinte Primaire / Cyan
+      bg = AppTheme.primary.withValues(alpha: 0.09);
+      fg = AppTheme.primary;
+      border = AppTheme.primary.withValues(alpha: 0.25);
+      icon = LucideIcons.fileText;
+    }
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3.5),
+      decoration: BoxDecoration(
+        color: bg,
+        borderRadius: BorderRadius.circular(7),
+        border: Border.all(color: border, width: 0.8),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 12, color: fg),
+          const SizedBox(width: 4.5),
+          Flexible(
+            child: Text(
+              label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: GoogleFonts.poppins(
+                fontSize: 12.5,
+                fontWeight: FontWeight.w600,
+                color: fg,
+                letterSpacing: 0.2,
+                height: 1.15,
+              ),
             ),
           ),
         ],
@@ -534,31 +645,9 @@ class _TableExpeditionScreenState extends State<TableExpeditionScreen> {
           Row(
             children: [
               Expanded(
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Flexible(
-                      child: Text(
-                        titre == null
-                            ? (nature ??
-                                (typeRemb != null
-                                    ? _formaterTypeRemb(typeRemb)
-                                    : '—'))
-                            : 'N° $titre',
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: GoogleFonts.poppins(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w700,
-                          color: AppTheme.primary,
-                        ),
-                      ),
-                    ),
-                    if (typeRemb != null) ...[
-                      const SizedBox(width: 8),
-                      _badgeTypeRemboursement(typeRemb),
-                    ],
-                  ],
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: _badgeTitre(titre, nature, typeRemb),
                 ),
               ),
               const SizedBox(width: 8),
@@ -567,11 +656,11 @@ class _TableExpeditionScreenState extends State<TableExpeditionScreen> {
                   _montant(montant),
                   style: GoogleFonts.poppins(
                     fontSize: 13.5,
-                    fontWeight: FontWeight.w800,
-                    color: const Color(0xFF0F172A),
+                    fontWeight: FontWeight.w600,
+                    color: AppTheme.primary,
                   ),
                 )
-              else if (valeurRenseignee(nature))
+              else if (titre != null && valeurRenseignee(nature))
                 Container(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 8,
@@ -585,11 +674,15 @@ class _TableExpeditionScreenState extends State<TableExpeditionScreen> {
                     nature!,
                     style: GoogleFonts.poppins(
                       fontSize: 10.5,
-                      fontWeight: FontWeight.w700,
+                      fontWeight: FontWeight.w600,
                       color: AppTheme.primary,
                     ),
                   ),
                 ),
+              if (typeRemb != null) ...[
+                const SizedBox(width: 8),
+                _badgeTypeRemboursement(typeRemb),
+              ],
             ],
           ),
           if (dates.isNotEmpty) ...[

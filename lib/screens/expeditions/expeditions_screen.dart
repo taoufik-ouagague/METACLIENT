@@ -511,8 +511,8 @@ class ExpeditionsScreen extends StatelessWidget {
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
                           color: Color(0xFF0F172A),
-                          fontSize: 15,
-                          fontWeight: FontWeight.w800,
+                          fontSize: 14.5,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
                     ),
@@ -557,8 +557,8 @@ class ExpeditionsScreen extends StatelessWidget {
                 _formatCurrency(item.mntTtc),
                 style: const TextStyle(
                   color: AppTheme.primary,
-                  fontSize: 13.5,
-                  fontWeight: FontWeight.w700,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
                 ),
               ),
             ],

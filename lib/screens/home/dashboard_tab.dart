@@ -328,7 +328,7 @@ class DashboardTab extends StatelessWidget {
                                               style: const TextStyle(
                                                 color: Color(0xFF0F172A),
                                                 fontSize: 14.5,
-                                                fontWeight: FontWeight.w700,
+                                                fontWeight: FontWeight.w600,
                                               ),
                                             ),
                                           ),
