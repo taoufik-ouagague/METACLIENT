@@ -1,7 +1,7 @@
 import 'dart:convert';
-import 'dart:typed_data';
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons/lucide_icons.dart';
@@ -108,6 +108,49 @@ class _HomeScreenState extends State<HomeScreen> {
         fit: StackFit.expand,
         children: [
           const AmbientBackground(),
+          // Le degrade appartient a la page, pas au bandeau : il traverse la
+          // barre (transparente) et s'eteint doucement plus bas, si bien que
+          // l'en-tete ne se lit plus comme un bloc rapporte.
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            height: 330,
+            child: IgnorePointer(
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      const Color(0xFF1B7A94),
+                      AppTheme.primary,
+                      const Color(0xFF3FC1D8),
+                      AppTheme.accentCyan.withValues(alpha: 0),
+                    ],
+                    stops: const [0.0, 0.20, 0.40, 1.0],
+                  ),
+                ),
+                child: Stack(
+                  children: [
+                    Positioned(
+                      left: -60,
+                      top: -70,
+                      child: _halo(220, Colors.white.withValues(alpha: 0.18)),
+                    ),
+                    Positioned(
+                      right: -80,
+                      top: 10,
+                      child: _halo(
+                        240,
+                        AppTheme.accentCyan.withValues(alpha: 0.30),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
           SafeArea(
             bottom: false,
             child: AnimatedSwitcher(
@@ -166,28 +209,16 @@ class _HomeScreenState extends State<HomeScreen> {
 
   // ==================== APP BAR STYLE DÉGRADÉ (STYLE META FLEET) ====================
   PreferredSizeWidget _buildAppBar() {
-    final configCtrl = Get.isRegistered<ConfigController>()
-        ? Get.find<ConfigController>()
-        : null;
-
     return AppBar(
       toolbarHeight: 48,
       backgroundColor: Colors.transparent,
       elevation: 0,
       scrolledUnderElevation: 0,
-      flexibleSpace: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              Colors.white.withValues(alpha: 0.95),
-              Colors.white.withValues(alpha: 0.70),
-              Colors.white.withValues(alpha: 0.0),
-            ],
-            stops: const [0.0, 0.70, 1.0],
-          ),
-        ),
+      // Sur fond teinte, les icones systeme passent en clair.
+      systemOverlayStyle: const SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
+        statusBarBrightness: Brightness.dark,
+        statusBarIconBrightness: Brightness.light,
       ),
       automaticallyImplyLeading: false,
       titleSpacing: 4,
@@ -195,21 +226,19 @@ class _HomeScreenState extends State<HomeScreen> {
         children: [
           IconButton(
             icon: const Icon(LucideIcons.menu, size: 22),
-            color: configCtrl?.primaryColor ?? AppTheme.primary,
+            color: Colors.white,
             onPressed: () => _cleScaffold.currentState?.openDrawer(),
           ),
           const SizedBox(width: 2),
-          ShaderMask(
-            shaderCallback: (bounds) =>
-                AppTheme.logoGradient.createShader(bounds),
-            child: Text(
-              'METACLIENT',
-              style: GoogleFonts.poppins(
-                fontSize: 18,
-                fontWeight: FontWeight.w800,
-                letterSpacing: 1.2,
-                color: Colors.white,
-              ),
+          // Le degrade du logo (bleu nuit -> cyan) disparaitrait sur le
+          // bandeau teinte : le mot passe en blanc plein.
+          Text(
+            'METACLIENT',
+            style: GoogleFonts.poppins(
+              fontSize: 18,
+              fontWeight: FontWeight.w800,
+              letterSpacing: 1.2,
+              color: Colors.white,
             ),
           ),
         ],
@@ -260,10 +289,9 @@ class _HomeScreenState extends State<HomeScreen> {
         height: 40,
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          gradient: isProfileActive ? AppTheme.primaryGradient : null,
-          color: isProfileActive ? null : Colors.white.withValues(alpha: 0.85),
+          color: Colors.white.withValues(alpha: isProfileActive ? 0.92 : 0.24),
           border: Border.all(
-            color: isProfileActive ? Colors.white : const Color(0xFFE2E8F0),
+            color: Colors.white.withValues(alpha: isProfileActive ? 1 : 0.50),
             width: 1.6,
           ),
           boxShadow: [
@@ -307,6 +335,20 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
+  /// Tache de lumiere diffuse posee dans le bandeau.
+  Widget _halo(double taille, Color couleur) {
+    return Container(
+      width: taille,
+      height: taille,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        gradient: RadialGradient(
+          colors: [couleur, couleur.withValues(alpha: 0)],
+        ),
+      ),
+    );
+  }
+
   Widget _appBarGlassButton({
     required IconData icon,
     required VoidCallback onTap,
@@ -330,9 +372,12 @@ class _HomeScreenState extends State<HomeScreen> {
         child: BackdropFilter(
           filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
           child: Material(
-            color: Colors.white.withValues(alpha: 0.85),
-            shape: const CircleBorder(
-              side: BorderSide(color: Colors.white, width: 1.2),
+            color: Colors.white.withValues(alpha: 0.24),
+            shape: CircleBorder(
+              side: BorderSide(
+                color: Colors.white.withValues(alpha: 0.50),
+                width: 1.3,
+              ),
             ),
             child: InkWell(
               customBorder: const CircleBorder(),
@@ -340,7 +385,7 @@ class _HomeScreenState extends State<HomeScreen> {
               child: Stack(
                 alignment: Alignment.center,
                 children: [
-                  Icon(icon, color: AppTheme.primary, size: 18),
+                  Icon(icon, color: Colors.white, size: 18),
                   if (hasBadge)
                     Positioned(
                       top: 8,

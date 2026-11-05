@@ -5,6 +5,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import '../../controllers/expedition_controller.dart';
 import '../../models/expedition_detail_model.dart';
 import '../../theme/app_theme.dart';
+import '../../widgets/carte_liste.dart';
 import '../../widgets/glass_container.dart';
 import 'table_expedition_screen.dart';
 import '../../widgets/visionneuse_document.dart';
@@ -99,7 +100,7 @@ class _ExpeditionDetailScreenState extends State<ExpeditionDetailScreen> {
                                   padding: const EdgeInsets.symmetric(
                                     horizontal: 8,
                                   ),
-                                  child: _traitTrajet(),
+                                  child: _traitTrajet(detail.sens),
                                 ),
                               ),
                               _buildRoutePill(
@@ -112,15 +113,9 @@ class _ExpeditionDetailScreenState extends State<ExpeditionDetailScreen> {
                           ),
                           const SizedBox(height: 18),
 
-                          // Metrics Row (Poids, Colis, TTC, Fond)
+                          // Metrics Row (Colis, Poids, port, nature)
                           Row(
                             children: [
-                              _tuileChiffre(
-                                'Poids',
-                                '${detail.poids ?? 0} kg',
-                                AppTheme.primary,
-                              ),
-                              const SizedBox(width: 8),
                               _tuileChiffre(
                                 'Colis',
                                 '${detail.colis ?? 0}',
@@ -128,13 +123,21 @@ class _ExpeditionDetailScreenState extends State<ExpeditionDetailScreen> {
                               ),
                               const SizedBox(width: 8),
                               _tuileChiffre(
-                                'TTC',
+                                'Poids',
+                                '${detail.poids ?? 0} kg',
+                                AppTheme.primary,
+                              ),
+                              const SizedBox(width: 8),
+                              // Sous le montant : le type de port (PPE, PD...) et la
+                              // nature de l'expedition, plutot que des libelles fixes.
+                              _tuileChiffre(
+                                _libelleOuDefaut(detail.port, 'TTC'),
                                 _formatCurrency(detail.mntTtc),
                                 AppTheme.statusSuccess,
                               ),
                               const SizedBox(width: 8),
                               _tuileChiffre(
-                                'Fond',
+                                _libelleOuDefaut(detail.nature, 'Fond'),
                                 _formatCurrency(detail.fond),
                                 AppTheme.statusWarning,
                               ),
@@ -159,47 +162,63 @@ class _ExpeditionDetailScreenState extends State<ExpeditionDetailScreen> {
                     // vide, il dit qu'il est vide plutot que de disparaitre.
                     Builder(
                       builder: (context) {
-                        final lignes = <MapEntry<String, String>>[
-                          MapEntry('Nature', detail.nature ?? ''),
-                          MapEntry('Sens', detail.sens ?? ''),
-                          MapEntry('Activité', detail.activite ?? ''),
-                          MapEntry('Type de livraison', detail.livraison ?? ''),
-                          MapEntry('BL / Facture', detail.blFact ?? ''),
-                          MapEntry(
-                            'Valeur déclarée',
-                            detail.valeurDeclaree == null
-                                ? ''
-                                : _formatCurrency(detail.valeurDeclaree),
-                          ),
-                          MapEntry(
-                            'Montant HT',
-                            detail.mntHt == null
-                                ? ''
-                                : _formatCurrency(detail.mntHt),
-                          ),
-                          MapEntry(
-                            'Facture en compte',
-                            detail.factureEncompte ?? '',
-                          ),
-                          MapEntry(
-                            'Date livraison mobile',
-                            detail.dateLivMobile ?? '',
-                          ),
-                          MapEntry(
-                            'Date encaissement',
-                            detail.dateEncaissement ?? '',
-                          ),
-                          // Renvoye par /trackingExpedition uniquement.
-                          MapEntry('Zone GPS', detail.gpsGeofence ?? ''),
-                          MapEntry(
-                            'Position GPS',
-                            detail.gpsLatitude == null ||
-                                    detail.gpsLongitude == null
-                                ? ''
-                                : '${detail.gpsLatitude}, ${detail.gpsLongitude}',
-                          ),
-                          MapEntry('Relevé GPS le', detail.gpsCapturedAt ?? ''),
-                        ].where((e) => _renseigne(e.value)).toList();
+                        final lignes =
+                            <MapEntry<String, String>>[
+                                  MapEntry('Activité', detail.activite ?? ''),
+                                  MapEntry(
+                                    'Type de livraison',
+                                    detail.livraison ?? '',
+                                  ),
+                                  MapEntry('BL / Facture', detail.blFact ?? ''),
+                                  MapEntry(
+                                    'Valeur déclarée',
+                                    detail.valeurDeclaree == null
+                                        ? ''
+                                        : _formatCurrency(
+                                            detail.valeurDeclaree,
+                                          ),
+                                  ),
+                                  MapEntry(
+                                    'Montant HT',
+                                    detail.mntHt == null
+                                        ? ''
+                                        : _formatCurrency(detail.mntHt),
+                                  ),
+                                  MapEntry(
+                                    'Facture en compte',
+                                    detail.factureEncompte ?? '',
+                                  ),
+                                  MapEntry(
+                                    'Date livraison mobile',
+                                    detail.dateLivMobile ?? '',
+                                  ),
+                                  MapEntry(
+                                    'Date encaissement',
+                                    detail.dateEncaissement ?? '',
+                                  ),
+                                  // Renvoye par /trackingExpedition uniquement.
+                                  MapEntry(
+                                    'Zone GPS',
+                                    detail.gpsGeofence ?? '',
+                                  ),
+                                  MapEntry(
+                                    'Position GPS',
+                                    detail.gpsLatitude == null ||
+                                            detail.gpsLongitude == null
+                                        ? ''
+                                        : '${detail.gpsLatitude}, ${detail.gpsLongitude}',
+                                  ),
+                                  MapEntry(
+                                    'Relevé GPS le',
+                                    detail.gpsCapturedAt ?? '',
+                                  ),
+                                ]
+                                .where(
+                                  (e) =>
+                                      e.key == 'Date livraison mobile' ||
+                                      _renseigne(e.value),
+                                )
+                                .toList();
 
                         if (lignes.isEmpty) return const SizedBox.shrink();
 
@@ -506,6 +525,31 @@ class _ExpeditionDetailScreenState extends State<ExpeditionDetailScreen> {
   }
 
   /// Contenu de la feuille « Suivi & etapes ».
+  /// Un attribut d'etape : icone et texte de la meme teinte, pour que le
+  /// lieu, l'agent, la tournee et le chauffeur se distinguent d'un regard.
+  Widget _attributEtape(IconData icone, String texte, Color couleur) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(top: 1.5),
+          child: Icon(icone, size: 12.5, color: couleur),
+        ),
+        const SizedBox(width: 6),
+        Expanded(
+          child: Text(
+            texte,
+            style: TextStyle(
+              color: couleur,
+              fontSize: 11.5,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
   List<Widget> _contenuProcessus(ExpeditionDetailModel detail) => [
     // ─── SUIVI PROCESSUS (TIMELINE DE LIVRAISON) ───────────────────
     const Row(
@@ -600,7 +644,7 @@ class _ExpeditionDetailScreenState extends State<ExpeditionDetailScreen> {
                   Expanded(
                     child: Padding(
                       padding: const EdgeInsets.only(bottom: 18.0),
-                      child: GlassContainer(
+                      child: CarteListe(
                         borderRadius: 16,
                         padding: const EdgeInsets.symmetric(
                           horizontal: 14,
@@ -652,35 +696,36 @@ class _ExpeditionDetailScreenState extends State<ExpeditionDetailScreen> {
                                   ),
                                 ],
                               ),
-                            if (step.faitA != null || step.faitPar != null) ...[
-                              const SizedBox(height: 4),
-                              Text(
-                                'Lieu: ${step.faitA ?? "—"} • Agent: ${step.faitPar ?? "—"}',
-                                style: const TextStyle(
-                                  color: Color(0xFF64748B),
-                                  fontSize: 11.5,
-                                ),
+                            if (_renseigne(step.faitA)) ...[
+                              const SizedBox(height: 5),
+                              _attributEtape(
+                                LucideIcons.mapPin,
+                                step.faitA!,
+                                const Color(0xFFF59E0B),
+                              ),
+                            ],
+                            if (_renseigne(step.faitPar)) ...[
+                              const SizedBox(height: 5),
+                              _attributEtape(
+                                LucideIcons.user,
+                                step.faitPar!,
+                                const Color(0xFF6366F1),
                               ),
                             ],
                             if (_renseigne(step.tourneeVoyage)) ...[
-                              const SizedBox(height: 2),
-                              Text(
-                                'Tournée / Voyage: ${step.tourneeVoyage}',
-                                style: const TextStyle(
-                                  color: Color(0xFF64748B),
-                                  fontSize: 11.5,
-                                ),
+                              const SizedBox(height: 5),
+                              _attributEtape(
+                                LucideIcons.navigation,
+                                step.tourneeVoyage!,
+                                const Color(0xFFA855F7),
                               ),
                             ],
-                            if (step.livreurChauffeur != null) ...[
-                              const SizedBox(height: 4),
-                              Text(
-                                'Chauffeur: ${step.livreurChauffeur}',
-                                style: const TextStyle(
-                                  color: AppTheme.primary,
-                                  fontSize: 11.5,
-                                  fontWeight: FontWeight.w600,
-                                ),
+                            if (_renseigne(step.livreurChauffeur)) ...[
+                              const SizedBox(height: 5),
+                              _attributEtape(
+                                LucideIcons.truck,
+                                step.livreurChauffeur!,
+                                AppTheme.primary,
                               ),
                             ],
                           ],
@@ -716,7 +761,7 @@ class _ExpeditionDetailScreenState extends State<ExpeditionDetailScreen> {
       ),
       const SizedBox(height: 10),
       ...detail.commentaires.map(
-        (c) => GlassContainer(
+        (c) => CarteListe(
           margin: const EdgeInsets.only(bottom: 10),
           borderRadius: 16,
           padding: const EdgeInsets.all(14),
@@ -829,7 +874,7 @@ class _ExpeditionDetailScreenState extends State<ExpeditionDetailScreen> {
             ),
           ),
         ...detail.gedDocuments.map(
-          (doc) => GlassContainer(
+          (doc) => CarteListe(
             onTap: () => ouvrirDocument(context, doc.lien),
             margin: const EdgeInsets.only(bottom: 10),
             borderRadius: 16,
@@ -887,26 +932,18 @@ class _ExpeditionDetailScreenState extends State<ExpeditionDetailScreen> {
   Widget _grilleTables(ExpeditionDetailModel detail) {
     final tables = <_TableExpedition>[
       _TableExpedition(
-        'Suivi',
+        'Étapes',
         LucideIcons.gitCommit,
         AppTheme.primary,
         detail.processus.length,
         () => _contenuProcessus(detail),
       ),
       _TableExpedition(
-        'Documents',
-        LucideIcons.fileText,
-        const Color(0xFF6366F1),
-        detail.gedDocuments.length,
-        () => _contenuGed(detail),
-      ),
-      _TableExpedition(
-        'Chèques / Traites',
-        LucideIcons.badgePercent,
-        AppTheme.statusWarning,
-        detail.retourCcCt.length,
-        () => const <Widget>[],
-        items: detail.retourCcCt,
+        'Commentaires',
+        LucideIcons.messageSquare,
+        const Color(0xFFEC4899),
+        detail.commentaires.length,
+        () => _contenuCommentaires(detail),
       ),
       _TableExpedition(
         'BL / Factures',
@@ -918,6 +955,14 @@ class _ExpeditionDetailScreenState extends State<ExpeditionDetailScreen> {
         naturesAttendues: const ['BL', 'FACTURE'],
       ),
       _TableExpedition(
+        'Chèques / Traites',
+        LucideIcons.badgePercent,
+        AppTheme.statusWarning,
+        detail.retourCcCt.length,
+        () => const <Widget>[],
+        items: detail.retourCcCt,
+      ),
+      _TableExpedition(
         'C/REMB',
         LucideIcons.wallet,
         const Color(0xFFA855F7),
@@ -926,11 +971,11 @@ class _ExpeditionDetailScreenState extends State<ExpeditionDetailScreen> {
         items: detail.chequeCr,
       ),
       _TableExpedition(
-        'Commentaires',
-        LucideIcons.messageSquare,
-        const Color(0xFFEC4899),
-        detail.commentaires.length,
-        () => _contenuCommentaires(detail),
+        'Documents',
+        LucideIcons.fileText,
+        const Color(0xFF6366F1),
+        detail.gedDocuments.length,
+        () => _contenuGed(detail),
       ),
     ];
 
@@ -967,7 +1012,9 @@ class _ExpeditionDetailScreenState extends State<ExpeditionDetailScreen> {
           offset: const Offset(0, 5),
         ),
       ],
-      onTap: () => _ouvrirTable(table),
+      // Un tableau vide n'ouvre rien : la page ne montrerait qu'un etat vide.
+      // Le bouton garde sa teinte, seul le ripple disparait.
+      onTap: table.nombre == 0 ? null : () => _ouvrirTable(table),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -1062,7 +1109,25 @@ class _ExpeditionDetailScreenState extends State<ExpeditionDetailScreen> {
 
   /// Trait de trajet en pointilles, avec le camion au milieu : un simple
   /// Divider ne disait rien du deplacement.
-  Widget _traitTrajet() {
+  /// Libelle d'une tuile : la valeur du champ, ou le libelle fixe si l'API ne
+  /// la renseigne pas.
+  String _libelleOuDefaut(String? valeur, String defaut) {
+    final v = valeur?.trim();
+    return (v == null || v.isEmpty) ? defaut : v;
+  }
+
+  /// [sens] : « E » (expedition) part vers la destination, « R » (retour)
+  /// revient vers l'origine. Tout autre valeur n'affiche aucune fleche.
+  Widget _traitTrajet(String? sens) {
+    final code = sens?.trim().toUpperCase();
+    final retour = code == 'R';
+    final aller = code == 'E';
+    final teinte = retour
+        ? AppTheme.statusDanger
+        : aller
+        ? AppTheme.statusSuccess
+        : AppTheme.primary;
+
     return SizedBox(
       height: 22,
       child: LayoutBuilder(
@@ -1095,14 +1160,13 @@ class _ExpeditionDetailScreenState extends State<ExpeditionDetailScreen> {
                 decoration: BoxDecoration(
                   color: Colors.white,
                   shape: BoxShape.circle,
-                  border: Border.all(
-                    color: AppTheme.primary.withValues(alpha: 0.25),
-                  ),
+                  border: Border.all(color: teinte.withValues(alpha: 0.35)),
                 ),
-                child: const Icon(
-                  LucideIcons.truck,
-                  size: 11,
-                  color: AppTheme.primary,
+                // Le camion de Lucide roule vers la droite : au retour on le
+                // retourne pour qu'il regarde la ville d'origine.
+                child: Transform.scale(
+                  scaleX: retour ? -1 : 1,
+                  child: Icon(LucideIcons.truck, size: 11, color: teinte),
                 ),
               ),
             ],

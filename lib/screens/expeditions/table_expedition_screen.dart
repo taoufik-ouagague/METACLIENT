@@ -1,11 +1,10 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import '../../theme/app_theme.dart';
+import '../../widgets/carte_liste.dart';
 import '../../widgets/info_rows_card.dart';
 
 /// Un tableau de l'expedition en pleine page.
@@ -96,71 +95,57 @@ class _TableExpeditionScreenState extends State<TableExpeditionScreen> {
     final avecFiltres = _avecFiltres;
     final lignes = _lignes;
 
+    // Meme mise en page que le detail de l'expedition : bandeau degrade a
+    // coins arrondis, contenu pose par-dessus. Les six tableaux partagent
+    // cette identite plutot qu'une couleur chacun.
     return Scaffold(
       backgroundColor: const Color(0xFFEFF3F8),
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        surfaceTintColor: Colors.transparent,
-        elevation: 0,
-        scrolledUnderElevation: 0,
-        // Barre teintee : chaque tableau garde sa couleur jusque dans son
-        // en-tete, et les icones systeme passent en clair pour rester lisibles.
-        systemOverlayStyle: SystemUiOverlayStyle(
-          statusBarColor: Colors.transparent,
-          statusBarBrightness: Brightness.dark,
-          statusBarIconBrightness: Brightness.light,
-        ),
-        flexibleSpace: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                Color.lerp(widget.couleur, Colors.black, 0.22)!,
-                widget.couleur,
-                Color.lerp(widget.couleur, Colors.white, 0.18)!,
-              ],
+      body: Stack(
+        children: [
+          _entete(lignes.length),
+          SafeArea(
+            bottom: false,
+            child: Padding(
+              padding: const EdgeInsets.only(top: 64),
+              child: Column(
+                children: [
+                  if (avecFiltres)
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 4, 16, 2),
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            for (var i = 0; i < natures.length; i++) ...[
+                              if (i > 0) const SizedBox(width: 9),
+                              _puceFiltre(natures[i], natures[i]),
+                            ],
+                          ],
+                        ),
+                      ),
+                    ),
+                  Expanded(child: _corps(lignes)),
+                ],
+              ),
             ),
           ),
-        ),
-        leading: IconButton(
-          icon: const Icon(LucideIcons.arrowLeft, color: Colors.white),
-          onPressed: () => Get.back<void>(),
-        ),
-        titleSpacing: 0,
-        title: Text(
-          widget.titre,
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 16,
-            fontWeight: FontWeight.w800,
-            letterSpacing: -0.1,
-          ),
-        ),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 16),
-            child: Center(
-              child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 4,
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.22),
-                  borderRadius: BorderRadius.circular(9),
-                  border: Border.all(
-                    color: Colors.white.withValues(alpha: 0.35),
-                  ),
-                ),
-                child: Text(
-                  '${lignes.length}',
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w800,
+          // Le bouton de retour est pose au-dessus du contenu : dans le
+          // bandeau il passerait sous la zone defilante.
+          SafeArea(
+            bottom: false,
+            child: Padding(
+              padding: const EdgeInsets.only(left: 6),
+              child: SizedBox(
+                height: 60,
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: IconButton(
+                    icon: const Icon(
+                      LucideIcons.arrowLeft,
+                      color: Colors.white,
+                    ),
+                    onPressed: () => Get.back<void>(),
                   ),
                 ),
               ),
@@ -168,27 +153,67 @@ class _TableExpeditionScreenState extends State<TableExpeditionScreen> {
           ),
         ],
       ),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          if (avecFiltres)
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 16, 16, 2),
-              child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    for (var i = 0; i < natures.length; i++) ...[
-                      if (i > 0) const SizedBox(width: 8),
-                      _puceFiltre(natures[i], natures[i]),
-                    ],
-                  ],
+    );
+  }
+
+  Widget _entete(int nombre) {
+    // Une seule rangee : retour, titre du tableau, compteur.
+    return Container(
+      height: MediaQuery.paddingOf(context).top + 60,
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [Color(0xFF1B7A94), AppTheme.primary, Color(0xFF3FC1D8)],
+        ),
+        borderRadius: BorderRadius.vertical(bottom: Radius.circular(30)),
+      ),
+      child: SafeArea(
+        bottom: false,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(6, 0, 18, 0),
+          child: Row(
+            children: [
+              // Place reservee au bouton de retour, pose au-dessus du contenu.
+              const SizedBox(width: 48, height: 48),
+              Expanded(
+                child: Text(
+                  widget.titre,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 19,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 0.2,
+                  ),
                 ),
               ),
-            ),
-          Expanded(child: _corps(lignes)),
-        ],
+              const SizedBox(width: 8),
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 11,
+                  vertical: 5,
+                ),
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.18),
+                  borderRadius: BorderRadius.circular(9),
+                  border: Border.all(
+                    color: Colors.white.withValues(alpha: 0.35),
+                  ),
+                ),
+                child: Text(
+                  '$nombre',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 12.5,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -254,17 +279,27 @@ class _TableExpeditionScreenState extends State<TableExpeditionScreen> {
       onTap: () => setState(() => _nature = valeur),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 180),
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 9),
         decoration: BoxDecoration(
-          color: actif ? widget.couleur : const Color(0xFFF1F5F9),
-          borderRadius: BorderRadius.circular(11),
+          gradient: actif ? AppTheme.primaryGradient : null,
+          color: actif ? null : Colors.white,
+          borderRadius: BorderRadius.circular(13),
           border: Border.all(
-            color: actif ? widget.couleur : const Color(0xFFE2E8F0),
+            color: actif ? Colors.transparent : const Color(0xFFE2E8F0),
           ),
+          boxShadow: [
+            BoxShadow(
+              color: actif
+                  ? AppTheme.primary.withValues(alpha: 0.30)
+                  : const Color(0xFF0F172A).withValues(alpha: 0.05),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
         ),
         child: Text(
           libelle,
-          style: TextStyle(
+          style: GoogleFonts.poppins(
             color: actif ? Colors.white : const Color(0xFF475569),
             fontSize: 12.5,
             fontWeight: FontWeight.w700,
@@ -283,6 +318,75 @@ class _TableExpeditionScreenState extends State<TableExpeditionScreen> {
     final l = libelleDepuisCle(cle).replaceFirst(RegExp('^Date '), '');
 
     return l.isEmpty ? cle : l[0].toUpperCase() + l.substring(1);
+  }
+
+  /// Libelle lisible de chaque etape datee ; une cle inconnue retombe sur
+  /// `<Champ> le`.
+  static const Map<String, String> _libelleEtape = {
+    'date_encaissement': 'Encaissé le',
+    'date_affectation': 'Affecté le',
+    'date_reception': 'Reçu le',
+    'date_remise': 'Remis le',
+    'date_livraison': 'Livré le',
+    'date_depot': 'Déposé le',
+  };
+
+  /// Une teinte par etape : la couleur suffit a reperer la date cherchee.
+  static const Map<String, Color> _couleurEtape = {
+    'date_encaissement': Color(0xFF10B981),
+    'date_affectation': Color(0xFF6366F1),
+    'date_reception': Color(0xFFF59E0B),
+    'date_remise': Color(0xFFA855F7),
+    'date_livraison': Color(0xFF0EA5E9),
+    'date_depot': Color(0xFFEC4899),
+  };
+
+  /// Une etape datee : pastille de couleur, libelle teinte, date en gras.
+  Widget _celluleDate(MapEntry<String, dynamic> date) {
+    final libelle = _libelleEtape[date.key] ?? '${_libelleCourt(date.key)} le';
+    final couleur = _couleurEtape[date.key] ?? const Color(0xFF64748B);
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          margin: const EdgeInsets.only(top: 6),
+          width: 7,
+          height: 7,
+          decoration: BoxDecoration(color: couleur, shape: BoxShape.circle),
+        ),
+        const SizedBox(width: 6),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                libelle,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: GoogleFonts.poppins(
+                  color: couleur,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: 0.1,
+                  height: 1.3,
+                ),
+              ),
+              Text(
+                date.value.toString(),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  color: Color(0xFF0F172A),
+                  fontSize: 15,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
   }
 
   /// Carte de liste reprise de META FLEET mobile : verre blanc, bande de
@@ -306,144 +410,99 @@ class _TableExpeditionScreenState extends State<TableExpeditionScreen> {
     final titre = autres.isNotEmpty ? autres.first.value.toString() : null;
     final suite = autres.skip(1).toList();
 
-    return Container(
-      margin: const EdgeInsets.only(bottom: 10),
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.85),
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(
-          color: widget.couleur.withValues(alpha: 0.45),
-          width: 1.3,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: const Color(0xFF1F3A5F).withValues(alpha: 0.05),
-            blurRadius: 14,
-            offset: const Offset(0, 5),
-          ),
-        ],
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(18),
-        child: Stack(
-          children: [
-            BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(16, 12, 14, 12),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            titre ?? (nature ?? '—'),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: GoogleFonts.poppins(
-                              fontSize: 14.5,
-                              fontWeight: FontWeight.w700,
-                              color: widget.couleur,
-                            ),
-                          ),
-                        ),
-                        if (montant is num)
-                          Text(
-                            _montant(montant),
-                            style: GoogleFonts.poppins(
-                              fontSize: 13.5,
-                              fontWeight: FontWeight.w800,
-                              color: const Color(0xFF0F172A),
-                            ),
-                          )
-                        else if (valeurRenseignee(nature))
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 3,
-                            ),
-                            decoration: BoxDecoration(
-                              color: widget.couleur.withValues(alpha: 0.12),
-                              borderRadius: BorderRadius.circular(6),
-                            ),
-                            child: Text(
-                              nature!,
-                              style: GoogleFonts.poppins(
-                                fontSize: 10.5,
-                                fontWeight: FontWeight.w700,
-                                color: widget.couleur,
-                              ),
-                            ),
-                          ),
-                      ],
+    return CarteListe(
+      margin: const EdgeInsets.only(bottom: 12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  titre == null ? (nature ?? '—') : 'N° $titre',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: GoogleFonts.poppins(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w700,
+                    color: AppTheme.primary,
+                  ),
+                ),
+              ),
+              if (montant is num)
+                Text(
+                  _montant(montant),
+                  style: GoogleFonts.poppins(
+                    fontSize: 13.5,
+                    fontWeight: FontWeight.w800,
+                    color: const Color(0xFF0F172A),
+                  ),
+                )
+              else if (valeurRenseignee(nature))
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 3,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppTheme.primary.withValues(alpha: 0.12),
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: Text(
+                    nature!,
+                    style: GoogleFonts.poppins(
+                      fontSize: 10.5,
+                      fontWeight: FontWeight.w700,
+                      color: AppTheme.primary,
                     ),
-                    if (dates.isNotEmpty) ...[
-                      const SizedBox(height: 6),
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.only(top: 1),
-                            child: Icon(
-                              LucideIcons.calendar,
-                              size: 12,
-                              color: widget.couleur.withValues(alpha: 0.7),
-                            ),
-                          ),
-                          const SizedBox(width: 5),
-                          Expanded(
-                            child: Text(
-                              dates
-                                  .map(
-                                    (d) => '${_libelleCourt(d.key)} ${d.value}',
-                                  )
-                                  .join('  •  '),
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(
-                                color: Color(0xFF64748B),
-                                fontSize: 11.5,
-                                height: 1.35,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                    if (suite.isNotEmpty) ...[
-                      const SizedBox(height: 4),
-                      Text(
-                        suite
-                            .map(
-                              (e) =>
-                                  '${_libelleCourt(e.key)} ${e.value is num ? _montant(e.value as num) : e.value}',
-                            )
-                            .join('  •  '),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          color: Color(0xFF94A3B8),
-                          fontSize: 11,
-                          height: 1.3,
-                        ),
-                      ),
-                    ],
+                  ),
+                ),
+            ],
+          ),
+          if (dates.isNotEmpty) ...[
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: 9),
+              child: Divider(height: 1, color: Color(0xFFEDF2F7)),
+            ),
+            // Deux etapes par ligne : les dates se lisent en colonnes
+            // plutot qu'en phrase qui repasse a la ligne.
+            for (var i = 0; i < dates.length; i += 2)
+              Padding(
+                padding: EdgeInsets.only(bottom: i + 2 < dates.length ? 6 : 0),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(child: _celluleDate(dates[i])),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: i + 1 < dates.length
+                          ? _celluleDate(dates[i + 1])
+                          : const SizedBox.shrink(),
+                    ),
                   ],
                 ),
               ),
-            ),
-            // Bande laterale : posee dans le ClipRRect, un Border non uniforme
-            // ne cohabite pas avec un borderRadius.
-            PositionedDirectional(
-              start: 0,
-              top: 0,
-              bottom: 0,
-              child: Container(width: 4, color: widget.couleur),
+          ],
+          if (suite.isNotEmpty) ...[
+            const SizedBox(height: 4),
+            Text(
+              suite
+                  .map(
+                    (e) =>
+                        '${_libelleCourt(e.key)} ${e.value is num ? _montant(e.value as num) : e.value}',
+                  )
+                  .join('  •  '),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(
+                color: Color(0xFF94A3B8),
+                fontSize: 11,
+                height: 1.3,
+              ),
             ),
           ],
-        ),
+        ],
       ),
     );
   }

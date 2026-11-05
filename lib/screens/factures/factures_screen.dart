@@ -5,7 +5,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import '../../controllers/facture_controller.dart';
 import '../../models/facture_model.dart';
 import '../../theme/app_theme.dart';
-import '../../widgets/glass_container.dart';
+import '../../widgets/carte_liste.dart';
 import '../../widgets/status_badge.dart';
 import 'facture_detail_screen.dart';
 import '../../widgets/scroll_reveal.dart';
@@ -165,7 +165,7 @@ class FacturesScreen extends StatelessWidget {
               factureCtrl.totalPages.value > 1) {
             return Padding(
               padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
-              child: GlassContainer(
+              child: CarteListe(
                 borderRadius: 16,
                 padding: const EdgeInsets.symmetric(
                   horizontal: 14,
@@ -226,6 +226,15 @@ class FacturesScreen extends StatelessWidget {
           borderRadius: BorderRadius.circular(12),
           gradient: isSelected ? AppTheme.primaryGradient : null,
           color: isSelected ? null : Colors.transparent,
+          boxShadow: isSelected
+              ? [
+                  BoxShadow(
+                    color: AppTheme.primary.withValues(alpha: 0.28),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  ),
+                ]
+              : null,
         ),
         child: Center(
           child: Text(
@@ -248,29 +257,32 @@ class FacturesScreen extends StatelessWidget {
         ctrl.filterStatut.value = value;
         ctrl.fetchAllFactures(resetPage: true);
       },
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 180),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
         decoration: BoxDecoration(
-          color: isSel
-              ? AppTheme.primary.withValues(alpha: 0.12)
-              : Colors.white,
-          borderRadius: BorderRadius.circular(10),
+          gradient: isSel ? AppTheme.primaryGradient : null,
+          color: isSel ? null : Colors.white,
+          borderRadius: BorderRadius.circular(13),
           border: Border.all(
-            color: isSel ? AppTheme.primary : const Color(0xFFE2E8F0),
+            color: isSel ? Colors.transparent : const Color(0xFFE2E8F0),
           ),
           boxShadow: [
             BoxShadow(
-              color: const Color(0xFF0F172A).withValues(alpha: 0.04),
-              blurRadius: 6,
+              color: isSel
+                  ? AppTheme.primary.withValues(alpha: 0.30)
+                  : const Color(0xFF0F172A).withValues(alpha: 0.05),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
             ),
           ],
         ),
         child: Text(
           label,
           style: TextStyle(
-            color: isSel ? AppTheme.primary : const Color(0xFF64748B),
+            color: isSel ? Colors.white : const Color(0xFF475569),
             fontSize: 12,
-            fontWeight: isSel ? FontWeight.w700 : FontWeight.w500,
+            fontWeight: FontWeight.w700,
           ),
         ),
       ),
@@ -280,8 +292,7 @@ class FacturesScreen extends StatelessWidget {
   Widget _buildFactureCard(FactureModel item) {
     final hasSolde = item.solde != null && item.solde! > 0;
 
-    return GlassContainer(
-      borderRadius: 18,
+    return CarteListe(
       padding: const EdgeInsets.all(16),
       onTap: () => Get.to(
         () => FactureDetailScreen(facture: item),
@@ -315,7 +326,7 @@ class FacturesScreen extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Facture N° ${item.numFacture}',
+                      'N° ${item.numFacture}',
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
