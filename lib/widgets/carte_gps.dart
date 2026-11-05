@@ -15,6 +15,7 @@ class CarteGps extends StatefulWidget {
   final String? capturedAt;
   final String? titre;
   final String? numDeclaration;
+  final double? height;
 
   const CarteGps({
     super.key,
@@ -24,6 +25,7 @@ class CarteGps extends StatefulWidget {
     this.capturedAt,
     this.titre,
     this.numDeclaration,
+    this.height,
   });
 
   @override
@@ -121,6 +123,7 @@ class _CarteGpsState extends State<CarteGps> with SingleTickerProviderStateMixin
         'https://staticmap.openstreetmap.de/staticmap.php?center=$lat,$lng&zoom=15&size=650x320&maptype=mapnik';
 
     return Container(
+      height: widget.height,
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(22),
@@ -238,191 +241,22 @@ class _CarteGpsState extends State<CarteGps> with SingleTickerProviderStateMixin
           ),
 
           // ─── APERÇU DE LA CARTE VISUELLE ──────────────────────────────────
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 14),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(16),
-              child: Stack(
-                children: [
-                  // Image de carte OSM ou Canvas stylisé
-                  SizedBox(
-                    height: 190,
-                    width: double.infinity,
-                    child: Image.network(
-                      staticMapUrl,
-                      fit: BoxFit.cover,
-                      loadingBuilder: (context, child, progress) {
-                        if (progress == null) return child;
-                        return _buildMapPlaceholder();
-                      },
-                      errorBuilder: (context, error, stackTrace) {
-                        return _buildMapPlaceholder();
-                      },
-                    ),
-                  ),
-
-                  // Pin central animé
-                  Positioned.fill(
-                    child: Center(
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          AnimatedBuilder(
-                            animation: _pulseAnimation,
-                            builder: (context, child) {
-                              return Stack(
-                                alignment: Alignment.center,
-                                children: [
-                                  // Onde pulsante
-                                  Container(
-                                    width: 44 * _pulseAnimation.value,
-                                    height: 44 * _pulseAnimation.value,
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      color: const Color(0xFFEF4444).withValues(
-                                        alpha: 0.25 * (1.3 - _pulseAnimation.value + 0.85),
-                                      ),
-                                    ),
-                                  ),
-                                  // Marqueur Pin
-                                  Container(
-                                    width: 36,
-                                    height: 36,
-                                    decoration: BoxDecoration(
-                                      color: const Color(0xFFEF4444),
-                                      shape: BoxShape.circle,
-                                      border: Border.all(color: Colors.white, width: 2.5),
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: Colors.black.withValues(alpha: 0.35),
-                                          blurRadius: 10,
-                                          offset: const Offset(0, 4),
-                                        ),
-                                      ],
-                                    ),
-                                    child: const Center(
-                                      child: Icon(
-                                        LucideIcons.navigation,
-                                        color: Colors.white,
-                                        size: 16,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              );
-                            },
-                          ),
-                          // Ombre sous le pin
-                          Container(
-                            width: 14,
-                            height: 5,
-                            decoration: BoxDecoration(
-                              color: Colors.black.withValues(alpha: 0.25),
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-
-                  // Overlay Badge Coordonnées (Bas Gauche)
-                  Positioned(
-                    left: 10,
-                    bottom: 10,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF0F172A).withValues(alpha: 0.82),
-                        borderRadius: BorderRadius.circular(20),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.2),
-                            blurRadius: 8,
-                          ),
-                        ],
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const Icon(
-                            LucideIcons.crosshair,
-                            size: 12,
-                            color: Color(0xFF38BDF8),
-                          ),
-                          const SizedBox(width: 6),
-                          Text(
-                            coordsStr,
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 11,
-                              fontWeight: FontWeight.w600,
-                              letterSpacing: 0.2,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-
-                  // Overlay Bouton Agrandir (Haut Droit)
-                  Positioned(
-                    right: 10,
-                    top: 10,
-                    child: Material(
-                      color: Colors.transparent,
-                      child: InkWell(
-                        onTap: _ouvrirGoogleMaps,
-                        borderRadius: BorderRadius.circular(20),
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.92),
-                            borderRadius: BorderRadius.circular(20),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withValues(alpha: 0.15),
-                                blurRadius: 8,
-                              ),
-                            ],
-                          ),
-                          child: const Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(
-                                LucideIcons.externalLink,
-                                size: 12,
-                                color: Color(0xFF0F172A),
-                              ),
-                              SizedBox(width: 4),
-                              Text(
-                                'Agrandir',
-                                style: TextStyle(
-                                  color: Color(0xFF0F172A),
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-
-                  // Zone cliquable sur toute la carte
-                  Positioned.fill(
-                    child: Material(
-                      color: Colors.transparent,
-                      child: InkWell(
-                        onTap: _ouvrirGoogleMaps,
-                      ),
-                    ),
-                  ),
-                ],
+          if (widget.height != null)
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 14),
+                child: _buildCarteStack(staticMapUrl, coordsStr),
+              ),
+            )
+          else
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 14),
+              child: SizedBox(
+                height: 190,
+                width: double.infinity,
+                child: _buildCarteStack(staticMapUrl, coordsStr),
               ),
             ),
-          ),
 
           // ─── BOUTONS D'ACTION (GOOGLE MAPS & ITINÉRAIRE) ──────────────────
           Padding(
@@ -478,6 +312,189 @@ class _CarteGpsState extends State<CarteGps> with SingleTickerProviderStateMixin
                   ),
                 ),
               ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCarteStack(String staticMapUrl, String coordsStr) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(16),
+      child: Stack(
+        children: [
+          // Image de carte OSM ou Canvas stylisé
+          SizedBox.expand(
+            child: Image.network(
+              staticMapUrl,
+              fit: BoxFit.cover,
+              loadingBuilder: (context, child, progress) {
+                if (progress == null) return child;
+                return _buildMapPlaceholder();
+              },
+              errorBuilder: (context, error, stackTrace) {
+                return _buildMapPlaceholder();
+              },
+            ),
+          ),
+
+          // Pin central animé
+          Positioned.fill(
+            child: Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  AnimatedBuilder(
+                    animation: _pulseAnimation,
+                    builder: (context, child) {
+                      return Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          // Onde pulsante
+                          Container(
+                            width: 44 * _pulseAnimation.value,
+                            height: 44 * _pulseAnimation.value,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: const Color(0xFFEF4444).withValues(
+                                alpha: 0.25 * (1.3 - _pulseAnimation.value + 0.85),
+                              ),
+                            ),
+                          ),
+                          // Marqueur Pin
+                          Container(
+                            width: 36,
+                            height: 36,
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFEF4444),
+                              shape: BoxShape.circle,
+                              border: Border.all(color: Colors.white, width: 2.5),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withValues(alpha: 0.35),
+                                  blurRadius: 10,
+                                  offset: const Offset(0, 4),
+                                ),
+                              ],
+                            ),
+                            child: const Center(
+                              child: Icon(
+                                LucideIcons.navigation,
+                                color: Colors.white,
+                                size: 16,
+                              ),
+                            ),
+                          ),
+                        ],
+                      );
+                    },
+                  ),
+                  // Ombre sous le pin
+                  Container(
+                    width: 14,
+                    height: 5,
+                    decoration: BoxDecoration(
+                      color: Colors.black.withValues(alpha: 0.25),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+
+          // Overlay Badge Coordonnées (Bas Gauche)
+          Positioned(
+            left: 10,
+            bottom: 10,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+              decoration: BoxDecoration(
+                color: const Color(0xFF0F172A).withValues(alpha: 0.82),
+                borderRadius: BorderRadius.circular(20),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.2),
+                    blurRadius: 8,
+                  ),
+                ],
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(
+                    LucideIcons.crosshair,
+                    size: 12,
+                    color: Color(0xFF38BDF8),
+                  ),
+                  const SizedBox(width: 6),
+                  Text(
+                    coordsStr,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600,
+                      letterSpacing: 0.2,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+
+          // Overlay Bouton Agrandir (Haut Droit)
+          Positioned(
+            right: 10,
+            top: 10,
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: _ouvrirGoogleMaps,
+                borderRadius: BorderRadius.circular(20),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.92),
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.15),
+                        blurRadius: 8,
+                      ),
+                    ],
+                  ),
+                  child: const Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        LucideIcons.externalLink,
+                        size: 12,
+                        color: Color(0xFF0F172A),
+                      ),
+                      SizedBox(width: 4),
+                      Text(
+                        'Agrandir',
+                        style: TextStyle(
+                          color: Color(0xFF0F172A),
+                          fontSize: 11,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+
+          // Zone cliquable sur toute la carte
+          Positioned.fill(
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: _ouvrirGoogleMaps,
+              ),
             ),
           ),
         ],

@@ -33,12 +33,20 @@ class ExpeditionDetailScreen extends StatefulWidget {
 class _ExpeditionDetailScreenState extends State<ExpeditionDetailScreen> {
   final ExpeditionController _controller = Get.find<ExpeditionController>();
 
-  bool _infosOuvertes = true;
+  late final PageController _sliderController;
+  int _currentSlide = 0;
 
   @override
   void initState() {
     super.initState();
+    _sliderController = PageController();
     if (!widget.dejaCharge) _controller.fetchDetail(widget.idExpedition);
+  }
+
+  @override
+  void dispose() {
+    _sliderController.dispose();
+    super.dispose();
   }
 
   String _formatCurrency(num? amount) {
@@ -157,235 +165,8 @@ class _ExpeditionDetailScreenState extends State<ExpeditionDetailScreen> {
 
                     const SizedBox(height: 22),
 
-                    // ─── DETAILS & PIECES (carte a 2 panneaux) ─────────────────────
-                    // Panneau 1 : les champs du contrat API qui n'ont pas leur place
-                    // ailleurs. Panneau 2 : les documents GED, toujours affiche —
-                    // vide, il dit qu'il est vide plutot que de disparaitre.
-                    Builder(
-                      builder: (context) {
-                        final lignes =
-                            <MapEntry<String, String>>[
-                                  MapEntry('Activité', detail.activite ?? ''),
-                                  MapEntry(
-                                    'Type de livraison',
-                                    detail.livraison ?? '',
-                                  ),
-                                  MapEntry('BL / Facture', detail.blFact ?? ''),
-                                  MapEntry(
-                                    'Valeur déclarée',
-                                    detail.valeurDeclaree == null
-                                        ? ''
-                                        : _formatCurrency(
-                                            detail.valeurDeclaree,
-                                          ),
-                                  ),
-                                  MapEntry(
-                                    'Montant HT',
-                                    detail.mntHt == null
-                                        ? ''
-                                        : _formatCurrency(detail.mntHt),
-                                  ),
-                                  MapEntry(
-                                    'Facture en compte',
-                                    detail.factureEncompte ?? '',
-                                  ),
-                                  MapEntry(
-                                    'Date livraison mobile',
-                                    detail.dateLivMobile ?? '',
-                                  ),
-                                  MapEntry(
-                                    'Date encaissement',
-                                    detail.dateEncaissement ?? '',
-                                  ),
-                                ]
-                                .where(
-                                  (e) =>
-                                      e.key == 'Date livraison mobile' ||
-                                      _renseigne(e.value),
-                                )
-                                .toList();
-
-                        if (lignes.isEmpty) return const SizedBox.shrink();
-
-                        return Container(
-                          padding: const EdgeInsets.fromLTRB(14, 4, 14, 4),
-                          decoration: BoxDecoration(
-                            // Un blanc parfaitement plat durcit la carte : le
-                            // degrade lui donne du relief sans la colorer.
-                            gradient: const LinearGradient(
-                              begin: Alignment.topCenter,
-                              end: Alignment.bottomCenter,
-                              colors: [Colors.white, Color(0xFFF7FAFD)],
-                            ),
-                            borderRadius: BorderRadius.circular(20),
-                            border: Border.all(color: const Color(0xFFE8EDF3)),
-                            boxShadow: [
-                              BoxShadow(
-                                color: const Color(
-                                  0xFF0F172A,
-                                ).withValues(alpha: 0.05),
-                                blurRadius: 18,
-                                offset: const Offset(0, 6),
-                              ),
-                            ],
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              InkWell(
-                                borderRadius: BorderRadius.circular(8),
-                                onTap: () => setState(
-                                  () => _infosOuvertes = !_infosOuvertes,
-                                ),
-                                child: Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                    vertical: 12,
-                                  ),
-                                  child: Row(
-                                    children: [
-                                      Container(
-                                        width: 30,
-                                        height: 30,
-                                        decoration: BoxDecoration(
-                                          color: AppTheme.primary.withValues(
-                                            alpha: 0.10,
-                                          ),
-                                          borderRadius: BorderRadius.circular(
-                                            10,
-                                          ),
-                                        ),
-                                        child: const Icon(
-                                          LucideIcons.info,
-                                          color: AppTheme.primary,
-                                          size: 16,
-                                        ),
-                                      ),
-                                      const SizedBox(width: 10),
-                                      const Expanded(
-                                        child: Text(
-                                          'Informations complémentaires',
-                                          style: TextStyle(
-                                            color: Color(0xFF0F172A),
-                                            fontSize: 14.5,
-                                            fontWeight: FontWeight.w700,
-                                            letterSpacing: -0.1,
-                                          ),
-                                        ),
-                                      ),
-                                      Container(
-                                        width: 26,
-                                        height: 26,
-                                        decoration: const BoxDecoration(
-                                          color: Color(0xFFF1F5F9),
-                                          shape: BoxShape.circle,
-                                        ),
-                                        child: AnimatedRotation(
-                                          duration: const Duration(
-                                            milliseconds: 200,
-                                          ),
-                                          turns: _infosOuvertes ? 0.5 : 0,
-                                          child: const Icon(
-                                            LucideIcons.chevronDown,
-                                            size: 15,
-                                            color: Color(0xFF475569),
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                              // Depliee a l'ouverture : ce sont les champs que
-                              // l'on vient lire. Le repli reste disponible.
-                              AnimatedCrossFade(
-                                duration: const Duration(milliseconds: 220),
-                                sizeCurve: Curves.easeOut,
-                                crossFadeState: _infosOuvertes
-                                    ? CrossFadeState.showSecond
-                                    : CrossFadeState.showFirst,
-                                firstChild: const SizedBox(
-                                  width: double.infinity,
-                                  height: 0,
-                                ),
-                                secondChild: Padding(
-                                  padding: const EdgeInsets.only(bottom: 12),
-                                  child: Column(
-                                    children: [
-                                      const Divider(
-                                        color: Color(0xFFE8EDF3),
-                                        height: 1,
-                                      ),
-                                      const SizedBox(height: 8),
-                                      // Une ligne sur deux est teintee : plus
-                                      // lisible qu'un filet entre chaque, et
-                                      // l'oeil suit la ligne jusqu'a sa valeur.
-                                      for (var i = 0; i < lignes.length; i++)
-                                        Container(
-                                          padding: const EdgeInsets.symmetric(
-                                            horizontal: 10,
-                                            vertical: 9,
-                                          ),
-                                          decoration: BoxDecoration(
-                                            color: i.isEven
-                                                ? const Color(0xFFF6F9FC)
-                                                : Colors.transparent,
-                                            borderRadius: BorderRadius.circular(
-                                              9,
-                                            ),
-                                          ),
-                                          child: Row(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Expanded(
-                                                flex: 5,
-                                                child: Text(
-                                                  lignes[i].key,
-                                                  style: const TextStyle(
-                                                    color: Color(0xFF64748B),
-                                                    fontSize: 12,
-                                                    fontWeight: FontWeight.w500,
-                                                  ),
-                                                ),
-                                              ),
-                                              const SizedBox(width: 10),
-                                              Expanded(
-                                                flex: 6,
-                                                child: Text(
-                                                  lignes[i].value,
-                                                  textAlign: TextAlign.end,
-                                                  style: const TextStyle(
-                                                    color: Color(0xFF0F172A),
-                                                    fontSize: 13,
-                                                    fontWeight: FontWeight.w700,
-                                                  ),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        );
-                      },
-                    ),
-
-                    // ─── CARTE & LOCALISATION GPS ──────────────────────────────
-                    if (detail.latitudeEffective != null &&
-                        detail.longitudeEffective != null) ...[
-                      const SizedBox(height: 20),
-                      CarteGps(
-                        latitude: detail.latitudeEffective!,
-                        longitude: detail.longitudeEffective!,
-                        geofence: detail.gpsGeofence,
-                        capturedAt: detail.gpsCapturedAt,
-                        numDeclaration: detail.numDeclaration,
-                      ),
-                    ],
+                    // ─── SLIDER INFORMATIONS & POSITION GPS ────────────────────────
+                    _buildInfoAndGpsSlider(detail),
                   ],
                 ),
               ),
@@ -403,6 +184,502 @@ class _ExpeditionDetailScreenState extends State<ExpeditionDetailScreen> {
           ],
         );
       }),
+    );
+  }
+
+  Widget _buildInfoAndGpsSlider(ExpeditionDetailModel detail) {
+    final lignes = <MapEntry<String, String>>[
+      MapEntry('Activité', detail.activite ?? ''),
+      MapEntry('Type de livraison', detail.livraison ?? ''),
+      MapEntry('BL / Facture', detail.blFact ?? ''),
+      MapEntry(
+        'Valeur déclarée',
+        detail.valeurDeclaree == null
+            ? ''
+            : _formatCurrency(detail.valeurDeclaree),
+      ),
+      MapEntry(
+        'Montant HT',
+        detail.mntHt == null ? '' : _formatCurrency(detail.mntHt),
+      ),
+      MapEntry('Facture en compte', detail.factureEncompte ?? ''),
+      MapEntry('Date livraison mobile', detail.dateLivMobile ?? ''),
+      MapEntry('Date encaissement', detail.dateEncaissement ?? ''),
+    ]
+        .where(
+          (e) =>
+              e.key == 'Date livraison mobile' || _renseigne(e.value),
+        )
+        .toList();
+
+    final hasGps = detail.latitudeEffective != null &&
+        detail.longitudeEffective != null;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        // ─── TABS DU SLIDER (Informations / Position GPS) ───────────────
+        Container(
+          padding: const EdgeInsets.all(4),
+          decoration: BoxDecoration(
+            color: Colors.white.withValues(alpha: 0.70),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: Colors.white.withValues(alpha: 0.90),
+              width: 1.5,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: AppTheme.primary.withValues(alpha: 0.05),
+                blurRadius: 12,
+                offset: const Offset(0, 3),
+              ),
+            ],
+          ),
+          child: Row(
+            children: [
+              Expanded(
+                child: GestureDetector(
+                  onTap: () {
+                    _sliderController.animateToPage(
+                      0,
+                      duration: const Duration(milliseconds: 320),
+                      curve: Curves.easeInOutCubic,
+                    );
+                  },
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 250),
+                    padding: const EdgeInsets.symmetric(vertical: 9),
+                    decoration: BoxDecoration(
+                      color: _currentSlide == 0
+                          ? Colors.white
+                          : Colors.transparent,
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: _currentSlide == 0
+                          ? [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.06),
+                                blurRadius: 8,
+                                offset: const Offset(0, 2),
+                              ),
+                            ]
+                          : null,
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          LucideIcons.info,
+                          size: 15,
+                          color: _currentSlide == 0
+                              ? AppTheme.primary
+                              : const Color(0xFF64748B),
+                        ),
+                        const SizedBox(width: 6),
+                        Text(
+                          'Informations',
+                          style: TextStyle(
+                            fontSize: 12.5,
+                            fontWeight: _currentSlide == 0
+                                ? FontWeight.w700
+                                : FontWeight.w500,
+                            color: _currentSlide == 0
+                                ? AppTheme.primary
+                                : const Color(0xFF64748B),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              Expanded(
+                child: GestureDetector(
+                  onTap: () {
+                    _sliderController.animateToPage(
+                      1,
+                      duration: const Duration(milliseconds: 320),
+                      curve: Curves.easeInOutCubic,
+                    );
+                  },
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 250),
+                    padding: const EdgeInsets.symmetric(vertical: 9),
+                    decoration: BoxDecoration(
+                      color: _currentSlide == 1
+                          ? Colors.white
+                          : Colors.transparent,
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: _currentSlide == 1
+                          ? [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.06),
+                                blurRadius: 8,
+                                offset: const Offset(0, 2),
+                              ),
+                            ]
+                          : null,
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          LucideIcons.mapPin,
+                          size: 15,
+                          color: _currentSlide == 1
+                              ? AppTheme.primary
+                              : const Color(0xFF64748B),
+                        ),
+                        const SizedBox(width: 6),
+                        Text(
+                          'Position GPS',
+                          style: TextStyle(
+                            fontSize: 12.5,
+                            fontWeight: _currentSlide == 1
+                                ? FontWeight.w700
+                                : FontWeight.w500,
+                            color: _currentSlide == 1
+                                ? AppTheme.primary
+                                : const Color(0xFF64748B),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+
+        const SizedBox(height: 14),
+
+        // ─── SLIDER (PAGEVIEW) ─────────────────────────────────────────
+        SizedBox(
+          height: 350,
+          child: PageView(
+            controller: _sliderController,
+            onPageChanged: (index) {
+              setState(() => _currentSlide = index);
+            },
+            children: [
+              _buildInformationsCard(lignes),
+              if (hasGps)
+                CarteGps(
+                  latitude: detail.latitudeEffective!,
+                  longitude: detail.longitudeEffective!,
+                  geofence: detail.gpsGeofence,
+                  capturedAt: detail.gpsCapturedAt,
+                  numDeclaration: detail.numDeclaration,
+                  height: 350,
+                )
+              else
+                _buildEmptyGpsCard(),
+            ],
+          ),
+        ),
+
+        const SizedBox(height: 14),
+
+        // ─── INDICATEURS DE SLIDE (DOTS) ────────────────────────────────
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: List.generate(
+            2,
+            (index) => GestureDetector(
+              onTap: () {
+                _sliderController.animateToPage(
+                  index,
+                  duration: const Duration(milliseconds: 320),
+                  curve: Curves.easeInOutCubic,
+                );
+              },
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 300),
+                margin: const EdgeInsets.symmetric(horizontal: 4),
+                width: _currentSlide == index ? 24 : 8,
+                height: 8,
+                decoration: BoxDecoration(
+                  gradient: _currentSlide == index
+                      ? AppTheme.primaryGradient
+                      : null,
+                  color: _currentSlide == index
+                      ? null
+                      : const Color(0xFFCBD5E1),
+                  borderRadius: BorderRadius.circular(4),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildInformationsCard(List<MapEntry<String, String>> lignes) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF0F172A).withValues(alpha: 0.06),
+            blurRadius: 20,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          // Entête carte informations
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
+            child: Row(
+              children: [
+                Container(
+                  width: 38,
+                  height: 38,
+                  decoration: BoxDecoration(
+                    color: AppTheme.primary.withValues(alpha: 0.1),
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: AppTheme.primary.withValues(alpha: 0.25),
+                      width: 1.5,
+                    ),
+                  ),
+                  child: const Center(
+                    child: Icon(
+                      LucideIcons.info,
+                      color: AppTheme.primary,
+                      size: 20,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Informations complémentaires',
+                        style: TextStyle(
+                          color: Color(0xFF0F172A),
+                          fontSize: 15,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: -0.2,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        '${lignes.length} détails enregistrés',
+                        style: const TextStyle(
+                          color: Color(0xFF64748B),
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const Divider(
+            color: Color(0xFFE8EDF3),
+            height: 1,
+            indent: 16,
+            endIndent: 16,
+          ),
+          // Liste des informations
+          Expanded(
+            child: RawScrollbar(
+              thumbColor: const Color(0xFFCBD5E1),
+              radius: const Radius.circular(4),
+              thickness: 3,
+              child: ListView.builder(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 8,
+                ),
+                physics: const BouncingScrollPhysics(),
+                itemCount: lignes.length,
+                itemBuilder: (context, i) {
+                  return Container(
+                    margin: const EdgeInsets.only(bottom: 4),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 8,
+                    ),
+                    decoration: BoxDecoration(
+                      color: i.isEven
+                          ? const Color(0xFFF6F9FC)
+                          : Colors.transparent,
+                      borderRadius: BorderRadius.circular(9),
+                    ),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          flex: 5,
+                          child: Text(
+                            lignes[i].key,
+                            style: const TextStyle(
+                              color: Color(0xFF64748B),
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          flex: 6,
+                          child: Text(
+                            lignes[i].value,
+                            textAlign: TextAlign.end,
+                            style: const TextStyle(
+                              color: Color(0xFF0F172A),
+                              fontSize: 13,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildEmptyGpsCard() {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF0F172A).withValues(alpha: 0.06),
+            blurRadius: 20,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
+            child: Row(
+              children: [
+                Container(
+                  width: 38,
+                  height: 38,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF94A3B8).withValues(alpha: 0.12),
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: const Color(0xFF94A3B8).withValues(alpha: 0.25),
+                      width: 1.5,
+                    ),
+                  ),
+                  child: const Center(
+                    child: Icon(
+                      LucideIcons.mapPinOff,
+                      color: Color(0xFF64748B),
+                      size: 20,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                const Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Position GPS',
+                        style: TextStyle(
+                          color: Color(0xFF0F172A),
+                          fontSize: 15,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: -0.2,
+                        ),
+                      ),
+                      SizedBox(height: 2),
+                      Text(
+                        'Non disponible',
+                        style: TextStyle(
+                          color: Color(0xFF64748B),
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const Divider(
+            color: Color(0xFFE8EDF3),
+            height: 1,
+            indent: 16,
+            endIndent: 16,
+          ),
+          Expanded(
+            child: Center(
+              child: Padding(
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      width: 56,
+                      height: 56,
+                      decoration: const BoxDecoration(
+                        color: Color(0xFFF1F5F9),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Center(
+                        child: Icon(
+                          LucideIcons.mapPinOff,
+                          size: 26,
+                          color: Color(0xFF94A3B8),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 14),
+                    const Text(
+                      'Aucune coordonnée GPS',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                        color: Color(0xFF1E293B),
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    const Text(
+                      'Les coordonnées GPS n\'ont pas été enregistrées pour cette expédition.',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Color(0xFF64748B),
+                        height: 1.4,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
