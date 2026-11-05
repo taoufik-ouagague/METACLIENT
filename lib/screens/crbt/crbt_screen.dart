@@ -225,6 +225,32 @@ class CrbtScreen extends StatelessWidget {
     );
   }
 
+  Widget _badgeType(String type) {
+    final lower = type.toLowerCase();
+    final bool isVir = lower.contains('vir');
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      decoration: BoxDecoration(
+        color: (isVir ? const Color(0xFF0EA5E9) : const Color(0xFFA855F7))
+            .withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(6),
+        border: Border.all(
+          color: (isVir ? const Color(0xFF0EA5E9) : const Color(0xFFA855F7))
+              .withValues(alpha: 0.28),
+          width: 0.8,
+        ),
+      ),
+      child: Text(
+        isVir ? 'Virement' : 'Chèque',
+        style: TextStyle(
+          fontSize: 10,
+          fontWeight: FontWeight.w700,
+          color: isVir ? const Color(0xFF0284C7) : const Color(0xFF9333EA),
+        ),
+      ),
+    );
+  }
+
   Widget _buildChequesList(BuildContext context, CrbtController ctrl) {
     if (ctrl.chequesCrbt.isEmpty) {
       return const Center(
@@ -266,15 +292,29 @@ class CrbtScreen extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        'Chèque N° ${item.numCheque}',
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          color: Color(0xFF0F172A),
-                          fontSize: 14.5,
-                          fontWeight: FontWeight.w700,
-                        ),
+                      Row(
+                        children: [
+                          Flexible(
+                            child: Text(
+                              (item.typeRemboursement != null &&
+                                      item.typeRemboursement!.toLowerCase().contains('vir'))
+                                  ? 'Virement N° ${item.numCheque}'
+                                  : 'Chèque N° ${item.numCheque}',
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                color: Color(0xFF0F172A),
+                                fontSize: 14.5,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ),
+                          if (item.typeRemboursement != null &&
+                              item.typeRemboursement!.trim().isNotEmpty) ...[
+                            const SizedBox(width: 6),
+                            _badgeType(item.typeRemboursement!),
+                          ],
+                        ],
                       ),
                       const SizedBox(height: 3),
                       Text(

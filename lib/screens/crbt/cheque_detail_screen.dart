@@ -85,15 +85,60 @@ class _ChequeDetailScreenState extends State<ChequeDetailScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
-                              'Chèque ${c.numCheque}',
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(
-                                color: Color(0xFF0F172A),
-                                fontSize: 17,
-                                fontWeight: FontWeight.w800,
-                              ),
+                            Row(
+                              children: [
+                                Flexible(
+                                  child: Text(
+                                    (c.typeRemboursement != null &&
+                                            c.typeRemboursement!.toLowerCase().contains('vir'))
+                                        ? 'Virement ${c.numCheque}'
+                                        : 'Chèque ${c.numCheque}',
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: const TextStyle(
+                                      color: Color(0xFF0F172A),
+                                      fontSize: 17,
+                                      fontWeight: FontWeight.w800,
+                                    ),
+                                  ),
+                                ),
+                                if (c.typeRemboursement != null &&
+                                    c.typeRemboursement!.trim().isNotEmpty) ...[
+                                  const SizedBox(width: 8),
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 7,
+                                      vertical: 2.5,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: (c.typeRemboursement!.toLowerCase().contains('vir')
+                                              ? const Color(0xFF0EA5E9)
+                                              : const Color(0xFFA855F7))
+                                          .withValues(alpha: 0.12),
+                                      borderRadius: BorderRadius.circular(6),
+                                      border: Border.all(
+                                        color: (c.typeRemboursement!.toLowerCase().contains('vir')
+                                                ? const Color(0xFF0EA5E9)
+                                                : const Color(0xFFA855F7))
+                                            .withValues(alpha: 0.28),
+                                        width: 0.8,
+                                      ),
+                                    ),
+                                    child: Text(
+                                      c.typeRemboursement!.toLowerCase().contains('vir')
+                                          ? 'Virement'
+                                          : 'Chèque',
+                                      style: TextStyle(
+                                        fontSize: 10.5,
+                                        fontWeight: FontWeight.w700,
+                                        color: c.typeRemboursement!.toLowerCase().contains('vir')
+                                            ? const Color(0xFF0284C7)
+                                            : const Color(0xFF9333EA),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ],
                             ),
                             const SizedBox(height: 2),
                             Text(
@@ -319,11 +364,13 @@ class _ChequeDetailScreenState extends State<ChequeDetailScreen> {
                                     fontWeight: FontWeight.w500,
                                   ),
                                 ),
-                                if (valeurRenseignee(item.modeReglement) ||
+                                if (valeurRenseignee(item.typeRemboursement) ||
+                                    valeurRenseignee(item.modeReglement) ||
                                     valeurRenseignee(item.refReglement)) ...[
                                   const SizedBox(height: 1),
                                   Text(
                                     [
+                                      item.typeRemboursement,
                                       item.modeReglement,
                                       item.refReglement,
                                     ].where(valeurRenseignee).join(' • '),

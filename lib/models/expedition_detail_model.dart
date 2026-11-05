@@ -70,6 +70,71 @@ class ExpeditionCommentaire {
   }
 }
 
+/// Élément de remboursement de l'expédition (chèque ou virement)
+class ChequeCrItem {
+  final String? typeRemboursement;
+  final String? numPiece;
+  final num? montant;
+  final String? dateRemise;
+  final String? dateEncaissement;
+  final String? banque;
+  final Map<String, dynamic> raw;
+
+  ChequeCrItem({
+    this.typeRemboursement,
+    this.numPiece,
+    this.montant,
+    this.dateRemise,
+    this.dateEncaissement,
+    this.banque,
+    required this.raw,
+  });
+
+  bool get isVirement {
+    final t = typeRemboursement?.toLowerCase() ?? '';
+    return t.contains('vir');
+  }
+
+  bool get isCheque {
+    final t = typeRemboursement?.toLowerCase() ?? '';
+    return t.contains('ch') || (!isVirement && t.isNotEmpty);
+  }
+
+  String get typeLibelle {
+    if (isVirement) return 'Virement';
+    if (isCheque) return 'Chèque';
+    if (typeRemboursement != null && typeRemboursement!.trim().isNotEmpty) {
+      final s = typeRemboursement!.trim();
+      return s[0].toUpperCase() + s.substring(1);
+    }
+    return 'C/REMB';
+  }
+
+  factory ChequeCrItem.fromJson(Map<String, dynamic> json) {
+    final type = (json['typeRemboursement'] ??
+            json['type_remboursement'] ??
+            json['typeRemb'] ??
+            json['type_remb'] ??
+            json['type'] ??
+            json['mode_reglement'])
+        ?.toString();
+    return ChequeCrItem(
+      typeRemboursement: type,
+      numPiece: (json['num_piece'] ??
+              json['num_cheque'] ??
+              json['piece'] ??
+              json['ref_reglement'] ??
+              json['num'])
+          ?.toString(),
+      montant: json['montant'] as num? ?? json['fond'] as num?,
+      dateRemise: json['date_remise']?.toString() ?? json['dateremise']?.toString(),
+      dateEncaissement: json['date_encaissement']?.toString(),
+      banque: json['banque']?.toString(),
+      raw: json,
+    );
+  }
+}
+
 class ExpeditionDetailModel {
   final int? idExpedition;
   final String numDeclaration;
@@ -141,6 +206,18 @@ class ExpeditionDetailModel {
     }
     return coordoneesGps ?? '';
   }
+
+  /// Remboursements structurés (chèques et virements)
+  List<ChequeCrItem> get chequeCrItems =>
+      chequeCr.map((e) => ChequeCrItem.fromJson(e)).toList();
+
+  /// Vrai si au moins un remboursement est par virement
+  bool get aVirementCr =>
+      chequeCrItems.any((e) => e.isVirement);
+
+  /// Vrai si au moins un remboursement est par chèque
+  bool get aChequeSeulCr =>
+      chequeCrItems.any((e) => e.isCheque);
 
   ExpeditionDetailModel({
     this.idExpedition,

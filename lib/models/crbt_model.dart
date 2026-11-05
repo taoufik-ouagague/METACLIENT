@@ -5,6 +5,7 @@ class ChequeCrbtModel {
   final String? banque;
   final String? dateRemise;
   final num montant;
+  final String? typeRemboursement;
 
   ChequeCrbtModel({
     required this.idCheque,
@@ -13,6 +14,7 @@ class ChequeCrbtModel {
     this.banque,
     this.dateRemise,
     required this.montant,
+    this.typeRemboursement,
   });
 
   factory ChequeCrbtModel.fromJson(Map<String, dynamic> json) {
@@ -23,6 +25,12 @@ class ChequeCrbtModel {
       banque: json['banque']?.toString(),
       dateRemise: json['dateremise']?.toString(),
       montant: (json['montant'] as num?) ?? 0,
+      typeRemboursement: (json['typeRemboursement'] ??
+              json['type_remboursement'] ??
+              json['typeRemb'] ??
+              json['type_remb'] ??
+              json['type'])
+          ?.toString(),
     );
   }
 }
@@ -36,6 +44,7 @@ class ChequeCrbtDetailItem {
   final num montant;
   final String? destinataire;
   final String? dateEmission;
+  final String? typeRemboursement;
 
   ChequeCrbtDetailItem({
     this.refReglement,
@@ -46,6 +55,7 @@ class ChequeCrbtDetailItem {
     required this.montant,
     this.destinataire,
     this.dateEmission,
+    this.typeRemboursement,
   });
 
   factory ChequeCrbtDetailItem.fromJson(Map<String, dynamic> json) {
@@ -58,6 +68,12 @@ class ChequeCrbtDetailItem {
       montant: (json['montant'] as num?) ?? 0,
       destinataire: json['destinataire']?.toString(),
       dateEmission: json['date_emission']?.toString(),
+      typeRemboursement: (json['typeRemboursement'] ??
+              json['type_remboursement'] ??
+              json['typeRemb'] ??
+              json['type_remb'] ??
+              json['type'])
+          ?.toString(),
     );
   }
 }

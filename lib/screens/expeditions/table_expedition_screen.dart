@@ -53,13 +53,41 @@ class _TableExpeditionScreenState extends State<TableExpeditionScreen> {
     if (natures.isNotEmpty) _nature = natures.first;
   }
 
+  static String? _extraireTypeRemboursement(Map<String, dynamic> item) {
+    final val = item['typeRemboursement'] ??
+        item['type_remboursement'] ??
+        item['typeRemb'] ??
+        item['type_remb'] ??
+        item['type'] ??
+        item['mode_reglement'];
+    if (val != null && val.toString().trim().isNotEmpty) {
+      return val.toString().trim();
+    }
+    return null;
+  }
+
+  static String _formaterTypeRemb(String type) {
+    final lower = type.toLowerCase();
+    if (lower.contains('vir')) return 'Virement';
+    if (lower.contains('ch')) return 'Chèque';
+    return type.isEmpty ? type : type[0].toUpperCase() + type.substring(1);
+  }
+
+  static String? _extraireNatureOuType(Map<String, dynamic> item) {
+    final n = item['nature']?.toString().trim();
+    if (n != null && n.isNotEmpty) return n;
+    final t = _extraireTypeRemboursement(item);
+    if (t != null && t.isNotEmpty) return _formaterTypeRemb(t);
+    return null;
+  }
+
   /// Natures proposees au filtre : celles annoncees par le contrat, puis
   /// celles reellement presentes que le contrat n'aurait pas prevues.
   List<String> get _natures {
     final vues = <String>[...widget.naturesAttendues];
     var sansNature = false;
     for (final item in widget.items ?? const <Map<String, dynamic>>[]) {
-      final n = item['nature']?.toString().trim();
+      final n = _extraireNatureOuType(item);
       if (n == null || n.isEmpty) {
         sansNature = true;
       } else if (!vues.contains(n)) {
@@ -79,11 +107,11 @@ class _TableExpeditionScreenState extends State<TableExpeditionScreen> {
 
     if (_nature == _sansNature) {
       return tous
-          .where((e) => (e['nature']?.toString().trim() ?? '').isEmpty)
+          .where((e) => (_extraireNatureOuType(e) ?? '').isEmpty)
           .toList();
     }
 
-    return tous.where((e) => e['nature']?.toString() == _nature).toList();
+    return tous.where((e) => _extraireNatureOuType(e) == _nature).toList();
   }
 
   String _montant(num? v) =>
@@ -389,11 +417,82 @@ class _TableExpeditionScreenState extends State<TableExpeditionScreen> {
     );
   }
 
+  Widget _badgeTypeRemboursement(String type) {
+    final lower = type.toLowerCase();
+    final bool isVirement = lower.contains('vir');
+    final bool isCheque = lower.contains('ch');
+
+    final Color bg;
+    final Color fg;
+    final Color border;
+    final IconData icon;
+    final String label;
+
+    if (isVirement) {
+      bg = const Color(0xFF0EA5E9).withValues(alpha: 0.12);
+      fg = const Color(0xFF0284C7);
+      border = const Color(0xFF0EA5E9).withValues(alpha: 0.28);
+      icon = LucideIcons.arrowRightLeft;
+      label = 'Virement';
+    } else if (isCheque) {
+      bg = const Color(0xFFA855F7).withValues(alpha: 0.12);
+      fg = const Color(0xFF9333EA);
+      border = const Color(0xFFA855F7).withValues(alpha: 0.28);
+      icon = LucideIcons.wallet;
+      label = 'Chèque';
+    } else {
+      bg = const Color(0xFF64748B).withValues(alpha: 0.10);
+      fg = const Color(0xFF475569);
+      border = const Color(0xFF64748B).withValues(alpha: 0.22);
+      icon = LucideIcons.receipt;
+      label = type.isEmpty ? 'C/REMB' : type[0].toUpperCase() + type.substring(1);
+    }
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
+      decoration: BoxDecoration(
+        color: bg,
+        borderRadius: BorderRadius.circular(6),
+        border: Border.all(color: border, width: 0.8),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 11, color: fg),
+          const SizedBox(width: 4),
+          Text(
+            label,
+            style: GoogleFonts.poppins(
+              fontSize: 10.5,
+              fontWeight: FontWeight.w700,
+              color: fg,
+              height: 1.1,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   /// Carte de liste reprise de META FLEET mobile : verre blanc, bande de
   /// couleur de 4 px a gauche, rayon 18. Compacte — trois lignes au plus.
   Widget _fiche(Map<String, dynamic> item, {required bool montrerNature}) {
-    const promus = {'nature', 'fond', 'montant'};
-    final nature = montrerNature ? item['nature']?.toString() : null;
+    const promus = {
+      'nature',
+      'fond',
+      'montant',
+      'typeRemboursement',
+      'type_remboursement',
+      'typeRemb',
+      'type_remb',
+      'type',
+      'mode_reglement',
+    };
+    final typeRemb = _extraireTypeRemboursement(item);
+    final nature = montrerNature
+        ? (item['nature']?.toString() ??
+            (typeRemb != null ? _formaterTypeRemb(typeRemb) : null))
+        : null;
     final montant = item['fond'] ?? item['montant'];
 
     final restantes = item.entries
@@ -406,9 +505,25 @@ class _TableExpeditionScreenState extends State<TableExpeditionScreen> {
         .where((e) => !_formatDate.hasMatch(e.value.toString().trim()))
         .toList();
 
-    // Le premier champ non date identifie la ligne (n° de piece, bordereau...).
-    final titre = autres.isNotEmpty ? autres.first.value.toString() : null;
-    final suite = autres.skip(1).toList();
+    // On cherche d'abord un champ qui identifie la pièce / référence
+    MapEntry<String, dynamic>? champTitre;
+    for (final e in autres) {
+      final k = e.key.toLowerCase();
+      if (k.contains('piece') ||
+          k.contains('cheque') ||
+          k.contains('ref') ||
+          k.contains('num') ||
+          k.contains('bordereau') ||
+          k.contains('bl') ||
+          k.contains('facture')) {
+        champTitre = e;
+        break;
+      }
+    }
+    champTitre ??= (autres.isNotEmpty ? autres.first : null);
+
+    final titre = champTitre?.value.toString();
+    final suite = autres.where((e) => e != champTitre).toList();
 
     return CarteListe(
       margin: const EdgeInsets.only(bottom: 12),
@@ -419,17 +534,34 @@ class _TableExpeditionScreenState extends State<TableExpeditionScreen> {
           Row(
             children: [
               Expanded(
-                child: Text(
-                  titre == null ? (nature ?? '—') : 'N° $titre',
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: GoogleFonts.poppins(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w700,
-                    color: AppTheme.primary,
-                  ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Flexible(
+                      child: Text(
+                        titre == null
+                            ? (nature ??
+                                (typeRemb != null
+                                    ? _formaterTypeRemb(typeRemb)
+                                    : '—'))
+                            : 'N° $titre',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: GoogleFonts.poppins(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w700,
+                          color: AppTheme.primary,
+                        ),
+                      ),
+                    ),
+                    if (typeRemb != null) ...[
+                      const SizedBox(width: 8),
+                      _badgeTypeRemboursement(typeRemb),
+                    ],
+                  ],
                 ),
               ),
+              const SizedBox(width: 8),
               if (montant is num)
                 Text(
                   _montant(montant),
