@@ -550,135 +550,66 @@ class ExpeditionsScreen extends StatelessWidget {
 
             // ─── 2. MIDDLE SECTION: ROUTE VISUAL WITH VAN & CITIES ───────────
             Stack(
-              alignment: Alignment.center,
+              alignment: Alignment.bottomCenter,
               children: [
-                // Arched dashed road + 3D Van & Packages illustration
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                // Clean seamless 3D transit graphic (pins, road, van, boxes, speed trails - no baked text)
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(16),
                   child: Image.asset(
-                    'assets/img/transit_road_van.webp',
-                    height: 82,
-                    fit: BoxFit.contain,
+                    'assets/img/transit_road_clean.webp',
+                    width: double.infinity,
+                    fit: BoxFit.fitWidth,
                     errorBuilder: (_, _, _) => Image.asset(
-                      'assets/img/transit_road_van.png',
-                      height: 82,
-                      fit: BoxFit.contain,
-                      errorBuilder: (_, _, _) => const SizedBox(height: 50),
+                      'assets/img/transit_road_clean.png',
+                      width: double.infinity,
+                      fit: BoxFit.fitWidth,
                     ),
                   ),
                 ),
 
-                // Origin & Destination Map Pins positioned on top of the road ends
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    // Origin Pin & City Name
-                    Expanded(
-                      flex: 4,
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Stack(
-                            alignment: Alignment.center,
-                            children: [
-                              Container(
-                                width: 44,
-                                height: 16,
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: const Color(0xFFE0F2FE)
-                                      .withValues(alpha: 0.8),
-                                ),
-                              ),
-                              Container(
-                                width: 28,
-                                height: 10,
-                                decoration: const BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: Color(0xFFBAE6FD),
-                                ),
-                              ),
-                              const Icon(
-                                LucideIcons.mapPin,
-                                color: Color(0xFF0284C7),
-                                size: 28,
-                              ),
-                            ],
+                // City Names placed directly below the pins
+                Positioned(
+                  left: 6,
+                  right: 6,
+                  bottom: 2,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      // Origin City
+                      SizedBox(
+                        width: 120,
+                        child: Text(
+                          (item.origine ?? 'CASABLANCA').toUpperCase(),
+                          textAlign: TextAlign.center,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            color: Color(0xFF0F172A),
+                            fontSize: 13,
+                            fontWeight: FontWeight.w900,
+                            letterSpacing: 0.4,
                           ),
-                          const SizedBox(height: 4),
-                          Text(
-                            (item.origine ?? 'CASABLANCA').toUpperCase(),
-                            textAlign: TextAlign.center,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
-                              color: Color(0xFF0F172A),
-                              fontSize: 13,
-                              fontWeight: FontWeight.w800,
-                              letterSpacing: 0.3,
-                            ),
-                          ),
-                        ],
+                        ),
                       ),
-                    ),
 
-                    // Spacer for the center road/van illustration
-                    const Expanded(
-                      flex: 5,
-                      child: SizedBox(height: 1),
-                    ),
-
-                    // Destination Pin & City Name
-                    Expanded(
-                      flex: 4,
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Stack(
-                            alignment: Alignment.center,
-                            children: [
-                              Container(
-                                width: 44,
-                                height: 16,
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: const Color(0xFFE0F2FE)
-                                      .withValues(alpha: 0.8),
-                                ),
-                              ),
-                              Container(
-                                width: 28,
-                                height: 10,
-                                decoration: const BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: Color(0xFFBAE6FD),
-                                ),
-                              ),
-                              const Icon(
-                                LucideIcons.mapPin,
-                                color: Color(0xFF0284C7),
-                                size: 28,
-                              ),
-                            ],
+                      // Destination City
+                      SizedBox(
+                        width: 120,
+                        child: Text(
+                          (item.destination ?? 'DESTINATION').toUpperCase(),
+                          textAlign: TextAlign.center,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            color: Color(0xFF0F172A),
+                            fontSize: 13,
+                            fontWeight: FontWeight.w900,
+                            letterSpacing: 0.4,
                           ),
-                          const SizedBox(height: 4),
-                          Text(
-                            (item.destination ?? 'DESTINATION').toUpperCase(),
-                            textAlign: TextAlign.center,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
-                              color: Color(0xFF0F172A),
-                              fontSize: 13,
-                              fontWeight: FontWeight.w800,
-                              letterSpacing: 0.3,
-                            ),
-                          ),
-                        ],
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ],
             ),
@@ -692,21 +623,21 @@ class ExpeditionsScreen extends StatelessWidget {
                 const Icon(
                   LucideIcons.package,
                   color: Color(0xFF0284C7),
-                  size: 17,
+                  size: 16,
                 ),
-                const SizedBox(width: 6),
+                const SizedBox(width: 5),
                 Text(
                   '${item.colis ?? 1} colis',
                   style: const TextStyle(
                     color: Color(0xFF334155),
-                    fontSize: 13,
+                    fontSize: 12.5,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
 
                 // Vertical separator
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
                   child: Container(
                     width: 1.2,
                     height: 14,
@@ -718,57 +649,64 @@ class ExpeditionsScreen extends StatelessWidget {
                 const Icon(
                   LucideIcons.scale,
                   color: Color(0xFF0284C7),
-                  size: 17,
+                  size: 16,
                 ),
-                const SizedBox(width: 6),
+                const SizedBox(width: 5),
                 Text(
                   '${item.poids ?? 0} kg',
                   style: const TextStyle(
                     color: Color(0xFF334155),
-                    fontSize: 13,
+                    fontSize: 12.5,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
 
-                const Spacer(),
+                const SizedBox(width: 8),
 
-                // Status pill (e.g. Véhicule en déplacement...)
-                Flexible(
-                  child: Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFE0F2FE),
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          isLivree ? LucideIcons.checkCheck : LucideIcons.truck,
-                          size: 16,
-                          color: const Color(0xFF0284C7),
-                        ),
-                        const SizedBox(width: 6),
-                        Flexible(
-                          child: Text(
+                // Status pill
+                Expanded(
+                  child: Align(
+                    alignment: Alignment.centerRight,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 6,
+                      ),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFE0F2FE),
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
                             isLivree
-                                ? 'Colis livré'
-                                : (item.processus != null &&
-                                        item.processus!.trim().isNotEmpty &&
-                                        item.processus != 'null'
-                                    ? item.processus!
-                                    : 'Véhicule en déplacement...'),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
-                              color: Color(0xFF0284C7),
-                              fontSize: 12,
-                              fontWeight: FontWeight.w700,
+                                ? LucideIcons.checkCheck
+                                : LucideIcons.truck,
+                            size: 15,
+                            color: const Color(0xFF0284C7),
+                          ),
+                          const SizedBox(width: 5),
+                          Flexible(
+                            child: Text(
+                              isLivree
+                                  ? 'Colis livré'
+                                  : (item.processus != null &&
+                                          item.processus!.trim().isNotEmpty &&
+                                          item.processus != 'null'
+                                      ? item.processus!
+                                      : 'Véhicule en déplacement...'),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                color: Color(0xFF0284C7),
+                                fontSize: 11,
+                                fontWeight: FontWeight.w700,
+                              ),
                             ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 ),
