@@ -25,8 +25,10 @@ class ApiService {
       .replaceAll(RegExp(r'"pwd"\s*:\s*"[^"]*"'), '"pwd":"***"')
       .replaceAll(RegExp(r'"token"\s*:\s*"[^"]*"'), '"token":"***"');
 
-  static const String defaultDevUrl = 'https://metaphore.kaytechnology.com:6799/CLIENTMOBILE';
-  static const String defaultAndroidEmulatorUrl = 'https://metaphore.kaytechnology.com:6799/CLIENTMOBILE';
+  static const String defaultDevUrl =
+      'https://metaphore.kaytechnology.com:6799/CLIENTMOBILE';
+  static const String defaultAndroidEmulatorUrl =
+      'https://metaphore.kaytechnology.com:6799/CLIENTMOBILE';
 
   static String baseUrl = _resolveDefaultUrl();
 
@@ -87,10 +89,7 @@ class ApiService {
   // API Post: /api/AuthentificationClient
   static Future<Map<String, dynamic>> login(String login, String pwd) async {
     final url = Uri.parse('$baseUrl/api/AuthentificationClient');
-    final body = jsonEncode({
-      'login': login.trim(),
-      'pwd': pwd.trim(),
-    });
+    final body = jsonEncode({'login': login.trim(), 'pwd': pwd.trim()});
 
     _logger.i('POST $url\nBody: ${_sansSecrets(body)}');
     final response = await http.post(
@@ -122,13 +121,24 @@ class ApiService {
     int? colis,
     num? mntFond,
   }) async {
-    final url = Uri.parse('$baseUrl/api/clientmobile/expeditions?page=$page&pageSize=$pageSize');
+    final url = Uri.parse(
+      '$baseUrl/api/clientmobile/expeditions?page=$page&pageSize=$pageSize',
+    );
     final currentYear = DateTime.now().year;
     final body = jsonEncode({
-      'du': (du != null && du.trim().isNotEmpty) ? du.trim() : '01/01/$currentYear',
-      'au': (au != null && au.trim().isNotEmpty) ? au.trim() : '31/12/$currentYear',
-      'numDeclaration': (numDeclaration != null && numDeclaration.trim().isNotEmpty) ? numDeclaration.trim() : null,
-      'numeroClient': (numeroClient != null && numeroClient.trim().isNotEmpty) ? numeroClient.trim() : null,
+      'du': (du != null && du.trim().isNotEmpty)
+          ? du.trim()
+          : '01/01/$currentYear',
+      'au': (au != null && au.trim().isNotEmpty)
+          ? au.trim()
+          : '31/12/$currentYear',
+      'numDeclaration':
+          (numDeclaration != null && numDeclaration.trim().isNotEmpty)
+          ? numDeclaration.trim()
+          : null,
+      'numeroClient': (numeroClient != null && numeroClient.trim().isNotEmpty)
+          ? numeroClient.trim()
+          : null,
       'livre': (livre != null && livre.trim().isNotEmpty) ? livre.trim() : null,
       'colis': colis,
       'mntFond': mntFond,
@@ -148,8 +158,12 @@ class ApiService {
 
   // ─── DÉTAIL D'UNE EXPÉDITION ─────────────────────────────────────────────────
   // API Get : /api/clientmobile/expeditionsDetail?idExpedition=...
-  static Future<Map<String, dynamic>> getExpeditionDetail(int idExpedition) async {
-    final url = Uri.parse('$baseUrl/api/clientmobile/expeditionsDetail?idExpedition=$idExpedition');
+  static Future<Map<String, dynamic>> getExpeditionDetail(
+    int idExpedition,
+  ) async {
+    final url = Uri.parse(
+      '$baseUrl/api/clientmobile/expeditionsDetail?idExpedition=$idExpedition',
+    );
     final response = await http.get(url, headers: _buildHeaders());
     return _handleResponse(response);
   }
@@ -161,7 +175,9 @@ class ApiService {
     int pageSize = 20,
     String? regle, // null = Tous, "en cours", "cloture"
   }) async {
-    final url = Uri.parse('$baseUrl/api/clientmobile/factures?page=$page&pageSize=$pageSize');
+    final url = Uri.parse(
+      '$baseUrl/api/clientmobile/factures?page=$page&pageSize=$pageSize',
+    );
     final body = jsonEncode({'regle': regle});
     final response = await http.post(url, headers: _buildHeaders(), body: body);
     return _handleResponse(response);
@@ -194,8 +210,12 @@ class ApiService {
 
   // ─── DÉTAIL D'UNE FACTURE (RÈGLEMENTS / AVOIRS) ──────────────────────────────
   // API Get : /api/clientmobile/facturesReglements?idFacture=...
-  static Future<Map<String, dynamic>> getFactureReglements(int idFacture) async {
-    final url = Uri.parse('$baseUrl/api/clientmobile/facturesReglements?idFacture=$idFacture');
+  static Future<Map<String, dynamic>> getFactureReglements(
+    int idFacture,
+  ) async {
+    final url = Uri.parse(
+      '$baseUrl/api/clientmobile/facturesReglements?idFacture=$idFacture',
+    );
     final response = await http.get(url, headers: _buildHeaders());
     return _handleResponse(response);
   }
@@ -212,14 +232,28 @@ class ApiService {
     String? libelleClient,
     String? remis,
   }) async {
-    final url = Uri.parse('$baseUrl/api/clientmobile/retourFondCCCT?page=$page&pageSize=$pageSize');
+    final url = Uri.parse(
+      '$baseUrl/api/clientmobile/retourFondCCCT?page=$page&pageSize=$pageSize',
+    );
     final currentYear = DateTime.now().year;
     final body = jsonEncode({
-      'du': (du != null && du.trim().isNotEmpty) ? du.trim() : '01/01/$currentYear',
-      'au': (au != null && au.trim().isNotEmpty) ? au.trim() : '31/12/$currentYear',
-      'numDeclaration': (numDeclaration != null && numDeclaration.trim().isNotEmpty) ? numDeclaration.trim() : null,
-      'numPiece': (numPiece != null && numPiece.trim().isNotEmpty) ? numPiece.trim() : null,
-      'libelleClient': (libelleClient != null && libelleClient.trim().isNotEmpty) ? libelleClient.trim() : null,
+      'du': (du != null && du.trim().isNotEmpty)
+          ? du.trim()
+          : '01/01/$currentYear',
+      'au': (au != null && au.trim().isNotEmpty)
+          ? au.trim()
+          : '31/12/$currentYear',
+      'numDeclaration':
+          (numDeclaration != null && numDeclaration.trim().isNotEmpty)
+          ? numDeclaration.trim()
+          : null,
+      'numPiece': (numPiece != null && numPiece.trim().isNotEmpty)
+          ? numPiece.trim()
+          : null,
+      'libelleClient':
+          (libelleClient != null && libelleClient.trim().isNotEmpty)
+          ? libelleClient.trim()
+          : null,
       'remis': (remis != null && remis.trim().isNotEmpty) ? remis.trim() : null,
     });
     final response = await http.post(url, headers: _buildHeaders(), body: body);
@@ -238,14 +272,28 @@ class ApiService {
     String? libelleClient,
     String? remis,
   }) async {
-    final url = Uri.parse('$baseUrl/api/clientmobile/retourFondBL?page=$page&pageSize=$pageSize');
+    final url = Uri.parse(
+      '$baseUrl/api/clientmobile/retourFondBL?page=$page&pageSize=$pageSize',
+    );
     final currentYear = DateTime.now().year;
     final body = jsonEncode({
-      'du': (du != null && du.trim().isNotEmpty) ? du.trim() : '01/01/$currentYear',
-      'au': (au != null && au.trim().isNotEmpty) ? au.trim() : '31/12/$currentYear',
-      'numDeclaration': (numDeclaration != null && numDeclaration.trim().isNotEmpty) ? numDeclaration.trim() : null,
-      'numPiece': (numPiece != null && numPiece.trim().isNotEmpty) ? numPiece.trim() : null,
-      'libelleClient': (libelleClient != null && libelleClient.trim().isNotEmpty) ? libelleClient.trim() : null,
+      'du': (du != null && du.trim().isNotEmpty)
+          ? du.trim()
+          : '01/01/$currentYear',
+      'au': (au != null && au.trim().isNotEmpty)
+          ? au.trim()
+          : '31/12/$currentYear',
+      'numDeclaration':
+          (numDeclaration != null && numDeclaration.trim().isNotEmpty)
+          ? numDeclaration.trim()
+          : null,
+      'numPiece': (numPiece != null && numPiece.trim().isNotEmpty)
+          ? numPiece.trim()
+          : null,
+      'libelleClient':
+          (libelleClient != null && libelleClient.trim().isNotEmpty)
+          ? libelleClient.trim()
+          : null,
       'remis': (remis != null && remis.trim().isNotEmpty) ? remis.trim() : null,
     });
     final response = await http.post(url, headers: _buildHeaders(), body: body);
@@ -264,11 +312,15 @@ class ApiService {
     String? libelleClient,
     String? remis,
   }) async {
-    final url = Uri.parse('$baseUrl/api/clientmobile/expeditionsCrbt?page=$page&pageSize=$pageSize');
+    final url = Uri.parse(
+      '$baseUrl/api/clientmobile/expeditionsCrbt?page=$page&pageSize=$pageSize',
+    );
     final currentYear = DateTime.now().year;
     final body = jsonEncode({
       'du': (du != null && du.trim().isNotEmpty) ? du.trim() : '01/01/2020',
-      'au': (au != null && au.trim().isNotEmpty) ? au.trim() : '31/12/$currentYear',
+      'au': (au != null && au.trim().isNotEmpty)
+          ? au.trim()
+          : '31/12/$currentYear',
       'num_declaration': numDeclaration ?? '',
       'num_piece': numPiece ?? '',
       'libelle_client': libelleClient ?? '',
@@ -290,11 +342,15 @@ class ApiService {
     String? libelleClient,
     String? remis,
   }) async {
-    final url = Uri.parse('$baseUrl/api/clientmobile/chequesCrbt?page=$page&pageSize=$pageSize');
+    final url = Uri.parse(
+      '$baseUrl/api/clientmobile/chequesCrbt?page=$page&pageSize=$pageSize',
+    );
     final currentYear = DateTime.now().year;
     final body = jsonEncode({
       'du': (du != null && du.trim().isNotEmpty) ? du.trim() : '01/01/2000',
-      'au': (au != null && au.trim().isNotEmpty) ? au.trim() : '31/12/$currentYear',
+      'au': (au != null && au.trim().isNotEmpty)
+          ? au.trim()
+          : '31/12/$currentYear',
       'num_declaration': numDeclaration ?? '',
       'num_piece': numPiece ?? '',
       'libelle_client': libelleClient ?? '',
@@ -307,7 +363,9 @@ class ApiService {
   // ─── DÉTAIL D'UN CHÈQUE CRBT ─────────────────────────────────────────────────
   // API Get : /api/clientmobile/detailChequeCrbt?idCheque=...
   static Future<Map<String, dynamic>> getDetailChequeCrbt(int idCheque) async {
-    final url = Uri.parse('$baseUrl/api/clientmobile/detailChequeCrbt?idCheque=$idCheque');
+    final url = Uri.parse(
+      '$baseUrl/api/clientmobile/detailChequeCrbt?idCheque=$idCheque',
+    );
     final response = await http.get(url, headers: _buildHeaders());
     return _handleResponse(response);
   }
@@ -320,20 +378,55 @@ class ApiService {
     String? du,
     String? au,
   }) async {
-    final url = Uri.parse('$baseUrl/api/clientmobile/virementCrbt?page=$page&pageSize=$pageSize');
+    final url = Uri.parse(
+      '$baseUrl/api/clientmobile/virementCrbt?page=$page&pageSize=$pageSize',
+    );
     final currentYear = DateTime.now().year;
     final body = jsonEncode({
       'du': (du != null && du.trim().isNotEmpty) ? du.trim() : '01/01/2000',
-      'au': (au != null && au.trim().isNotEmpty) ? au.trim() : '31/12/$currentYear',
+      'au': (au != null && au.trim().isNotEmpty)
+          ? au.trim()
+          : '31/12/$currentYear',
     });
     final response = await http.post(url, headers: _buildHeaders(), body: body);
     return _handleResponse(response);
   }
 
+  // ─── RELEVÉ PRÉPAYÉ ──────────────────────────────────────────────────────────
+  // API Get : /api/clientmobile/relevePrepaye?page=1&pageSize=20
+  //
+  // En POST, le serveur repond 405 : contrairement aux autres listes paginees,
+  // celle-ci ne prend pas de corps, donc pas de periode. Le filtre par dates
+  // de l'ecran s'applique sur les lignes recues.
+  static Future<Map<String, dynamic>> getRelevePrepaye({
+    int page = 1,
+    int pageSize = 20,
+  }) async {
+    final url = Uri.parse(
+      '$baseUrl/api/clientmobile/relevePrepaye?page=$page&pageSize=$pageSize',
+    );
+    final response = await http.get(url, headers: _buildHeaders());
+    return _handleResponse(response);
+  }
+
+  // ─── AGENCES DU RÉSEAU ───────────────────────────────────────────────────────
+  // API Get : /api/clientmobile/agences
+  //
+  // Repond par un tableau nu ; _handleResponse l'enveloppe dans { data: [...] }.
+  static Future<Map<String, dynamic>> getAgences() async {
+    final url = Uri.parse('$baseUrl/api/clientmobile/agences');
+    final response = await http.get(url, headers: _buildHeaders());
+    return _handleResponse(response);
+  }
+
   // ─── DÉTAIL D'UN ORDRE DE VIREMENT ───────────────────────────────────────────
   // API Get : /api/clientmobile/detailVirementCrbt?idVirement=...
-  static Future<Map<String, dynamic>> getDetailVirementCrbt(int idVirement) async {
-    final url = Uri.parse('$baseUrl/api/clientmobile/detailVirementCrbt?idVirement=$idVirement');
+  static Future<Map<String, dynamic>> getDetailVirementCrbt(
+    int idVirement,
+  ) async {
+    final url = Uri.parse(
+      '$baseUrl/api/clientmobile/detailVirementCrbt?idVirement=$idVirement',
+    );
     final response = await http.get(url, headers: _buildHeaders());
     return _handleResponse(response);
   }

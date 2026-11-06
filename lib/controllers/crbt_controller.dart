@@ -17,8 +17,10 @@ class CrbtController extends GetxController {
   final RxList<ChequeCrbtModel> chequesCrbt = <ChequeCrbtModel>[].obs;
   final RxList<VirementCrbtModel> virementsCrbt = <VirementCrbtModel>[].obs;
 
-  final RxList<ChequeCrbtDetailItem> selectedChequeDetails = <ChequeCrbtDetailItem>[].obs;
-  final RxList<VirementCrbtDetailItem> selectedVirementDetails = <VirementCrbtDetailItem>[].obs;
+  final RxList<ChequeCrbtDetailItem> selectedChequeDetails =
+      <ChequeCrbtDetailItem>[].obs;
+  final RxList<VirementCrbtDetailItem> selectedVirementDetails =
+      <VirementCrbtDetailItem>[].obs;
 
   @override
   void onInit() {
@@ -64,7 +66,9 @@ class CrbtController extends GetxController {
       selectedChequeDetails.clear();
       final res = await ApiService.getDetailChequeCrbt(idCheque);
       final list = (res['data'] as List? ?? [])
-          .map((e) => ChequeCrbtDetailItem.fromJson(Map<String, dynamic>.from(e)))
+          .map(
+            (e) => ChequeCrbtDetailItem.fromJson(Map<String, dynamic>.from(e)),
+          )
           .toList();
       selectedChequeDetails.value = list;
     } catch (e) {
@@ -100,7 +104,10 @@ class CrbtController extends GetxController {
       selectedVirementDetails.clear();
       final res = await ApiService.getDetailVirementCrbt(idVirement);
       final list = (res['data'] as List? ?? [])
-          .map((e) => VirementCrbtDetailItem.fromJson(Map<String, dynamic>.from(e)))
+          .map(
+            (e) =>
+                VirementCrbtDetailItem.fromJson(Map<String, dynamic>.from(e)),
+          )
           .toList();
       selectedVirementDetails.value = list;
     } catch (e) {

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:intl/intl.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../../controllers/expedition_controller.dart';
 import '../../models/expedition_model.dart';
@@ -8,19 +7,11 @@ import '../../theme/app_theme.dart';
 import '../../widgets/barre_segments.dart';
 import '../../widgets/carte_filtres.dart';
 import '../../widgets/glass_container.dart';
-import '../../widgets/status_badge.dart';
 import 'expedition_detail_screen.dart';
 import '../../widgets/scroll_reveal.dart';
-import '../../widgets/info_rows_card.dart';
 
 class ExpeditionsScreen extends StatelessWidget {
   const ExpeditionsScreen({super.key});
-
-  String _formatCurrency(num? amount) {
-    if (amount == null) return '0.00 DH';
-    final formatter = NumberFormat('#,##0.00', 'fr_FR');
-    return '${formatter.format(amount)} DH';
-  }
 
   void _showFilterDialog(BuildContext context, ExpeditionController ctrl) {
     final duCtrl = TextEditingController(text: ctrl.filterDu.value);
@@ -430,9 +421,44 @@ class ExpeditionsScreen extends StatelessWidget {
   }
 
   Widget _buildExpeditionCard(ExpeditionModel item) {
-    return GlassContainer(
-      borderRadius: 18,
-      padding: const EdgeInsets.all(15),
+    final isLivree = item.isLivree;
+    final statutUpper =
+        (item.statut ?? (isLivree ? 'LIVRÉ' : 'EN COURS')).toUpperCase();
+    final bool isEnCours = statutUpper.contains('COURS') ||
+        (!isLivree &&
+            !statutUpper.contains('RETOUR') &&
+            !statutUpper.contains('ANNUL'));
+    final bool isRetour = statutUpper.contains('RETOUR');
+    final bool isAnnule = statutUpper.contains('ANNUL');
+
+    // Badge styling matching the mockup
+    final Color badgeBg;
+    final Color badgeFg;
+    final IconData badgeIcon;
+
+    if (isLivree || statutUpper.contains('LIVR')) {
+      badgeBg = const Color(0xFFDCFCE7);
+      badgeFg = const Color(0xFF16A34A);
+      badgeIcon = LucideIcons.checkCircle2;
+    } else if (isEnCours) {
+      badgeBg = const Color(0xFFFFEDD5);
+      badgeFg = const Color(0xFFEA580C);
+      badgeIcon = LucideIcons.history;
+    } else if (isRetour) {
+      badgeBg = const Color(0xFFFFE4E6);
+      badgeFg = const Color(0xFFE11D48);
+      badgeIcon = LucideIcons.undo2;
+    } else if (isAnnule) {
+      badgeBg = const Color(0xFFF1F5F9);
+      badgeFg = const Color(0xFF64748B);
+      badgeIcon = LucideIcons.xCircle;
+    } else {
+      badgeBg = const Color(0xFFE0F2FE);
+      badgeFg = const Color(0xFF0284C7);
+      badgeIcon = LucideIcons.info;
+    }
+
+    return GestureDetector(
       onTap: () {
         if (item.idExpedition != null) {
           Get.to(
@@ -442,136 +468,314 @@ class ExpeditionsScreen extends StatelessWidget {
           );
         }
       },
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(7),
-                decoration: BoxDecoration(
-                  color: AppTheme.primary.withValues(alpha: 0.10),
-                  borderRadius: BorderRadius.circular(10),
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(24),
+          border: Border.all(
+            color: const Color(0xFFE2E8F0),
+            width: 1.2,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0xFF0F172A).withValues(alpha: 0.05),
+              blurRadius: 18,
+              offset: const Offset(0, 6),
+            ),
+          ],
+        ),
+        padding: const EdgeInsets.fromLTRB(18, 16, 18, 16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // ─── 1. TOP ROW: BOX ICON + DECLARATION NUMBER + STATUS BADGE ────
+            Row(
+              children: [
+                Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFE0F2FE),
+                    borderRadius: BorderRadius.circular(13),
+                  ),
+                  child: const Icon(
+                    LucideIcons.package,
+                    color: Color(0xFF0284C7),
+                    size: 22,
+                  ),
                 ),
-                child: const Icon(
-                  LucideIcons.package,
-                  color: AppTheme.primary,
-                  size: 18,
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    item.numDeclaration,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      color: Color(0xFF0F172A),
+                      fontSize: 18,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 0.5,
+                    ),
+                  ),
                 ),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Flexible(
-                      child: Text(
-                        item.numDeclaration,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          color: Color(0xFF0F172A),
-                          fontSize: 14.5,
-                          fontWeight: FontWeight.w600,
+                const SizedBox(width: 8),
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+                  decoration: BoxDecoration(
+                    color: badgeBg,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(badgeIcon, size: 16, color: badgeFg),
+                      const SizedBox(width: 6),
+                      Text(
+                        statutUpper,
+                        style: TextStyle(
+                          color: badgeFg,
+                          fontSize: 12.5,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: 0.4,
                         ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+
+            const SizedBox(height: 14),
+
+            // ─── 2. MIDDLE SECTION: ROUTE VISUAL WITH VAN & CITIES ───────────
+            Stack(
+              alignment: Alignment.center,
+              children: [
+                // Arched dashed road + 3D Van & Packages illustration
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  child: Image.asset(
+                    'assets/img/transit_road_van.webp',
+                    height: 82,
+                    fit: BoxFit.contain,
+                    errorBuilder: (_, _, _) => Image.asset(
+                      'assets/img/transit_road_van.png',
+                      height: 82,
+                      fit: BoxFit.contain,
+                      errorBuilder: (_, _, _) => const SizedBox(height: 50),
+                    ),
+                  ),
+                ),
+
+                // Origin & Destination Map Pins positioned on top of the road ends
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    // Origin Pin & City Name
+                    Expanded(
+                      flex: 4,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Stack(
+                            alignment: Alignment.center,
+                            children: [
+                              Container(
+                                width: 44,
+                                height: 16,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: const Color(0xFFE0F2FE)
+                                      .withValues(alpha: 0.8),
+                                ),
+                              ),
+                              Container(
+                                width: 28,
+                                height: 10,
+                                decoration: const BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: Color(0xFFBAE6FD),
+                                ),
+                              ),
+                              const Icon(
+                                LucideIcons.mapPin,
+                                color: Color(0xFF0284C7),
+                                size: 28,
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            (item.origine ?? 'CASABLANCA').toUpperCase(),
+                            textAlign: TextAlign.center,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              color: Color(0xFF0F172A),
+                              fontSize: 13,
+                              fontWeight: FontWeight.w800,
+                              letterSpacing: 0.3,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    // Spacer for the center road/van illustration
+                    const Expanded(
+                      flex: 5,
+                      child: SizedBox(height: 1),
+                    ),
+
+                    // Destination Pin & City Name
+                    Expanded(
+                      flex: 4,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Stack(
+                            alignment: Alignment.center,
+                            children: [
+                              Container(
+                                width: 44,
+                                height: 16,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: const Color(0xFFE0F2FE)
+                                      .withValues(alpha: 0.8),
+                                ),
+                              ),
+                              Container(
+                                width: 28,
+                                height: 10,
+                                decoration: const BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: Color(0xFFBAE6FD),
+                                ),
+                              ),
+                              const Icon(
+                                LucideIcons.mapPin,
+                                color: Color(0xFF0284C7),
+                                size: 28,
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            (item.destination ?? 'DESTINATION').toUpperCase(),
+                            textAlign: TextAlign.center,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              color: Color(0xFF0F172A),
+                              fontSize: 13,
+                              fontWeight: FontWeight.w800,
+                              letterSpacing: 0.3,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ],
                 ),
-              ),
-              const SizedBox(width: 8),
-              StatusBadge(
-                status: item.statut ?? (item.isLivree ? 'Livré' : 'En cours'),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
+              ],
+            ),
 
-          // Route: Origine -> Destination
-          Row(
-            children: [
-              const Icon(
-                LucideIcons.mapPin,
-                size: 13,
-                color: AppTheme.primaryIcons,
-              ),
-              const SizedBox(width: 4),
-              Expanded(
-                child: Text(
-                  '${item.origine ?? "—"} → ${item.destination ?? "—"}',
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
+            const SizedBox(height: 14),
+
+            // ─── 3. BOTTOM ROW: COLIS/WEIGHT + MOVEMENT STATUS PILL ──────────
+            Row(
+              children: [
+                // Colis icon & count
+                const Icon(
+                  LucideIcons.package,
+                  color: Color(0xFF0284C7),
+                  size: 17,
+                ),
+                const SizedBox(width: 6),
+                Text(
+                  '${item.colis ?? 1} colis',
                   style: const TextStyle(
                     color: Color(0xFF334155),
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
-              ),
-              const SizedBox(width: 8),
-              Text(
-                _formatCurrency(item.mntTtc),
-                style: const TextStyle(
-                  color: AppTheme.primary,
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ],
-          ),
 
-          const SizedBox(height: 8),
-
-          // Destinataire & Details
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(
-                child: Text(
-                  'Dest: ${item.destinataire ?? "—"}',
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    color: Color(0xFF64748B),
-                    fontSize: 12,
+                // Vertical separator
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                  child: Container(
+                    width: 1.2,
+                    height: 14,
+                    color: const Color(0xFFCBD5E1),
                   ),
                 ),
-              ),
-              Text(
-                '${item.colis ?? 1} colis • ${item.poids ?? 0} kg',
-                style: const TextStyle(
-                  color: Color(0xFF64748B),
-                  fontSize: 11.5,
-                ),
-              ),
-            ],
-          ),
 
-          if (valeurRenseignee(item.processus) ||
-              valeurRenseignee(item.dateLivraison) ||
-              valeurRenseignee(item.dateLivPh) ||
-              (item.fond ?? 0) > 0 ||
-              (item.valeurDeclaree ?? 0) > 0) ...[
-            const SizedBox(height: 6),
-            Text(
-              [
-                if ((item.fond ?? 0) > 0)
-                  '${item.nature ?? "Fond"} : ${_formatCurrency(item.fond)}',
-                if (valeurRenseignee(item.processus)) item.processus,
-                if (valeurRenseignee(item.dateLivraison))
-                  'Livré le ${item.dateLivraison}',
-                if (valeurRenseignee(item.dateLivPh))
-                  'Prévu le ${item.dateLivPh}',
-                if ((item.notificationLivraison ?? '0') != '0') 'Notifié',
-                if ((item.valeurDeclaree ?? 0) > 0)
-                  'Val. déclarée ${_formatCurrency(item.valeurDeclaree)}',
-              ].join(' • '),
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 11),
+                // Weight icon & value
+                const Icon(
+                  LucideIcons.scale,
+                  color: Color(0xFF0284C7),
+                  size: 17,
+                ),
+                const SizedBox(width: 6),
+                Text(
+                  '${item.poids ?? 0} kg',
+                  style: const TextStyle(
+                    color: Color(0xFF334155),
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+
+                const Spacer(),
+
+                // Status pill (e.g. Véhicule en déplacement...)
+                Flexible(
+                  child: Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFE0F2FE),
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          isLivree ? LucideIcons.checkCheck : LucideIcons.truck,
+                          size: 16,
+                          color: const Color(0xFF0284C7),
+                        ),
+                        const SizedBox(width: 6),
+                        Flexible(
+                          child: Text(
+                            isLivree
+                                ? 'Colis livré'
+                                : (item.processus != null &&
+                                        item.processus!.trim().isNotEmpty &&
+                                        item.processus != 'null'
+                                    ? item.processus!
+                                    : 'Véhicule en déplacement...'),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              color: Color(0xFF0284C7),
+                              fontSize: 12,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
             ),
           ],
-        ],
+        ),
       ),
     );
   }

@@ -6,6 +6,8 @@ import '../../controllers/facture_controller.dart';
 import '../../models/facture_model.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/barre_segments.dart';
+import '../../widgets/carte_accent.dart';
+import '../../widgets/etiquette_valeur.dart';
 import '../../widgets/carte_liste.dart';
 import '../../widgets/status_badge.dart';
 import 'facture_detail_screen.dart';
@@ -247,119 +249,140 @@ class FacturesScreen extends StatelessWidget {
 
   Widget _buildFactureCard(FactureModel item) {
     final hasSolde = item.solde != null && item.solde! > 0;
+    // La teinte suit l'etat de la facture, deja porte par l'icone et le
+    // badge : reglee ou non, cela se voit desormais au premier coup d'oeil.
+    final teinte = hasSolde ? AppTheme.statusDanger : AppTheme.statusSuccess;
 
-    return CarteListe(
-      padding: const EdgeInsets.all(16),
+    return CarteAccent(
+      teinte: teinte,
+      icone: hasSolde ? LucideIcons.fileWarning : LucideIcons.fileCheck2,
       onTap: () => Get.to(
         () => FactureDetailScreen(facture: item),
         transition: Transition.cupertino,
         duration: const Duration(milliseconds: 360),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: hasSolde
-                      ? AppTheme.statusDanger.withValues(alpha: 0.12)
-                      : AppTheme.statusSuccess.withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(12),
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(20, 16, 16, 16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: hasSolde
+                        ? AppTheme.statusDanger.withValues(alpha: 0.12)
+                        : AppTheme.statusSuccess.withValues(alpha: 0.12),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Icon(
+                    hasSolde ? LucideIcons.fileWarning : LucideIcons.fileCheck2,
+                    color: hasSolde
+                        ? AppTheme.statusDanger
+                        : AppTheme.statusSuccess,
+                    size: 20,
+                  ),
                 ),
-                child: Icon(
-                  hasSolde ? LucideIcons.fileWarning : LucideIcons.fileCheck2,
-                  color: hasSolde
-                      ? AppTheme.statusDanger
-                      : AppTheme.statusSuccess,
-                  size: 20,
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      EtiquetteValeur(
+                        intitule: 'N° ',
+                        valeur: item.numFacture,
+                        couleur: AppTheme.primary,
+                        couleurIntitule: AppTheme.primary,
+                        taille: 15,
+                      ),
+                      const SizedBox(height: 3),
+                      Row(
+                        children: [
+                          const Icon(
+                            LucideIcons.calendar,
+                            size: 12,
+                            color: Color(0xFF94A3B8),
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            item.dateFacture ?? '—',
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              color: Color(0xFF64748B),
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
+                const SizedBox(width: 8),
+                StatusBadge(
+                  status: item.statut ?? (hasSolde ? 'En instance' : 'Payée'),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            const Divider(color: Color(0xFFE2E8F0), height: 1),
+            const SizedBox(height: 12),
+
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      'N° ${item.numFacture}',
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        color: Color(0xFF0F172A),
-                        fontSize: 15,
-                        fontWeight: FontWeight.w800,
+                    const Text(
+                      'Montant TTC',
+                      style: TextStyle(
+                        color: Color(0xFF64748B),
+                        fontSize: 11.5,
                       ),
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      item.dateFacture ?? '—',
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
+                      _formatCurrency(item.mntTtc),
                       style: const TextStyle(
-                        color: Color(0xFF64748B),
-                        fontSize: 12,
+                        color: Color(0xFF334155),
+                        fontSize: 14,
+                        fontWeight: FontWeight.w800,
                       ),
                     ),
                   ],
                 ),
-              ),
-              const SizedBox(width: 8),
-              StatusBadge(
-                status: item.statut ?? (hasSolde ? 'En instance' : 'Payée'),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          const Divider(color: Color(0xFFE2E8F0), height: 1),
-          const SizedBox(height: 12),
-
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'Montant TTC',
-                    style: TextStyle(color: Color(0xFF64748B), fontSize: 11.5),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    _formatCurrency(item.mntTtc),
-                    style: const TextStyle(
-                      color: Color(0xFF0F172A),
-                      fontSize: 14,
-                      fontWeight: FontWeight.w700,
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    const Text(
+                      'Reste à payer (Solde)',
+                      style: TextStyle(
+                        color: Color(0xFF64748B),
+                        fontSize: 11.5,
+                      ),
                     ),
-                  ),
-                ],
-              ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  const Text(
-                    'Reste à payer (Solde)',
-                    style: TextStyle(color: Color(0xFF64748B), fontSize: 11.5),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    _formatCurrency(
-                      item.solde ?? (item.isPayee ? 0 : item.mntTtc),
+                    const SizedBox(height: 2),
+                    Text(
+                      _formatCurrency(
+                        item.solde ?? (item.isPayee ? 0 : item.mntTtc),
+                      ),
+                      style: TextStyle(
+                        color: hasSolde
+                            ? AppTheme.statusDanger
+                            : AppTheme.statusSuccess,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w800,
+                      ),
                     ),
-                    style: TextStyle(
-                      color: hasSolde
-                          ? AppTheme.statusDanger
-                          : AppTheme.statusSuccess,
-                      fontSize: 15,
-                      fontWeight: FontWeight.w800,
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ],
+                  ],
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }

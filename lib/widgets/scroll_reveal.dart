@@ -27,7 +27,9 @@ class ScrollReveal extends StatelessWidget {
     super.key,
     required this.index,
     required this.child,
-    this.cascade = 9,
+    // Assez large pour la grille du tableau de bord : au-dela, une carte
+    // repartirait en meme temps que la premiere.
+    this.cascade = 12,
   }) : decalage = 26,
        echelle = 0.9;
 

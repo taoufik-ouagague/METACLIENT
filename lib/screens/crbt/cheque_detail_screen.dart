@@ -90,7 +90,9 @@ class _ChequeDetailScreenState extends State<ChequeDetailScreen> {
                                 Flexible(
                                   child: Text(
                                     (c.typeRemboursement != null &&
-                                            c.typeRemboursement!.toLowerCase().contains('vir'))
+                                            c.typeRemboursement!
+                                                .toLowerCase()
+                                                .contains('vir'))
                                         ? 'Virement ${c.numCheque}'
                                         : 'Chèque ${c.numCheque}',
                                     maxLines: 1,
@@ -111,27 +113,38 @@ class _ChequeDetailScreenState extends State<ChequeDetailScreen> {
                                       vertical: 2.5,
                                     ),
                                     decoration: BoxDecoration(
-                                      color: (c.typeRemboursement!.toLowerCase().contains('vir')
-                                              ? const Color(0xFF0EA5E9)
-                                              : const Color(0xFFA855F7))
-                                          .withValues(alpha: 0.12),
+                                      color:
+                                          (c.typeRemboursement!
+                                                      .toLowerCase()
+                                                      .contains('vir')
+                                                  ? const Color(0xFF0EA5E9)
+                                                  : const Color(0xFFA855F7))
+                                              .withValues(alpha: 0.12),
                                       borderRadius: BorderRadius.circular(6),
                                       border: Border.all(
-                                        color: (c.typeRemboursement!.toLowerCase().contains('vir')
-                                                ? const Color(0xFF0EA5E9)
-                                                : const Color(0xFFA855F7))
-                                            .withValues(alpha: 0.28),
+                                        color:
+                                            (c.typeRemboursement!
+                                                        .toLowerCase()
+                                                        .contains('vir')
+                                                    ? const Color(0xFF0EA5E9)
+                                                    : const Color(0xFFA855F7))
+                                                .withValues(alpha: 0.28),
                                         width: 0.8,
                                       ),
                                     ),
                                     child: Text(
-                                      c.typeRemboursement!.toLowerCase().contains('vir')
+                                      c.typeRemboursement!
+                                              .toLowerCase()
+                                              .contains('vir')
                                           ? 'Virement'
                                           : 'Chèque',
                                       style: TextStyle(
                                         fontSize: 10.5,
                                         fontWeight: FontWeight.w700,
-                                        color: c.typeRemboursement!.toLowerCase().contains('vir')
+                                        color:
+                                            c.typeRemboursement!
+                                                .toLowerCase()
+                                                .contains('vir')
                                             ? const Color(0xFF0284C7)
                                             : const Color(0xFF9333EA),
                                       ),

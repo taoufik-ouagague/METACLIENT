@@ -56,18 +56,21 @@ class ExpeditionModel {
   });
 
   factory ExpeditionModel.fromJson(Map<String, dynamic> json) {
-    final rawType = (json['typeRemboursement'] ??
-            json['type_remboursement'] ??
-            json['typeRemb'] ??
-            json['type_remb'] ??
-            json['mode_reglement'] ??
-            json['modereglement'] ??
-            json['type_reglement'] ??
-            json['type'])
-        ?.toString();
+    final rawType =
+        (json['typeRemboursement'] ??
+                json['type_remboursement'] ??
+                json['typeRemb'] ??
+                json['type_remb'] ??
+                json['mode_reglement'] ??
+                json['modereglement'] ??
+                json['type_reglement'] ??
+                json['type'])
+            ?.toString();
 
     return ExpeditionModel(
-      idExpedition: json['id_expedition'] is num ? (json['id_expedition'] as num).toInt() : null,
+      idExpedition: json['id_expedition'] is num
+          ? (json['id_expedition'] as num).toInt()
+          : null,
       numDeclaration: json['num_declaration']?.toString() ?? '',
       dateTaxation: json['date_taxation']?.toString(),
       dateLivraison: json['date_livraison']?.toString(),
@@ -114,7 +117,10 @@ class ExpeditionModel {
     final t = (typeRemboursement ?? '').toLowerCase();
     if (t.contains('ch')) return true;
     final n = (nature ?? '').toLowerCase();
-    if (n.contains('chq') || n.contains('cheq') || n.contains('chk') || n == 'c.chq') {
+    if (n.contains('chq') ||
+        n.contains('cheq') ||
+        n.contains('chk') ||
+        n == 'c.chq') {
       return true;
     }
     return false;

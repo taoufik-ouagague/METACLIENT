@@ -6,7 +6,7 @@ class AppTheme {
   static const Color primary = Color(0xFF2193B0);
   static const Color primaryIcons = Color(0xFF22B7CE);
   static const Color accentCyan = Color(0xFF6DD5ED);
-  
+
   // Light Theme Colors
   static const Color bgLight = Color(0xFFF8FAFC);
   static const Color textPrimary = Color(0xFF0F172A);
@@ -24,7 +24,9 @@ class AppTheme {
   static Color glassBg = Colors.white.withValues(alpha: 0.07);
   static Color glassBgHover = Colors.white.withValues(alpha: 0.12);
   static Color glassBorder = Colors.white.withValues(alpha: 0.18);
-  static Color glassBorderActive = const Color(0xFF22B7CE).withValues(alpha: 0.6);
+  static Color glassBorderActive = const Color(
+    0xFF22B7CE,
+  ).withValues(alpha: 0.6);
 
   // Status Colors
   static const Color statusSuccess = Color(0xFF10B981);
@@ -56,10 +58,7 @@ class AppTheme {
   );
 
   static const LinearGradient glassGradient = LinearGradient(
-    colors: [
-      Color(0x1AFFFFFF),
-      Color(0x0AFFFFFF),
-    ],
+    colors: [Color(0x1AFFFFFF), Color(0x0AFFFFFF)],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );
@@ -107,14 +106,8 @@ class AppTheme {
           fontSize: 16,
           fontWeight: FontWeight.w600,
         ),
-        bodyMedium: GoogleFonts.poppins(
-          color: textSecondary,
-          fontSize: 14,
-        ),
-        bodySmall: GoogleFonts.poppins(
-          color: textMuted,
-          fontSize: 12,
-        ),
+        bodyMedium: GoogleFonts.poppins(color: textSecondary, fontSize: 14),
+        bodySmall: GoogleFonts.poppins(color: textMuted, fontSize: 12),
       ),
       appBarTheme: AppBarTheme(
         backgroundColor: Colors.transparent,
@@ -144,26 +137,27 @@ class AppTheme {
         onSecondary: Colors.black,
         onSurface: Colors.white,
       ),
-      textTheme: GoogleFonts.poppinsTextTheme(ThemeData.dark().textTheme).copyWith(
-        titleLarge: GoogleFonts.poppins(
-          color: Colors.white,
-          fontSize: 20,
-          fontWeight: FontWeight.w700,
-        ),
-        titleMedium: GoogleFonts.poppins(
-          color: Colors.white,
-          fontSize: 16,
-          fontWeight: FontWeight.w600,
-        ),
-        bodyMedium: GoogleFonts.poppins(
-          color: const Color(0xFFCBD5E1),
-          fontSize: 14,
-        ),
-        bodySmall: GoogleFonts.poppins(
-          color: const Color(0xFF94A3B8),
-          fontSize: 12,
-        ),
-      ),
+      textTheme: GoogleFonts.poppinsTextTheme(ThemeData.dark().textTheme)
+          .copyWith(
+            titleLarge: GoogleFonts.poppins(
+              color: Colors.white,
+              fontSize: 20,
+              fontWeight: FontWeight.w700,
+            ),
+            titleMedium: GoogleFonts.poppins(
+              color: Colors.white,
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+            ),
+            bodyMedium: GoogleFonts.poppins(
+              color: const Color(0xFFCBD5E1),
+              fontSize: 14,
+            ),
+            bodySmall: GoogleFonts.poppins(
+              color: const Color(0xFF94A3B8),
+              fontSize: 12,
+            ),
+          ),
       appBarTheme: AppBarTheme(
         backgroundColor: Colors.transparent,
         elevation: 0,

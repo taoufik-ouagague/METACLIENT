@@ -32,9 +32,9 @@ class UserModel {
   }
 
   Map<String, dynamic> toJson() => {
-        'code': code,
-        'libelle': libelle,
-        'roles': roles.map((r) => {'droit': r}).toList(),
-        'token': token,
-      };
+    'code': code,
+    'libelle': libelle,
+    'roles': roles.map((r) => {'droit': r}).toList(),
+    'token': token,
+  };
 }

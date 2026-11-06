@@ -6,8 +6,9 @@ import '../../controllers/retour_fond_controller.dart';
 import '../../models/retour_fond_model.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/barre_segments.dart';
+import '../../widgets/carte_accent.dart';
 import '../../widgets/carte_filtres.dart';
-import '../../widgets/glass_container.dart';
+import '../../widgets/etiquette_valeur.dart';
 import '../../widgets/status_badge.dart';
 import '../../widgets/scroll_reveal.dart';
 import '../../widgets/info_rows_card.dart';
@@ -390,145 +391,178 @@ class RetoursScreen extends StatelessWidget {
   Widget _buildRetourCard(BuildContext context, RetourFondModel item) {
     final isMoney = item.fond != null && item.fond! > 0;
 
-    return GlassContainer(
-      borderRadius: 18,
-      padding: const EdgeInsets.all(16),
+    // Une seule teinte : les deux natures sont deja distinguees par l'icone
+    // (jetons ou document) et par le libelle.
+    return CarteAccent(
+      teinte: AppTheme.primary,
+      icone: isMoney ? LucideIcons.coins : LucideIcons.fileText,
       onTap: () => _ouvrirFiche(context, item),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: AppTheme.primary.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(10),
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(20, 16, 16, 16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: AppTheme.primary.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Icon(
+                    isMoney ? LucideIcons.coins : LucideIcons.fileText,
+                    color: AppTheme.primary,
+                    size: 18,
+                  ),
                 ),
-                child: Icon(
-                  isMoney ? LucideIcons.coins : LucideIcons.fileText,
-                  color: AppTheme.primary,
-                  size: 18,
-                ),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Décl: ${item.numDeclaration ?? "—"}',
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        color: Color(0xFF0F172A),
-                        fontSize: 14.5,
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                    if (valeurRenseignee(item.numPiece)) ...[
-                      const SizedBox(height: 2),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
                       Text(
-                        'N° pièce: ${item.numPiece}',
+                        'Décl: ${item.numDeclaration ?? "—"}',
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
-                          color: Color(0xFF475569),
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
+                          color: Color(0xFF0F172A),
+                          fontSize: 14.5,
+                          fontWeight: FontWeight.w800,
                         ),
                       ),
+                      if (valeurRenseignee(item.numPiece)) ...[
+                        const SizedBox(height: 2),
+                        EtiquetteValeur(
+                          intitule: 'N° pièce : ',
+                          valeur: '${item.numPiece}',
+                          couleur: const Color(0xFF7C3AED),
+                          taille: 12,
+                        ),
+                      ],
+                      if (item.bordereau != null) ...[
+                        const SizedBox(height: 2),
+                        EtiquetteValeur(
+                          intitule: 'Bordereau : ',
+                          valeur: '${item.bordereau}',
+                          couleur: const Color(0xFF4F46E5),
+                          taille: 11.5,
+                        ),
+                      ],
                     ],
-                    if (item.bordereau != null) ...[
-                      const SizedBox(height: 2),
-                      Text(
-                        'Bordereau: ${item.bordereau}',
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
+                  ),
+                ),
+                const SizedBox(width: 8),
+                StatusBadge(status: item.nature),
+              ],
+            ),
+            const SizedBox(height: 12),
+            const Divider(color: Color(0xFFE2E8F0), height: 1),
+            const SizedBox(height: 12),
+
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Destinataire',
+                        style: TextStyle(
                           color: Color(0xFF64748B),
                           fontSize: 11.5,
                         ),
                       ),
+                      const SizedBox(height: 2),
+                      RichText(
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        text: TextSpan(
+                          children: [
+                            TextSpan(
+                              text: item.destinataire ?? '—',
+                              style: const TextStyle(
+                                color: Color(0xFF0F172A),
+                                fontSize: 13,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            TextSpan(
+                              text: '  ${item.destination ?? "—"}',
+                              style: const TextStyle(
+                                color: Color(0xFF0284C7),
+                                fontSize: 12.5,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                     ],
-                  ],
+                  ),
                 ),
-              ),
-              const SizedBox(width: 8),
-              StatusBadge(status: item.nature),
-            ],
-          ),
-          const SizedBox(height: 12),
-          const Divider(color: Color(0xFFE2E8F0), height: 1),
-          const SizedBox(height: 12),
-
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'Destinataire',
-                      style: TextStyle(
-                        color: Color(0xFF64748B),
-                        fontSize: 11.5,
+                if (isMoney) ...[
+                  const SizedBox(width: 8),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      const Text(
+                        'Montant Fond',
+                        style: TextStyle(
+                          color: Color(0xFF64748B),
+                          fontSize: 11.5,
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      '${item.destinataire ?? "—"} (${item.destination ?? "—"})',
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        color: Color(0xFF0F172A),
-                        fontSize: 13,
-                        fontWeight: FontWeight.w600,
+                      const SizedBox(height: 2),
+                      Text(
+                        _formatCurrency(item.fond),
+                        style: const TextStyle(
+                          color: AppTheme.primary,
+                          fontSize: 14.5,
+                          fontWeight: FontWeight.w800,
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-              ),
-              if (isMoney) ...[
-                const SizedBox(width: 8),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    const Text(
-                      'Montant Fond',
-                      style: TextStyle(
-                        color: Color(0xFF64748B),
-                        fontSize: 11.5,
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      _formatCurrency(item.fond),
-                      style: const TextStyle(
-                        color: AppTheme.primary,
-                        fontSize: 14.5,
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                  ],
-                ),
+                    ],
+                  ),
+                ],
               ],
-            ],
-          ),
-
-          if (item.dateRemise != null ||
-              item.dateEncaissement != null ||
-              item.banque != null) ...[
-            const SizedBox(height: 8),
-            Text(
-              '${item.banque != null ? "Banque: ${item.banque} • " : ""}'
-              '${item.dateEncaissement != null ? "Encaissé: ${item.dateEncaissement} • " : ""}'
-              '${item.dateRemise != null ? "Remis: ${item.dateRemise}" : ""}',
-              style: const TextStyle(color: Color(0xFF64748B), fontSize: 11.5),
             ),
+
+            if (item.dateRemise != null ||
+                item.dateEncaissement != null ||
+                item.banque != null) ...[
+              const SizedBox(height: 8),
+              Wrap(
+                spacing: 14,
+                runSpacing: 4,
+                children: [
+                  if (item.banque != null)
+                    EtiquetteValeur(
+                      intitule: 'Banque : ',
+                      valeur: item.banque!,
+                      couleur: const Color(0xFF4F46E5),
+                      taille: 11.5,
+                    ),
+                  if (item.dateEncaissement != null)
+                    EtiquetteValeur(
+                      intitule: 'Encaissé : ',
+                      valeur: item.dateEncaissement!,
+                      couleur: const Color(0xFF059669),
+                      taille: 11.5,
+                    ),
+                  if (item.dateRemise != null)
+                    EtiquetteValeur(
+                      intitule: 'Remis : ',
+                      valeur: item.dateRemise!,
+                      couleur: const Color(0xFFD97706),
+                      taille: 11.5,
+                    ),
+                ],
+              ),
+            ],
           ],
-        ],
+        ),
       ),
     );
   }

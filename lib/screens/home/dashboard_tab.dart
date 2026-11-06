@@ -5,6 +5,8 @@ import 'package:lucide_icons/lucide_icons.dart';
 import '../../controllers/auth_controller.dart';
 import '../../controllers/dashboard_controller.dart';
 import '../../controllers/expedition_controller.dart';
+import '../../controllers/agence_controller.dart';
+import '../../controllers/prepaye_controller.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/glass_container.dart';
 import '../../widgets/scroll_reveal.dart';
@@ -26,6 +28,8 @@ class DashboardTab extends StatelessWidget {
     final authCtrl = Get.find<AuthController>();
     final dashCtrl = Get.find<DashboardController>();
     final expCtrl = Get.find<ExpeditionController>();
+    final prepayeCtrl = Get.find<PrepayeController>();
+    final agenceCtrl = Get.find<AgenceController>();
     final searchCtrl = TextEditingController();
 
     return RefreshIndicator(
@@ -34,10 +38,20 @@ class DashboardTab extends StatelessWidget {
       onRefresh: () async {
         await dashCtrl.loadDashboardData();
         await authCtrl.fetchClientInfo();
+        await prepayeCtrl.fetchReleve();
+        await agenceCtrl.fetchAgences();
       },
       child: SingleChildScrollView(
         physics: const AlwaysScrollableScrollPhysics(),
-        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+        // Un padding explicite ecrase celui que le Scaffold reserve pour la
+        // barre flottante : on le reprend, sinon la derniere rangee reste
+        // cachee dessous.
+        padding: EdgeInsets.fromLTRB(
+          18,
+          14,
+          18,
+          14 + MediaQuery.paddingOf(context).bottom,
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -102,7 +116,26 @@ class DashboardTab extends StatelessWidget {
               ),
             ),
 
-            const SizedBox(height: 20),
+            const SizedBox(height: 16),
+
+            // ─── 2. CARTE DE TÊTE : CE QUE LE CLIENT VIENT VOIR ─────────────
+            Obx(
+              () => ScrollReveal.grille(
+                index: 1,
+                child: StatCard(
+                  vedette: true,
+                  chargement: dashCtrl.isLoading.value,
+                  title: 'Solde dû total',
+                  value: _formatCurrency(dashCtrl.totalSoldeDu.value),
+                  icon: LucideIcons.wallet,
+                  subtitle: 'Impayé',
+                  color: const Color(0xFFE11D48),
+                  onTap: () => onNavigateTab?.call(2),
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 10),
 
             // ─── 3. STATS KPI GRID ───────────────────────────────────────────
             Obx(
@@ -115,6 +148,8 @@ class DashboardTab extends StatelessWidget {
                           index: 0,
                           child: StatCard(
                             chargement: dashCtrl.isLoading.value,
+                            attenue:
+                                dashCtrl.expeditionsEncoursCount.value == 0,
                             title: 'En cours de livraison',
                             value: '${dashCtrl.expeditionsEncoursCount.value}',
                             icon: LucideIcons.truck,
@@ -149,6 +184,7 @@ class DashboardTab extends StatelessWidget {
                           index: 2,
                           child: StatCard(
                             chargement: dashCtrl.isLoading.value,
+                            attenue: dashCtrl.facturesInstancesCount.value == 0,
                             title: 'Factures en instances',
                             value: '${dashCtrl.facturesInstancesCount.value}',
                             icon: LucideIcons.fileWarning,
@@ -162,14 +198,15 @@ class DashboardTab extends StatelessWidget {
                       Expanded(
                         child: ScrollReveal.grille(
                           index: 3,
-                          child: StatCard(
-                            chargement: dashCtrl.isLoading.value,
-                            title: 'Solde dû total',
-                            value: _formatCurrency(dashCtrl.totalSoldeDu.value),
-                            icon: LucideIcons.wallet,
-                            subtitle: 'Impayé',
-                            color: const Color(0xFFE11D48),
-                            onTap: () => onNavigateTab?.call(2),
+                          child: Obx(
+                            () => StatCard(
+                              chargement: prepayeCtrl.isLoading.value,
+                              title: 'Solde prépayé',
+                              value: _formatCurrency(prepayeCtrl.solde),
+                              icon: LucideIcons.wallet,
+                              color: const Color(0xFF0D9488),
+                              onTap: () => onNavigateTab?.call(5),
+                            ),
                           ),
                         ),
                       ),
@@ -190,10 +227,10 @@ class DashboardTab extends StatelessWidget {
                       index: 4,
                       child: StatCard(
                         chargement: dashCtrl.isLoading.value,
+                        attenue: dashCtrl.retoursCcCtCount.value == 0,
                         title: 'Chèques / Traites',
                         value: '${dashCtrl.retoursCcCtCount.value}',
                         icon: LucideIcons.rotateCcw,
-                        subtitle: 'Retours',
                         color: const Color(0xFFA855F7),
                         onTap: () => onNavigateTab?.call(3),
                       ),
@@ -205,10 +242,10 @@ class DashboardTab extends StatelessWidget {
                       index: 5,
                       child: StatCard(
                         chargement: dashCtrl.isLoading.value,
+                        attenue: dashCtrl.retoursBlCount.value == 0,
                         title: 'Retours BL / Factures',
                         value: '${dashCtrl.retoursBlCount.value}',
                         icon: LucideIcons.receipt,
-                        subtitle: 'Documents',
                         color: const Color(0xFF0891B2),
                         onTap: () => onNavigateTab?.call(3),
                       ),
@@ -228,6 +265,7 @@ class DashboardTab extends StatelessWidget {
                       index: 6,
                       child: StatCard(
                         chargement: dashCtrl.isLoading.value,
+                        attenue: dashCtrl.crbtChequesCount.value == 0,
                         title: 'Chèques encaissés',
                         value: '${dashCtrl.crbtChequesCount.value}',
                         icon: LucideIcons.banknote,
@@ -243,6 +281,7 @@ class DashboardTab extends StatelessWidget {
                       index: 7,
                       child: StatCard(
                         chargement: dashCtrl.isLoading.value,
+                        attenue: dashCtrl.crbtVirementsCount.value == 0,
                         title: 'Ordres de virement',
                         value: '${dashCtrl.crbtVirementsCount.value}',
                         icon: LucideIcons.arrowUpRight,
@@ -253,6 +292,27 @@ class DashboardTab extends StatelessWidget {
                     ),
                   ),
                 ],
+              ),
+            ),
+
+            const SizedBox(height: 10),
+
+            // ─── 5. LE RÉSEAU ───────────────────────────────────────────────
+            // Pleine largeur : impair dans la grille, et de nature differente
+            // des compteurs du compte client.
+            Obx(
+              () => ScrollReveal.grille(
+                index: 9,
+                child: StatCard(
+                  chargement: agenceCtrl.isLoading.value,
+                  attenue: agenceCtrl.agences.isEmpty,
+                  title: 'Agences du réseau',
+                  value: '${agenceCtrl.agences.length}',
+                  icon: LucideIcons.building2,
+                  subtitle: 'Réseau',
+                  color: const Color(0xFF4F46E5),
+                  onTap: () => onNavigateTab?.call(6),
+                ),
               ),
             ),
 

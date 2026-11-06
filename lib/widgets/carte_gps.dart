@@ -32,7 +32,8 @@ class CarteGps extends StatefulWidget {
   State<CarteGps> createState() => _CarteGpsState();
 }
 
-class _CarteGpsState extends State<CarteGps> with SingleTickerProviderStateMixin {
+class _CarteGpsState extends State<CarteGps>
+    with SingleTickerProviderStateMixin {
   late AnimationController _pulseController;
   late Animation<double> _pulseAnimation;
 
@@ -58,7 +59,9 @@ class _CarteGpsState extends State<CarteGps> with SingleTickerProviderStateMixin
   Future<void> _ouvrirGoogleMaps() async {
     final lat = widget.latitude;
     final lng = widget.longitude;
-    final url = Uri.parse('https://www.google.com/maps/search/?api=1&query=$lat,$lng');
+    final url = Uri.parse(
+      'https://www.google.com/maps/search/?api=1&query=$lat,$lng',
+    );
     try {
       final ok = await launchUrl(url, mode: LaunchMode.externalApplication);
       if (!ok) {
@@ -78,7 +81,9 @@ class _CarteGpsState extends State<CarteGps> with SingleTickerProviderStateMixin
   Future<void> _ouvrirItineraire() async {
     final lat = widget.latitude;
     final lng = widget.longitude;
-    final url = Uri.parse('https://www.google.com/maps/dir/?api=1&destination=$lat,$lng');
+    final url = Uri.parse(
+      'https://www.google.com/maps/dir/?api=1&destination=$lat,$lng',
+    );
     try {
       final ok = await launchUrl(url, mode: LaunchMode.externalApplication);
       if (!ok) {
@@ -108,7 +113,11 @@ class _CarteGpsState extends State<CarteGps> with SingleTickerProviderStateMixin
       duration: const Duration(seconds: 2),
       margin: const EdgeInsets.all(16),
       borderRadius: 12,
-      icon: const Icon(LucideIcons.checkCheck, color: Color(0xFF10B981), size: 20),
+      icon: const Icon(
+        LucideIcons.checkCheck,
+        color: Color(0xFF10B981),
+        size: 20,
+      ),
     );
   }
 
@@ -186,10 +195,14 @@ class _CarteGpsState extends State<CarteGps> with SingleTickerProviderStateMixin
                                   vertical: 2,
                                 ),
                                 decoration: BoxDecoration(
-                                  color: const Color(0xFF10B981).withValues(alpha: 0.12),
+                                  color: const Color(
+                                    0xFF10B981,
+                                  ).withValues(alpha: 0.12),
                                   borderRadius: BorderRadius.circular(6),
                                   border: Border.all(
-                                    color: const Color(0xFF10B981).withValues(alpha: 0.3),
+                                    color: const Color(
+                                      0xFF10B981,
+                                    ).withValues(alpha: 0.3),
                                     width: 1,
                                   ),
                                 ),
@@ -210,7 +223,8 @@ class _CarteGpsState extends State<CarteGps> with SingleTickerProviderStateMixin
                       ),
                       const SizedBox(height: 1),
                       Text(
-                        widget.capturedAt != null && widget.capturedAt!.trim().isNotEmpty
+                        widget.capturedAt != null &&
+                                widget.capturedAt!.trim().isNotEmpty
                             ? 'Relevé le ${widget.capturedAt}'
                             : coordsStr,
                         style: const TextStyle(
@@ -301,7 +315,10 @@ class _CarteGpsState extends State<CarteGps> with SingleTickerProviderStateMixin
                     ),
                     style: OutlinedButton.styleFrom(
                       foregroundColor: const Color(0xFF0F172A),
-                      side: const BorderSide(color: Color(0xFFCBD5E1), width: 1.2),
+                      side: const BorderSide(
+                        color: Color(0xFFCBD5E1),
+                        width: 1.2,
+                      ),
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
@@ -356,7 +373,8 @@ class _CarteGpsState extends State<CarteGps> with SingleTickerProviderStateMixin
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
                               color: const Color(0xFFEF4444).withValues(
-                                alpha: 0.25 * (1.3 - _pulseAnimation.value + 0.85),
+                                alpha:
+                                    0.25 * (1.3 - _pulseAnimation.value + 0.85),
                               ),
                             ),
                           ),
@@ -367,7 +385,10 @@ class _CarteGpsState extends State<CarteGps> with SingleTickerProviderStateMixin
                             decoration: BoxDecoration(
                               color: const Color(0xFFEF4444),
                               shape: BoxShape.circle,
-                              border: Border.all(color: Colors.white, width: 2.5),
+                              border: Border.all(
+                                color: Colors.white,
+                                width: 2.5,
+                              ),
                               boxShadow: [
                                 BoxShadow(
                                   color: Colors.black.withValues(alpha: 0.35),
@@ -451,7 +472,10 @@ class _CarteGpsState extends State<CarteGps> with SingleTickerProviderStateMixin
                 onTap: _ouvrirGoogleMaps,
                 borderRadius: BorderRadius.circular(20),
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 6,
+                  ),
                   decoration: BoxDecoration(
                     color: Colors.white.withValues(alpha: 0.92),
                     borderRadius: BorderRadius.circular(20),
@@ -490,9 +514,7 @@ class _CarteGpsState extends State<CarteGps> with SingleTickerProviderStateMixin
           Positioned.fill(
             child: Material(
               color: Colors.transparent,
-              child: InkWell(
-                onTap: _ouvrirGoogleMaps,
-              ),
+              child: InkWell(onTap: _ouvrirGoogleMaps),
             ),
           ),
         ],
@@ -507,16 +529,10 @@ class _CarteGpsState extends State<CarteGps> with SingleTickerProviderStateMixin
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [
-            Color(0xFFE2E8F0),
-            Color(0xFFCBD5E1),
-            Color(0xFFE2E8F0),
-          ],
+          colors: [Color(0xFFE2E8F0), Color(0xFFCBD5E1), Color(0xFFE2E8F0)],
         ),
       ),
-      child: CustomPaint(
-        painter: _RoadGridPainter(),
-      ),
+      child: CustomPaint(painter: _RoadGridPainter()),
     );
   }
 }

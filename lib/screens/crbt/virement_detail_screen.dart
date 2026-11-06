@@ -215,7 +215,9 @@ class _VirementDetailScreenState extends State<VirementDetailScreen> {
                           return const Center(
                             child: Padding(
                               padding: EdgeInsets.symmetric(vertical: 40),
-                              child: CircularProgressIndicator(color: AppTheme.primary),
+                              child: CircularProgressIndicator(
+                                color: AppTheme.primary,
+                              ),
                             ),
                           );
                         }

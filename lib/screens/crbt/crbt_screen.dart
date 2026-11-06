@@ -6,8 +6,9 @@ import '../../controllers/crbt_controller.dart';
 import '../../models/crbt_model.dart';
 import '../../widgets/barre_segments.dart';
 import '../../theme/app_theme.dart';
+import '../../widgets/carte_accent.dart';
+import '../../widgets/etiquette_valeur.dart';
 import '../../widgets/info_rows_card.dart';
-import '../../widgets/glass_container.dart';
 import '../../widgets/status_badge.dart';
 
 import 'cheque_detail_screen.dart';
@@ -95,6 +96,26 @@ class CrbtScreen extends StatelessWidget {
     );
   }
 
+  /// « icone + texte » : l'icone dit la nature du champ, la couleur le relie
+  /// au reste de la carte.
+  Widget _mention(IconData icone, String texte, Color couleur) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(icone, size: 13, color: couleur.withValues(alpha: 0.75)),
+        const SizedBox(width: 4),
+        Text(
+          texte,
+          style: TextStyle(
+            color: couleur,
+            fontSize: 12.5,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+      ],
+    );
+  }
+
   Widget _buildExpeditionsList(CrbtController ctrl) {
     if (ctrl.expeditionsCrbt.isEmpty) {
       return const Center(
@@ -115,70 +136,82 @@ class CrbtScreen extends StatelessWidget {
         final item = ctrl.expeditionsCrbt[idx];
         return ScrollReveal(
           index: idx,
-          child: GlassContainer(
-            borderRadius: 18,
-            padding: const EdgeInsets.all(15),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        'Déclaration: ${item.numDeclaration}',
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          color: Color(0xFF0F172A),
-                          fontSize: 14.5,
-                          fontWeight: FontWeight.w700,
+          child: CarteAccent(
+            teinte: AppTheme.primary,
+            icone: LucideIcons.package,
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(19, 15, 15, 15),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        child: EtiquetteValeur(
+                          intitule: 'Déclaration : ',
+                          valeur: item.numDeclaration,
+                          couleur: AppTheme.primary,
+                          couleurIntitule: const Color(0xFF475569),
+                          taille: 14.5,
                         ),
                       ),
-                    ),
-                    const SizedBox(width: 8),
-                    if (item.typeRemboursementLibelle != null)
-                      _badgeType(item.typeRemboursementLibelle!)
-                    else
-                      StatusBadge(status: item.nature ?? 'CRBT'),
-                  ],
-                ),
-                const SizedBox(height: 8),
-                Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        'Dest: ${item.destinataire ?? "—"} (${item.destination ?? "—"})',
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
+                      const SizedBox(width: 8),
+                      if (item.typeRemboursementLibelle != null)
+                        _badgeType(item.typeRemboursementLibelle!)
+                      else
+                        StatusBadge(status: item.nature ?? 'CRBT'),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  // Destinataire et destination sur toute la largeur, avec
+                  // leur icone : en partageant la ligne avec le montant, le
+                  // nom finissait en « … ».
+                  Wrap(
+                    spacing: 12,
+                    runSpacing: 4,
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    children: [
+                      _mention(
+                        LucideIcons.user,
+                        item.destinataire ?? '—',
+                        const Color(0xFF7C3AED),
+                      ),
+                      _mention(
+                        LucideIcons.mapPin,
+                        item.destination ?? '—',
+                        const Color(0xFF0284C7),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 6),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Expanded(
+                        child:
+                            item.dateLivraison != null ||
+                                item.dateTaxation != null
+                            ? EtiquetteValeur(
+                                intitule: 'Date : ',
+                                valeur:
+                                    '${item.dateLivraison ?? item.dateTaxation}',
+                                couleur: const Color(0xFF059669),
+                              )
+                            : const SizedBox.shrink(),
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        _formatCurrency(item.fond),
                         style: const TextStyle(
-                          color: Color(0xFF475569),
-                          fontSize: 12.5,
+                          color: AppTheme.primary,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w800,
                         ),
                       ),
-                    ),
-                    const SizedBox(width: 8),
-                    Text(
-                      _formatCurrency(item.fond),
-                      style: const TextStyle(
-                        color: AppTheme.primary,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                  ],
-                ),
-                if (item.dateLivraison != null ||
-                    item.dateTaxation != null) ...[
-                  const SizedBox(height: 4),
-                  Text(
-                    'Date: ${item.dateLivraison ?? item.dateTaxation}',
-                    style: const TextStyle(
-                      color: Color(0xFF64748B),
-                      fontSize: 11.5,
-                    ),
+                    ],
                   ),
                 ],
-              ],
+              ),
             ),
           ),
         );
@@ -232,89 +265,92 @@ class CrbtScreen extends StatelessWidget {
         final item = ctrl.chequesCrbt[idx];
         return ScrollReveal(
           index: idx,
-          child: GlassContainer(
-            borderRadius: 18,
-            padding: const EdgeInsets.all(15),
+          child: CarteAccent(
+            teinte: AppTheme.primary,
+            icone: LucideIcons.banknote,
             onTap: () => _openChequeDetail(context, item),
-            child: Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: AppTheme.primary.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(12),
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(19, 15, 15, 15),
+              child: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: AppTheme.primary.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const Icon(
+                      LucideIcons.landmark,
+                      color: AppTheme.primary,
+                      size: 20,
+                    ),
                   ),
-                  child: const Icon(
-                    LucideIcons.landmark,
-                    color: AppTheme.primary,
-                    size: 20,
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Flexible(
-                            child: Text(
-                              (item.typeRemboursement != null &&
-                                      item.typeRemboursement!
-                                          .toLowerCase()
-                                          .contains('vir'))
-                                  ? 'Virement N° ${item.numCheque}'
-                                  : 'Chèque N° ${item.numCheque}',
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(
-                                color: Color(0xFF0F172A),
-                                fontSize: 14.5,
-                                fontWeight: FontWeight.w700,
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Flexible(
+                              child: Text(
+                                (item.typeRemboursement != null &&
+                                        item.typeRemboursement!
+                                            .toLowerCase()
+                                            .contains('vir'))
+                                    ? 'Virement N° ${item.numCheque}'
+                                    : 'Chèque N° ${item.numCheque}',
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(
+                                  color: Color(0xFF0F172A),
+                                  fontSize: 14.5,
+                                  fontWeight: FontWeight.w700,
+                                ),
                               ),
                             ),
-                          ),
-                          if (item.typeRemboursement != null &&
-                              item.typeRemboursement!.trim().isNotEmpty) ...[
-                            const SizedBox(width: 6),
-                            _badgeType(item.typeRemboursement!),
+                            if (item.typeRemboursement != null &&
+                                item.typeRemboursement!.trim().isNotEmpty) ...[
+                              const SizedBox(width: 6),
+                              _badgeType(item.typeRemboursement!),
+                            ],
                           ],
-                        ],
-                      ),
-                      const SizedBox(height: 3),
-                      Text(
-                        'Banque: ${item.banque ?? "—"} • Remise: ${item.dateRemise ?? "—"}',
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          color: Color(0xFF64748B),
-                          fontSize: 11.5,
                         ),
+                        const SizedBox(height: 3),
+                        Text(
+                          'Banque: ${item.banque ?? "—"} • Remise: ${item.dateRemise ?? "—"}',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            color: Color(0xFF64748B),
+                            fontSize: 11.5,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        _formatCurrency(item.montant),
+                        style: const TextStyle(
+                          color: AppTheme.primary,
+                          fontSize: 14.5,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                      const SizedBox(width: 6),
+                      const Icon(
+                        LucideIcons.chevronRight,
+                        color: Color(0xFF94A3B8),
+                        size: 16,
                       ),
                     ],
                   ),
-                ),
-                const SizedBox(width: 8),
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      _formatCurrency(item.montant),
-                      style: const TextStyle(
-                        color: AppTheme.primary,
-                        fontSize: 14.5,
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                    const SizedBox(width: 6),
-                    const Icon(
-                      LucideIcons.chevronRight,
-                      color: Color(0xFF94A3B8),
-                      size: 16,
-                    ),
-                  ],
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         );
@@ -342,106 +378,102 @@ class CrbtScreen extends StatelessWidget {
         final item = ctrl.virementsCrbt[idx];
         return ScrollReveal(
           index: idx,
-          child: GlassContainer(
-            borderRadius: 18,
-            padding: const EdgeInsets.all(15),
+          // Meme habillage que les autres listes : le teal porte la carte,
+          // le vert reste au montant, seule valeur qui le merite.
+          child: CarteAccent(
+            teinte: AppTheme.primary,
+            icone: LucideIcons.arrowUpRight,
             onTap: () => _openVirementDetail(context, item),
-            child: Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: AppTheme.statusSuccess.withValues(alpha: 0.12),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: const Icon(
-                    LucideIcons.arrowUpRight,
-                    color: AppTheme.statusSuccess,
-                    size: 20,
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(19, 15, 15, 15),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
                     children: [
+                      Container(
+                        padding: const EdgeInsets.all(9),
+                        decoration: BoxDecoration(
+                          color: AppTheme.primary.withValues(alpha: 0.12),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: const Icon(
+                          LucideIcons.arrowUpRight,
+                          color: AppTheme.primary,
+                          size: 18,
+                        ),
+                      ),
+                      const SizedBox(width: 11),
+                      // Le numero seul, sans l'intitule « Virement » que
+                      // l'onglet et l'icone disent deja, avec le montant au
+                      // bout de la meme ligne.
+                      Expanded(
+                        child: Text(
+                          item.numOv,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            color: AppTheme.primary,
+                            fontSize: 14.5,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
                       Text(
-                        'Virement: ${item.numOv}',
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
+                        _formatCurrency(item.fond),
                         style: const TextStyle(
-                          color: Color(0xFF0F172A),
+                          color: AppTheme.statusSuccess,
                           fontSize: 14.5,
-                          fontWeight: FontWeight.w700,
+                          fontWeight: FontWeight.w800,
                         ),
                       ),
-                      const SizedBox(height: 3),
-                      Text(
-                        'Mandat: ${item.numeroMandat ?? "—"} • ${item.dateVirement ?? "—"}',
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          color: Color(0xFF64748B),
-                          fontSize: 11.5,
-                        ),
+                      const SizedBox(width: 4),
+                      const Icon(
+                        LucideIcons.chevronRight,
+                        color: Color(0xFF94A3B8),
+                        size: 16,
                       ),
-                      if (valeurRenseignee(item.libelleClient) ||
-                          valeurRenseignee(item.codeClient)) ...[
-                        const SizedBox(height: 2),
-                        Text(
-                          [
-                            item.libelleClient,
-                            item.codeClient,
-                          ].where(valeurRenseignee).join(' • '),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            color: Color(0xFF94A3B8),
-                            fontSize: 11,
-                          ),
-                        ),
-                      ],
-                      if (valeurRenseignee(item.dateMandat) ||
-                          valeurRenseignee(item.status)) ...[
-                        const SizedBox(height: 2),
-                        Text(
-                          [
-                            if (valeurRenseignee(item.dateMandat))
-                              'Mandat du ${item.dateMandat}',
-                            if (valeurRenseignee(item.status)) item.status,
-                          ].join(' • '),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            color: Color(0xFF94A3B8),
-                            fontSize: 11,
-                          ),
-                        ),
-                      ],
                     ],
                   ),
-                ),
-                const SizedBox(width: 8),
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      _formatCurrency(item.fond),
-                      style: const TextStyle(
-                        color: AppTheme.statusSuccess,
-                        fontSize: 14.5,
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                    const SizedBox(width: 6),
-                    const Icon(
-                      LucideIcons.chevronRight,
-                      color: Color(0xFF94A3B8),
-                      size: 16,
-                    ),
-                  ],
-                ),
-              ],
+                  const SizedBox(height: 9),
+                  // Les mentions se replient : sur une seule ligne partagee
+                  // avec le montant, elles finissaient toutes en « … ».
+                  Wrap(
+                    spacing: 12,
+                    runSpacing: 5,
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    children: [
+                      // Le client n'est pas repete : toute la liste est la
+                      // sienne, le nom et le code ne distinguaient rien.
+                      if (valeurRenseignee(item.numeroMandat))
+                        _mention(
+                          LucideIcons.hash,
+                          'Mandat ${item.numeroMandat}',
+                          const Color(0xFF7C3AED),
+                        ),
+                      if (valeurRenseignee(item.dateVirement))
+                        _mention(
+                          LucideIcons.calendar,
+                          item.dateVirement!,
+                          const Color(0xFF4F46E5),
+                        ),
+                      if (valeurRenseignee(item.dateMandat))
+                        _mention(
+                          LucideIcons.fileSignature,
+                          'Mandat du ${item.dateMandat}',
+                          const Color(0xFF0284C7),
+                        ),
+                      if (valeurRenseignee(item.status))
+                        _mention(
+                          LucideIcons.circleDot,
+                          item.status!,
+                          const Color(0xFFD97706),
+                        ),
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
         );

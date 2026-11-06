@@ -23,11 +23,11 @@ class ClientConfigModel {
   }
 
   Map<String, dynamic> toJson() => {
-        'optionalColor': optionalColor,
-        'primaryColor': primaryColor,
-        'secondaryColor': secondaryColor,
-        'logoUrl': logoUrl,
-      };
+    'optionalColor': optionalColor,
+    'primaryColor': primaryColor,
+    'secondaryColor': secondaryColor,
+    'logoUrl': logoUrl,
+  };
 
   static Color? parseHexColor(String? hexString) {
     if (hexString == null || hexString.trim().isEmpty) return null;

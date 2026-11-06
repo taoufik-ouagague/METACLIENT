@@ -47,13 +47,16 @@ class ConfigController extends GetxController {
   }
 
   Color get primaryColor => clientConfig.value?.primary ?? AppTheme.primary;
-  Color get secondaryColor => clientConfig.value?.secondary ?? AppTheme.primaryIcons;
-  Color get optionalColor => clientConfig.value?.optional ?? AppTheme.accentCyan;
+  Color get secondaryColor =>
+      clientConfig.value?.secondary ?? AppTheme.primaryIcons;
+  Color get optionalColor =>
+      clientConfig.value?.optional ?? AppTheme.accentCyan;
   Color? get rawOptionalColor => clientConfig.value?.optional;
   String? get logoUrl => clientConfig.value?.logoUrl;
 
   bool get hasCustomColors =>
-      clientConfig.value?.primary != null || clientConfig.value?.secondary != null;
+      clientConfig.value?.primary != null ||
+      clientConfig.value?.secondary != null;
 
   LinearGradient get buttonGradient {
     return clientConfig.value?.buttonGradient ?? AppTheme.primaryGradient;

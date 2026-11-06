@@ -279,7 +279,6 @@ class _LoginScreenState extends State<LoginScreen>
                                     height: 86,
                                     borderRadius: 24,
                                     padding: const EdgeInsets.all(10),
-                                    blur: 0,
                                     color: Colors.white,
                                     border: Border.all(
                                       color: AppTheme.primaryIcons.withValues(
@@ -391,6 +390,8 @@ class _LoginScreenState extends State<LoginScreen>
                           // Login Frosted Glass Card
                           GlassContainer(
                             isLight: false,
+                            // Seul vrai verre de l'app : la photo est dessous.
+                            blur: 16,
                             borderRadius: 28,
                             padding: const EdgeInsets.symmetric(
                               horizontal: 22,

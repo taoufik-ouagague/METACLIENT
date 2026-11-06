@@ -111,23 +111,26 @@ class ChequeCrItem {
   }
 
   factory ChequeCrItem.fromJson(Map<String, dynamic> json) {
-    final type = (json['typeRemboursement'] ??
-            json['type_remboursement'] ??
-            json['typeRemb'] ??
-            json['type_remb'] ??
-            json['type'] ??
-            json['mode_reglement'])
-        ?.toString();
+    final type =
+        (json['typeRemboursement'] ??
+                json['type_remboursement'] ??
+                json['typeRemb'] ??
+                json['type_remb'] ??
+                json['type'] ??
+                json['mode_reglement'])
+            ?.toString();
     return ChequeCrItem(
       typeRemboursement: type,
-      numPiece: (json['num_piece'] ??
-              json['num_cheque'] ??
-              json['piece'] ??
-              json['ref_reglement'] ??
-              json['num'])
-          ?.toString(),
+      numPiece:
+          (json['num_piece'] ??
+                  json['num_cheque'] ??
+                  json['piece'] ??
+                  json['ref_reglement'] ??
+                  json['num'])
+              ?.toString(),
       montant: json['montant'] as num? ?? json['fond'] as num?,
-      dateRemise: json['date_remise']?.toString() ?? json['dateremise']?.toString(),
+      dateRemise:
+          json['date_remise']?.toString() ?? json['dateremise']?.toString(),
       dateEncaissement: json['date_encaissement']?.toString(),
       banque: json['banque']?.toString(),
       raw: json,
@@ -277,8 +280,8 @@ class ExpeditionDetailModel {
 
   static Map<String, dynamic> _geo(Map<String, dynamic> json) =>
       json['geofence'] is Map
-          ? Map<String, dynamic>.from(json['geofence'] as Map)
-          : const {};
+      ? Map<String, dynamic>.from(json['geofence'] as Map)
+      : const {};
 
   static double? _nombre(Object? v) =>
       v == null ? null : double.tryParse(v.toString());
@@ -292,23 +295,28 @@ class ExpeditionDetailModel {
     final rawCheque = json['cheque_cr'] as List? ?? [];
 
     final geoMap = _geo(json);
-    double? lat = _nombre(geoMap['gpsLatitude']) ??
+    double? lat =
+        _nombre(geoMap['gpsLatitude']) ??
         _nombre(json['latitude']) ??
         _nombre(json['gps_latitude']) ??
         _nombre(json['lat']);
-    double? lng = _nombre(geoMap['gpsLongitude']) ??
+    double? lng =
+        _nombre(geoMap['gpsLongitude']) ??
         _nombre(json['longitude']) ??
         _nombre(json['gps_longitude']) ??
         _nombre(json['lng']);
 
-    final rawCoord = json['coordonees_gps']?.toString() ??
+    final rawCoord =
+        json['coordonees_gps']?.toString() ??
         json['coordonnees_gps']?.toString() ??
         json['coordonee_gps']?.toString() ??
         json['coordonnee_gps']?.toString() ??
         geoMap['coordonees_gps']?.toString() ??
         geoMap['coordonnees_gps']?.toString();
 
-    if ((lat == null || lng == null) && rawCoord != null && rawCoord.contains(',')) {
+    if ((lat == null || lng == null) &&
+        rawCoord != null &&
+        rawCoord.contains(',')) {
       final parts = rawCoord.split(RegExp(r'[,;]'));
       if (parts.length >= 2) {
         lat ??= double.tryParse(parts[0].trim());
@@ -316,12 +324,14 @@ class ExpeditionDetailModel {
       }
     }
 
-    final geofence = geoMap['gpsGeofence']?.toString() ??
+    final geofence =
+        geoMap['gpsGeofence']?.toString() ??
         json['gps_geofence']?.toString() ??
         (json['geofence'] is String ? json['geofence']?.toString() : null) ??
         json['zone_gps']?.toString();
 
-    final capturedAt = geoMap['gpsCapturedAt']?.toString() ??
+    final capturedAt =
+        geoMap['gpsCapturedAt']?.toString() ??
         json['gps_captured_at']?.toString() ??
         json['date_gps']?.toString();
 
@@ -343,9 +353,17 @@ class ExpeditionDetailModel {
       dateTaxation: json['date_taxation']?.toString(),
       port: json['port']?.toString(),
       livraison: json['livraison']?.toString(),
-      processus: rawProc.map((e) => ProcessusStep.fromJson(Map<String, dynamic>.from(e))).toList(),
-      gedDocuments: rawGed.map((e) => GedDocument.fromJson(Map<String, dynamic>.from(e))).toList(),
-      commentaires: rawComments.map((e) => ExpeditionCommentaire.fromJson(Map<String, dynamic>.from(e))).toList(),
+      processus: rawProc
+          .map((e) => ProcessusStep.fromJson(Map<String, dynamic>.from(e)))
+          .toList(),
+      gedDocuments: rawGed
+          .map((e) => GedDocument.fromJson(Map<String, dynamic>.from(e)))
+          .toList(),
+      commentaires: rawComments
+          .map(
+            (e) => ExpeditionCommentaire.fromJson(Map<String, dynamic>.from(e)),
+          )
+          .toList(),
       retourCcCt: rawCcCt.map((e) => Map<String, dynamic>.from(e)).toList(),
       retourBlFacture: rawBl.map((e) => Map<String, dynamic>.from(e)).toList(),
       chequeCr: rawCheque.map((e) => Map<String, dynamic>.from(e)).toList(),
@@ -364,7 +382,8 @@ class ExpeditionDetailModel {
       gpsLongitude: lng,
       gpsGeofence: geofence,
       gpsCapturedAt: capturedAt,
-      coordoneesGps: rawCoord ?? (lat != null && lng != null ? '$lat, $lng' : null),
+      coordoneesGps:
+          rawCoord ?? (lat != null && lng != null ? '$lat, $lng' : null),
     );
   }
 }

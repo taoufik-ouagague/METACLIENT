@@ -3,6 +3,8 @@ import 'package:get/get.dart';
 import 'controllers/auth_controller.dart';
 import 'controllers/config_controller.dart';
 import 'controllers/crbt_controller.dart';
+import 'controllers/prepaye_controller.dart';
+import 'controllers/agence_controller.dart';
 import 'controllers/dashboard_controller.dart';
 import 'controllers/expedition_controller.dart';
 import 'controllers/facture_controller.dart';
@@ -37,6 +39,8 @@ class MetaClientApp extends StatelessWidget {
     Get.put(FactureController(), permanent: true);
     Get.put(RetourFondController(), permanent: true);
     Get.put(CrbtController(), permanent: true);
+    Get.put(PrepayeController(), permanent: true);
+    Get.put(AgenceController(), permanent: true);
 
     return GetMaterialApp(
       title: 'Meta Client',

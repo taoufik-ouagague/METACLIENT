@@ -16,6 +16,12 @@ class GlassContainer extends StatelessWidget {
   final List<BoxShadow>? boxShadow;
   final bool? isLight;
 
+  /// `blur` vaut 0 par defaut : un BackdropFilter coute un saveLayer plein
+  /// ecran, et sur un fond fixe sous un remplissage deja opaque il ne se voit
+  /// pas. Pire, enveloppe dans l'Opacity d'une animation d'apparition, il fait
+  /// crier Impeller (« SetInheritedOpacity ... CanAcceptOpacity returns
+  /// false »). Ne le demander que par-dessus une image ou du contenu qui
+  /// defile.
   const GlassContainer({
     super.key,
     required this.child,
@@ -24,7 +30,7 @@ class GlassContainer extends StatelessWidget {
     this.padding,
     this.margin,
     this.borderRadius = 20,
-    this.blur = 16,
+    this.blur = 0,
     this.color,
     this.border,
     this.onTap,

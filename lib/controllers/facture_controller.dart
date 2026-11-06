@@ -38,7 +38,9 @@ class FactureController extends GetxController {
       final res = await ApiService.getFacturesInstances();
       List<FactureModel> list = [];
       if (res is List) {
-        list = res.map((e) => FactureModel.fromJson(Map<String, dynamic>.from(e))).toList();
+        list = res
+            .map((e) => FactureModel.fromJson(Map<String, dynamic>.from(e)))
+            .toList();
       } else if (res is Map && res['data'] is List) {
         list = (res['data'] as List)
             .map((e) => FactureModel.fromJson(Map<String, dynamic>.from(e)))
@@ -56,7 +58,9 @@ class FactureController extends GetxController {
 
     try {
       isLoading.value = true;
-      final String? regle = filterStatut.value == 'tous' ? null : filterStatut.value;
+      final String? regle = filterStatut.value == 'tous'
+          ? null
+          : filterStatut.value;
       final res = await ApiService.getFactures(
         page: currentPage.value,
         pageSize: 20,
@@ -88,8 +92,12 @@ class FactureController extends GetxController {
       isLoadingDetail.value = true;
       selectedDetail.value = null;
       final res = await ApiService.getFactureReglements(idFacture);
-      final data = (res['data'] as List? ?? []).isNotEmpty ? res['data'][0] : res;
-      selectedDetail.value = FactureDetailModel.fromJson(Map<String, dynamic>.from(data));
+      final data = (res['data'] as List? ?? []).isNotEmpty
+          ? res['data'][0]
+          : res;
+      selectedDetail.value = FactureDetailModel.fromJson(
+        Map<String, dynamic>.from(data),
+      );
     } catch (e) {
       Get.snackbar(
         'Détail indisponible',

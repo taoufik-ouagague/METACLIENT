@@ -15,6 +15,8 @@ import '../expeditions/expeditions_screen.dart';
 import '../factures/factures_screen.dart';
 import '../profile/profile_screen.dart';
 import '../retours/retours_screen.dart';
+import '../prepaye/releve_prepaye_screen.dart';
+import '../agences/agences_screen.dart';
 import 'dashboard_tab.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -48,6 +50,11 @@ class _HomeScreenState extends State<HomeScreen> {
 
   bool _correspond(String label) =>
       _filtreMenu.isEmpty || label.toLowerCase().contains(_filtreMenu);
+
+  /// Position de l'onglet Profil, cherchee et non ecrite en dur : elle se
+  /// decale des qu'une entree est ajoutee avant lui.
+  int get _indexProfil =>
+      _getOnglets().indexWhere((o) => o.labelMenu == 'Profil');
 
   List<
     ({IconData icone, String label, String labelMenu, Widget page, bool barre})
@@ -88,6 +95,22 @@ class _HomeScreenState extends State<HomeScreen> {
         labelMenu: 'CRBT',
         page: const CrbtScreen(),
         barre: true,
+      ),
+      // Hors barre du bas : elle porte deja cinq entrees, ces deux-la vivent
+      // dans le menu lateral.
+      (
+        icone: LucideIcons.wallet,
+        label: 'Prépayé',
+        labelMenu: 'Relevé prépayé',
+        page: const RelevePrepayeScreen(),
+        barre: false,
+      ),
+      (
+        icone: LucideIcons.building2,
+        label: 'Agences',
+        labelMenu: 'Agences',
+        page: const AgencesScreen(),
+        barre: false,
       ),
       (
         icone: LucideIcons.user,
@@ -299,7 +322,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ? client!.raisonSociale
           : (user?.libelle ?? '');
 
-      void ouvrir() => _changerOnglet(5);
+      void ouvrir() => _changerOnglet(_indexProfil);
 
       final isProfileActive = _index == 5;
 
@@ -698,7 +721,7 @@ class _HomeScreenState extends State<HomeScreen> {
         child: InkWell(
           borderRadius: BorderRadius.circular(18),
           onTap: () {
-            setState(() => _index = 5);
+            _changerOnglet(_indexProfil);
             Navigator.of(context).pop();
           },
           child: Container(

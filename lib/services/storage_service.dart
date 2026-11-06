@@ -36,25 +36,32 @@ class StorageService {
   }
 
   static String? getToken() => prefs.getString(keyToken);
-  static Future<bool> setToken(String token) => prefs.setString(keyToken, token);
+  static Future<bool> setToken(String token) =>
+      prefs.setString(keyToken, token);
 
   static String? getUserCode() => prefs.getString(keyCode);
-  static Future<bool> setUserCode(String code) => prefs.setString(keyCode, code);
+  static Future<bool> setUserCode(String code) =>
+      prefs.setString(keyCode, code);
 
   static String? getUserLibelle() => prefs.getString(keyLibelle);
-  static Future<bool> setUserLibelle(String libelle) => prefs.setString(keyLibelle, libelle);
+  static Future<bool> setUserLibelle(String libelle) =>
+      prefs.setString(keyLibelle, libelle);
 
   static String? getLogin() => prefs.getString(keyLogin);
-  static Future<bool> setLogin(String login) => prefs.setString(keyLogin, login);
+  static Future<bool> setLogin(String login) =>
+      prefs.setString(keyLogin, login);
 
   static String? getServerUrl() => prefs.getString(keyServerUrl);
-  static Future<bool> setServerUrl(String url) => prefs.setString(keyServerUrl, url);
+  static Future<bool> setServerUrl(String url) =>
+      prefs.setString(keyServerUrl, url);
 
   static String? getProfilePhoto() => prefs.getString(keyProfilePhoto);
-  static Future<bool> setProfilePhoto(String photo) => prefs.setString(keyProfilePhoto, photo);
+  static Future<bool> setProfilePhoto(String photo) =>
+      prefs.setString(keyProfilePhoto, photo);
 
   static String? getClientConfigRaw() => prefs.getString(keyClientConfig);
-  static Future<bool> setClientConfigRaw(String jsonStr) => prefs.setString(keyClientConfig, jsonStr);
+  static Future<bool> setClientConfigRaw(String jsonStr) =>
+      prefs.setString(keyClientConfig, jsonStr);
 
   static bool hasToken() {
     final t = getToken();

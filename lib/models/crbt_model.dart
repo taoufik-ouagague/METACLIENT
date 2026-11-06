@@ -25,12 +25,13 @@ class ChequeCrbtModel {
       banque: json['banque']?.toString(),
       dateRemise: json['dateremise']?.toString(),
       montant: (json['montant'] as num?) ?? 0,
-      typeRemboursement: (json['typeRemboursement'] ??
-              json['type_remboursement'] ??
-              json['typeRemb'] ??
-              json['type_remb'] ??
-              json['type'])
-          ?.toString(),
+      typeRemboursement:
+          (json['typeRemboursement'] ??
+                  json['type_remboursement'] ??
+                  json['typeRemb'] ??
+                  json['type_remb'] ??
+                  json['type'])
+              ?.toString(),
     );
   }
 }
@@ -68,12 +69,13 @@ class ChequeCrbtDetailItem {
       montant: (json['montant'] as num?) ?? 0,
       destinataire: json['destinataire']?.toString(),
       dateEmission: json['date_emission']?.toString(),
-      typeRemboursement: (json['typeRemboursement'] ??
-              json['type_remboursement'] ??
-              json['typeRemb'] ??
-              json['type_remb'] ??
-              json['type'])
-          ?.toString(),
+      typeRemboursement:
+          (json['typeRemboursement'] ??
+                  json['type_remboursement'] ??
+                  json['typeRemb'] ??
+                  json['type_remb'] ??
+                  json['type'])
+              ?.toString(),
     );
   }
 }
