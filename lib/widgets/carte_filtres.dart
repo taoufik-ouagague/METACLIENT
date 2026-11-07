@@ -8,6 +8,10 @@ import '../theme/app_theme.dart';
 /// derriere le verre, sinon le flou n'a rien a montrer.
 const Color voileFiltres = Color(0x470F172A);
 
+/// Hauteur commune aux champs et aux boutons du bas : le dialogue garde un
+/// rythme regulier quelle que soit la ligne.
+const double _rayonCapsule = 24;
+
 /// Libelle en petites capitales pose au-dessus d'un champ ou d'un groupe.
 class LibelleFiltre extends StatelessWidget {
   const LibelleFiltre(this.texte, {super.key});
@@ -17,12 +21,12 @@ class LibelleFiltre extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Text(
-      texte,
+      texte.toUpperCase(),
       style: const TextStyle(
-        color: Color(0xFF4A5A6E),
-        fontSize: 11,
+        color: Color(0xFF5A7086),
+        fontSize: 11.5,
         fontWeight: FontWeight.w700,
-        letterSpacing: 0.3,
+        letterSpacing: 0.7,
       ),
     );
   }
@@ -49,7 +53,7 @@ class ChampFiltre extends StatelessWidget {
   Widget build(BuildContext context) {
     OutlineInputBorder bordure(Color couleur, double epaisseur) =>
         OutlineInputBorder(
-          borderRadius: BorderRadius.circular(13),
+          borderRadius: BorderRadius.circular(_rayonCapsule),
           borderSide: BorderSide(color: couleur, width: epaisseur),
         );
 
@@ -57,33 +61,32 @@ class ChampFiltre extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         LibelleFiltre(libelle),
-        const SizedBox(height: 5),
+        const SizedBox(height: 9),
         TextField(
           controller: controleur,
           keyboardType: clavier,
           style: const TextStyle(
             color: Color(0xFF0F172A),
-            fontSize: 13.5,
+            fontSize: 15,
             fontWeight: FontWeight.w600,
           ),
           decoration: InputDecoration(
             hintText: exemple,
             hintStyle: const TextStyle(
               color: Color(0xFF8FA3B8),
-              fontSize: 13,
+              fontSize: 15,
               fontWeight: FontWeight.w500,
             ),
-            prefixIcon: Icon(icone, size: 16, color: AppTheme.primary),
+            prefixIcon: Icon(icone, size: 19, color: AppTheme.primary),
             prefixIconConstraints: const BoxConstraints(
-              minWidth: 36,
-              minHeight: 36,
+              minWidth: 42,
+              minHeight: 44,
             ),
             isDense: true,
             filled: true,
-            // Translucide : le fond de la page transparait a travers le champ.
-            fillColor: Colors.white.withValues(alpha: 0.42),
-            contentPadding: const EdgeInsets.fromLTRB(0, 11, 12, 11),
-            enabledBorder: bordure(Colors.white.withValues(alpha: 0.75), 1.2),
+            fillColor: Colors.white,
+            contentPadding: const EdgeInsets.fromLTRB(0, 15, 10, 15),
+            enabledBorder: bordure(Colors.white, 1.2),
             focusedBorder: bordure(AppTheme.primary, 1.4),
           ),
         ),
@@ -109,18 +112,19 @@ class ChoixSegment extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
+      behavior: HitTestBehavior.opaque,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 180),
-        padding: const EdgeInsets.symmetric(vertical: 9),
+        padding: const EdgeInsets.symmetric(vertical: 13),
         decoration: BoxDecoration(
           gradient: actif ? AppTheme.primaryGradient : null,
-          borderRadius: BorderRadius.circular(11),
+          borderRadius: BorderRadius.circular(20),
           boxShadow: actif
               ? [
                   BoxShadow(
                     color: AppTheme.primary.withValues(alpha: 0.30),
-                    blurRadius: 10,
-                    offset: const Offset(0, 4),
+                    blurRadius: 12,
+                    offset: const Offset(0, 5),
                   ),
                 ]
               : null,
@@ -130,7 +134,7 @@ class ChoixSegment extends StatelessWidget {
             libelle,
             style: TextStyle(
               color: actif ? Colors.white : const Color(0xFF42526A),
-              fontSize: 12.5,
+              fontSize: 14,
               fontWeight: FontWeight.w700,
             ),
           ),
@@ -140,22 +144,38 @@ class ChoixSegment extends StatelessWidget {
   }
 }
 
-/// Le rail qui porte les ChoixSegment, repartis a parts egales.
+/// Le rail qui porte les ChoixSegment, repartis a parts egales. Un mince filet
+/// separe deux positions inactives voisines ; la capsule active s'en passe.
 class RailSegments extends StatelessWidget {
   const RailSegments({super.key, required this.choix});
 
-  final List<Widget> choix;
+  final List<ChoixSegment> choix;
 
   @override
   Widget build(BuildContext context) {
+    final enfants = <Widget>[];
+    for (var i = 0; i < choix.length; i++) {
+      if (i > 0) {
+        final visible = !choix[i - 1].actif && !choix[i].actif;
+        enfants.add(
+          Container(
+            width: 1,
+            height: 22,
+            color: visible ? const Color(0xFFC3D5E4) : Colors.transparent,
+          ),
+        );
+      }
+      enfants.add(Expanded(child: choix[i]));
+    }
+
     return Container(
-      padding: const EdgeInsets.all(4),
+      padding: const EdgeInsets.all(5),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.38),
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.7)),
+        color: Colors.white.withValues(alpha: 0.62),
+        borderRadius: BorderRadius.circular(_rayonCapsule),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.85)),
       ),
-      child: Row(children: [for (final c in choix) Expanded(child: c)]),
+      child: Row(children: enfants),
     );
   }
 }
@@ -181,9 +201,9 @@ class CarteFiltres extends StatelessWidget {
   Widget build(BuildContext context) {
     return Dialog(
       backgroundColor: Colors.transparent,
-      insetPadding: const EdgeInsets.symmetric(horizontal: 22),
+      insetPadding: const EdgeInsets.symmetric(horizontal: 18),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(26),
+        borderRadius: BorderRadius.circular(34),
         child: BackdropFilter(
           filter: ImageFilter.blur(sigmaX: 26, sigmaY: 26),
           child: Container(
@@ -192,11 +212,11 @@ class CarteFiltres extends StatelessWidget {
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
                 colors: [
-                  Colors.white.withValues(alpha: 0.74),
-                  Colors.white.withValues(alpha: 0.52),
+                  const Color(0xFFEAF6FE).withValues(alpha: 0.88),
+                  const Color(0xFFD6ECFB).withValues(alpha: 0.72),
                 ],
               ),
-              borderRadius: BorderRadius.circular(26),
+              borderRadius: BorderRadius.circular(34),
               border: Border.all(
                 color: Colors.white.withValues(alpha: 0.8),
                 width: 1.4,
@@ -210,15 +230,15 @@ class CarteFiltres extends StatelessWidget {
               ],
             ),
             child: SingleChildScrollView(
-              padding: const EdgeInsets.fromLTRB(20, 18, 20, 18),
+              padding: const EdgeInsets.fromLTRB(22, 20, 22, 22),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _enTete(),
-                  const SizedBox(height: 14),
+                  const SizedBox(height: 22),
                   ...contenu,
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 24),
                   _boutons(),
                 ],
               ),
@@ -233,22 +253,22 @@ class CarteFiltres extends StatelessWidget {
     return Row(
       children: [
         Container(
-          width: 34,
-          height: 34,
+          width: 46,
+          height: 46,
           decoration: BoxDecoration(
             gradient: AppTheme.primaryGradient,
-            borderRadius: BorderRadius.circular(11),
+            borderRadius: BorderRadius.circular(15),
             boxShadow: [
               BoxShadow(
                 color: AppTheme.primary.withValues(alpha: 0.32),
-                blurRadius: 12,
-                offset: const Offset(0, 5),
+                blurRadius: 14,
+                offset: const Offset(0, 6),
               ),
             ],
           ),
-          child: const Icon(LucideIcons.filter, color: Colors.white, size: 17),
+          child: const Icon(LucideIcons.filter, color: Colors.white, size: 22),
         ),
-        const SizedBox(width: 11),
+        const SizedBox(width: 14),
         Expanded(
           child: Text(
             titre,
@@ -256,15 +276,27 @@ class CarteFiltres extends StatelessWidget {
             overflow: TextOverflow.ellipsis,
             style: const TextStyle(
               color: Color(0xFF0F172A),
-              fontSize: 16,
+              fontSize: 22,
               fontWeight: FontWeight.w800,
             ),
           ),
         ),
-        IconButton(
-          visualDensity: VisualDensity.compact,
-          icon: const Icon(LucideIcons.x, size: 18, color: Color(0xFF6B7C91)),
-          onPressed: () => Get.back<void>(),
+        GestureDetector(
+          onTap: () => Get.back<void>(),
+          behavior: HitTestBehavior.opaque,
+          child: Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.85),
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(
+              LucideIcons.x,
+              size: 20,
+              color: Color(0xFF33455C),
+            ),
+          ),
         ),
       ],
     );
@@ -274,52 +306,75 @@ class CarteFiltres extends StatelessWidget {
     return Row(
       children: [
         Expanded(
-          child: TextButton(
-            style: TextButton.styleFrom(
-              padding: const EdgeInsets.symmetric(vertical: 13),
-              backgroundColor: Colors.white.withValues(alpha: 0.42),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(13),
-                side: BorderSide(color: Colors.white.withValues(alpha: 0.8)),
+          flex: 2,
+          child: GestureDetector(
+            onTap: onReinitialiser,
+            behavior: HitTestBehavior.opaque,
+            child: Container(
+              padding: const EdgeInsets.symmetric(vertical: 15),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(_rayonCapsule),
               ),
-            ),
-            onPressed: onReinitialiser,
-            child: const Text(
-              'Réinitialiser',
-              style: TextStyle(
-                color: Color(0xFF42526A),
-                fontSize: 13.5,
-                fontWeight: FontWeight.w700,
+              child: const Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    LucideIcons.rotateCcw,
+                    size: 18,
+                    color: Color(0xFF42526A),
+                  ),
+                  SizedBox(width: 8),
+                  Text(
+                    'Réinitialiser',
+                    style: TextStyle(
+                      color: Color(0xFF42526A),
+                      fontSize: 15,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
         ),
-        const SizedBox(width: 10),
+        const SizedBox(width: 12),
         Expanded(
+          flex: 3,
           child: GestureDetector(
             onTap: onAppliquer,
+            behavior: HitTestBehavior.opaque,
             child: Container(
-              padding: const EdgeInsets.symmetric(vertical: 13),
+              padding: const EdgeInsets.symmetric(vertical: 15),
               decoration: BoxDecoration(
                 gradient: AppTheme.primaryGradient,
-                borderRadius: BorderRadius.circular(13),
+                borderRadius: BorderRadius.circular(_rayonCapsule),
                 boxShadow: [
                   BoxShadow(
                     color: AppTheme.primary.withValues(alpha: 0.34),
-                    blurRadius: 14,
-                    offset: const Offset(0, 6),
+                    blurRadius: 16,
+                    offset: const Offset(0, 7),
                   ),
                 ],
               ),
-              child: const Center(
-                child: Text(
-                  'Appliquer',
-                  style: TextStyle(
+              child: const Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    LucideIcons.checkCircle2,
+                    size: 19,
                     color: Colors.white,
-                    fontSize: 13.5,
-                    fontWeight: FontWeight.w800,
                   ),
-                ),
+                  SizedBox(width: 9),
+                  Text(
+                    'Appliquer',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 15,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                ],
               ),
             ),
           ),

@@ -54,7 +54,7 @@ class RetoursScreen extends StatelessWidget {
                   icone: LucideIcons.calendar,
                 ),
               ),
-              const SizedBox(width: 10),
+              const SizedBox(width: 12),
               Expanded(
                 child: ChampFiltre(
                   controleur: auCtrl,
@@ -65,30 +65,30 @@ class RetoursScreen extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 16),
           ChampFiltre(
             controleur: declCtrl,
             libelle: 'N° DÉCLARATION',
             exemple: '260029143',
             icone: LucideIcons.hash,
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 16),
           ChampFiltre(
             controleur: clientCtrl,
             libelle: 'CLIENT',
             exemple: 'LUMINEA SANTE',
             icone: LucideIcons.building2,
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 16),
           ChampFiltre(
             controleur: pieceCtrl,
             libelle: 'N° PIÈCE',
             exemple: '2102282',
             icone: LucideIcons.fileText,
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 20),
           const LibelleFiltre('REMISE'),
-          const SizedBox(height: 7),
+          const SizedBox(height: 9),
           Obx(
             () => RailSegments(
               choix: [
