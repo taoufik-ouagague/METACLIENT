@@ -7,10 +7,8 @@ import '../../models/facture_model.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/barre_segments.dart';
 import '../../widgets/carte_accent.dart';
-import '../../widgets/etiquette_valeur.dart';
-import '../../widgets/carte_liste.dart';
-import '../../widgets/status_badge.dart';
 import 'facture_detail_screen.dart';
+import '../../widgets/scroll_infini.dart';
 import '../../widgets/scroll_reveal.dart';
 
 class FacturesScreen extends StatelessWidget {
@@ -123,87 +121,48 @@ class FacturesScreen extends StatelessWidget {
               );
             }
 
-            return RefreshIndicator(
-              color: AppTheme.primary,
-              backgroundColor: Colors.white,
-              onRefresh: () async {
-                if (factureCtrl.activeTab.value == 0) {
-                  await factureCtrl.fetchFacturesInstances();
-                } else {
-                  await factureCtrl.fetchAllFactures();
-                }
-              },
-              child: ListView.separated(
-                // Nouvelle cle a chaque onglet : la revelation rejoue.
-                key: ValueKey<int>(factureCtrl.activeTab.value),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 18,
-                  vertical: 8,
-                ),
-                itemCount: list.length,
-                separatorBuilder: (_, _) => const SizedBox(height: 10),
-                itemBuilder: (context, index) {
-                  final item = list[index];
-                  return ScrollReveal(
-                    index: index,
-                    child: _buildFactureCard(item),
-                  );
+            // Seul l'onglet « Toutes » est pagine ; « En instances » tient
+            // en un appel et n'a rien de plus a tirer.
+            final pagine = factureCtrl.activeTab.value == 1;
+            final pied = pagine && factureCtrl.isLoadingMore.value;
+
+            return ScrollInfini(
+              onFin: pagine ? factureCtrl.chargerPlus : () {},
+              child: RefreshIndicator(
+                color: AppTheme.primary,
+                backgroundColor: Colors.white,
+                onRefresh: () async {
+                  if (factureCtrl.activeTab.value == 0) {
+                    await factureCtrl.fetchFacturesInstances();
+                  } else {
+                    await factureCtrl.fetchAllFactures(resetPage: true);
+                  }
                 },
+                child: ListView.separated(
+                  // Nouvelle cle a chaque onglet : la revelation rejoue.
+                  key: ValueKey<int>(factureCtrl.activeTab.value),
+                  padding: EdgeInsets.fromLTRB(
+                    18,
+                    8,
+                    18,
+                    8 + MediaQuery.paddingOf(context).bottom,
+                  ),
+                  itemCount: list.length + (pied ? 1 : 0),
+                  separatorBuilder: (_, _) => const SizedBox(height: 10),
+                  itemBuilder: (context, index) {
+                    if (index >= list.length) return const PiedChargement();
+                    final item = list[index];
+                    return ScrollReveal(
+                      index: index,
+                      child: _buildFactureCard(item),
+                    );
+                  },
+                ),
               ),
             );
           }),
         ),
 
-        // ─── PAGINATION BAR FOR ALL FACTURES ───────────────────────────────
-        Obx(() {
-          if (factureCtrl.activeTab.value == 1 &&
-              factureCtrl.totalPages.value > 1) {
-            return Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
-              child: CarteListe(
-                borderRadius: 16,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 14,
-                  vertical: 8,
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    IconButton(
-                      icon: const Icon(
-                        LucideIcons.chevronLeft,
-                        color: AppTheme.primary,
-                      ),
-                      onPressed: factureCtrl.currentPage.value > 1
-                          ? factureCtrl.previousPage
-                          : null,
-                    ),
-                    Text(
-                      'Page ${factureCtrl.currentPage.value} / ${factureCtrl.totalPages.value}',
-                      style: const TextStyle(
-                        color: Color(0xFF0F172A),
-                        fontSize: 13,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    IconButton(
-                      icon: const Icon(
-                        LucideIcons.chevronRight,
-                        color: AppTheme.primary,
-                      ),
-                      onPressed:
-                          factureCtrl.currentPage.value <
-                              factureCtrl.totalPages.value
-                          ? factureCtrl.nextPage
-                          : null,
-                    ),
-                  ],
-                ),
-              ),
-            );
-          }
-          return const SizedBox.shrink();
-        }),
       ],
     );
   }
@@ -249,70 +208,122 @@ class FacturesScreen extends StatelessWidget {
 
   Widget _buildFactureCard(FactureModel item) {
     final hasSolde = item.solde != null && item.solde! > 0;
-    // La teinte suit l'etat de la facture, deja porte par l'icone et le
-    // badge : reglee ou non, cela se voit desormais au premier coup d'oeil.
-    final teinte = hasSolde ? AppTheme.statusDanger : AppTheme.statusSuccess;
+    // La teinte suit l'etat de la facture : rouge tant qu'il reste a payer,
+    // vert une fois reglee.
+    // Couleurs relevees au pixel sur la maquette.
+    const rouge = Color(0xFFF02F3A);
+    final teinte = hasSolde ? rouge : AppTheme.statusSuccess;
+    final icone = hasSolde ? LucideIcons.fileClock : LucideIcons.fileCheck2;
+    // Fonds rose de la maquette pour l'etat en instance ; la version reglee
+    // garde une teinte tiree du vert.
+    final fondIcone = hasSolde
+        ? const Color(0xFFFEDBE6)
+        : teinte.withValues(alpha: 0.13);
+    final fondPastille = hasSolde
+        ? const Color(0xFFFFDCE3)
+        : teinte.withValues(alpha: 0.14);
+    final bordPastille = hasSolde
+        ? const Color(0xFFFFB9C7)
+        : teinte.withValues(alpha: 0.30);
+    final texteStatut = hasSolde ? const Color(0xFFEF3340) : teinte;
+    final jauge = hasSolde ? const Color(0xFFF52F43) : teinte;
+
+    final ttc = (item.mntTtc ?? 0).toDouble();
+    final reste = (item.solde ?? (item.isPayee ? 0 : ttc)).toDouble();
+    // Part reglee, de 0 a 1. Sans montant TTC on ne peut rien en dire.
+    final regle = ttc > 0 ? ((ttc - reste) / ttc).clamp(0.0, 1.0) : 0.0;
+    final pourcent = (regle * 100).round();
+
+    const gris = Color(0xFF647A9F);
+
+    final echeance = Get.find<FactureController>().echeanceDe(item);
+
+    // Mesures relevees sur la maquette (1590 px de large pour ~366 pt ici,
+    // soit x0,23). Poppins porte une interligne d'environ 1,5 : on la ramene
+    // a 1,15, sinon chaque ligne ajoute un tiers de hauteur a la carte.
+    const serre = 1.15;
+
+    // Les tailles fournies donnent une carte de ~167 pt ; celle des
+    // expeditions fait w x 334/953, soit ~128 pt. Un facteur unique les y
+    // ramene en gardant les proportions entre les elements.
+    const k = 0.77;
 
     return CarteAccent(
       teinte: teinte,
-      icone: hasSolde ? LucideIcons.fileWarning : LucideIcons.fileCheck2,
+      icone: icone,
+      fondTeinte: false,
+      fond: const Color(0xFFF5F9FF),
+      // Meme rayon que les cartes d'expedition.
+      rayon: 24,
+      ombres: [
+        BoxShadow(
+          color: const Color(0xFF269BC4).withValues(alpha: 0.20),
+          blurRadius: 22,
+          offset: const Offset(0, 9),
+        ),
+      ],
+      couleurFiligrane: const Color(0xFFD9EAFB).withValues(alpha: 0.35),
+      tailleFiligrane: 92 * k,
+      basFiligrane: 40 * k,
       onTap: () => Get.to(
         () => FactureDetailScreen(facture: item),
         transition: Transition.cupertino,
         duration: const Duration(milliseconds: 360),
       ),
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(20, 16, 16, 16),
+        padding: const EdgeInsets.fromLTRB(14, 11 * k, 12, 9 * k),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // ─── En-tete : icone, numero, date, statut ─────────────────────
             Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Container(
-                  padding: const EdgeInsets.all(8),
+                  width: 42 * k,
+                  height: 42 * k,
                   decoration: BoxDecoration(
-                    color: hasSolde
-                        ? AppTheme.statusDanger.withValues(alpha: 0.12)
-                        : AppTheme.statusSuccess.withValues(alpha: 0.12),
-                    borderRadius: BorderRadius.circular(12),
+                    color: fondIcone,
+                    borderRadius: BorderRadius.circular(10 * k),
                   ),
-                  child: Icon(
-                    hasSolde ? LucideIcons.fileWarning : LucideIcons.fileCheck2,
-                    color: hasSolde
-                        ? AppTheme.statusDanger
-                        : AppTheme.statusSuccess,
-                    size: 20,
-                  ),
+                  child: Icon(icone, color: teinte, size: 24 * k),
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: 11),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      EtiquetteValeur(
-                        intitule: 'N° ',
-                        valeur: item.numFacture,
-                        couleur: AppTheme.primary,
-                        couleurIntitule: AppTheme.primary,
-                        taille: 15,
+                      FittedBox(
+                        fit: BoxFit.scaleDown,
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          'N° ${item.numFacture}',
+                          maxLines: 1,
+                          style: const TextStyle(
+                            color: Color(0xFF0284C7),
+                            fontSize: 21 * k,
+                            height: serre,
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: -0.2,
+                          ),
+                        ),
                       ),
-                      const SizedBox(height: 3),
+                      const SizedBox(height: 2),
                       Row(
                         children: [
                           const Icon(
                             LucideIcons.calendar,
-                            size: 12,
-                            color: Color(0xFF94A3B8),
+                            size: 16 * k,
+                            color: gris,
                           ),
-                          const SizedBox(width: 4),
+                          const SizedBox(width: 6),
                           Text(
                             item.dateFacture ?? '—',
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
                             style: const TextStyle(
-                              color: Color(0xFF64748B),
-                              fontSize: 12,
-                              fontWeight: FontWeight.w600,
+                              color: gris,
+                              fontSize: 16 * k,
+                              height: serre,
+                              fontWeight: FontWeight.w500,
                             ),
                           ),
                         ],
@@ -321,68 +332,208 @@ class FacturesScreen extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 8),
-                StatusBadge(
-                  status: item.statut ?? (hasSolde ? 'En instance' : 'Payée'),
+                _pastilleStatut(
+                  hasSolde ? 'EN INSTANCE' : 'PAYÉE',
+                  hasSolde ? LucideIcons.clock : LucideIcons.checkCircle2,
+                  texteStatut,
+                  fondPastille,
+                  bordPastille,
+                  k,
                 ),
               ],
             ),
-            const SizedBox(height: 12),
-            const Divider(color: Color(0xFFE2E8F0), height: 1),
-            const SizedBox(height: 12),
+            const SizedBox(height: 7 * k),
+            const Divider(color: Color(0xFFE5EDF9), height: 1),
+            const SizedBox(height: 7 * k),
 
+            // ─── Montants & Progression ───────────────────────────────────
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'Montant TTC',
-                      style: TextStyle(
-                        color: Color(0xFF64748B),
-                        fontSize: 11.5,
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      _formatCurrency(item.mntTtc),
-                      style: const TextStyle(
-                        color: Color(0xFF334155),
-                        fontSize: 14,
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                  ],
+                Expanded(
+                  flex: 5,
+                  child: _montant(
+                    'Montant TTC',
+                    _formatCurrency(item.mntTtc),
+                    const Color(0xFF172E50),
+                    k,
+                  ),
                 ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    const Text(
-                      'Reste à payer (Solde)',
-                      style: TextStyle(
-                        color: Color(0xFF64748B),
-                        fontSize: 11.5,
-                      ),
+                const SizedBox(width: 8),
+                Expanded(
+                  flex: 5,
+                  child: _montant(
+                    'Reste à payer',
+                    _formatCurrency(reste),
+                    teinte,
+                    k,
+                  ),
+                ),
+                const SizedBox(width: 10),
+                _jaugeCirculaire(
+                  regle: regle,
+                  pourcent: pourcent,
+                  jauge: jauge,
+                  texteStatut: texteStatut,
+                  k: k,
+                ),
+              ],
+            ),
+            const SizedBox(height: 8 * k),
+
+            // ─── Echeance ─────────────────────────────────────────────────
+            Row(
+              children: [
+                const Icon(LucideIcons.calendar, size: 17 * k, color: gris),
+                const SizedBox(width: 7),
+                Expanded(
+                  // La liste ne renvoie pas toujours l'echeance : sans elle,
+                  // la ligne invite au detail plutot que d'afficher un tiret.
+                  child: Text(
+                    echeance != null
+                        ? 'Échéance : $echeance'
+                        : 'Voir le détail',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      color: gris,
+                      fontSize: 17 * k,
+                      height: serre,
+                      fontWeight: FontWeight.w500,
                     ),
-                    const SizedBox(height: 2),
-                    Text(
-                      _formatCurrency(
-                        item.solde ?? (item.isPayee ? 0 : item.mntTtc),
-                      ),
-                      style: TextStyle(
-                        color: hasSolde
-                            ? AppTheme.statusDanger
-                            : AppTheme.statusSuccess,
-                        fontSize: 15,
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                  ],
+                  ),
+                ),
+                const Icon(
+                  LucideIcons.chevronRight,
+                  size: 16 * k,
+                  color: Color(0xFF6D819E),
                 ),
               ],
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  /// Pastille de statut : icone + libelle, sur la teinte de la carte.
+  Widget _pastilleStatut(
+    String libelle,
+    IconData icone,
+    Color teinte,
+    Color fond,
+    Color bord,
+    double k,
+  ) {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 10 * k, vertical: 5 * k),
+      decoration: BoxDecoration(
+        color: fond,
+        borderRadius: BorderRadius.circular(25),
+        border: Border.all(color: bord),
+        boxShadow: [
+          BoxShadow(
+            color: teinte.withValues(alpha: 0.12),
+            blurRadius: 8,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icone, size: 15 * k, color: teinte),
+          SizedBox(width: 5 * k),
+          Text(
+            libelle,
+            style: TextStyle(
+              color: teinte,
+              fontSize: 14 * k,
+              height: 1.15,
+              fontWeight: FontWeight.w600,
+              letterSpacing: 0.1,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Intitule gris au-dessus d'un montant en gras.
+  Widget _montant(String intitule, String valeur, Color couleur, double k) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          intitule,
+          style: TextStyle(
+            color: const Color(0xFF647A9F),
+            fontSize: 15 * k,
+            height: 1.15,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+        SizedBox(height: 2 * k),
+        FittedBox(
+          fit: BoxFit.scaleDown,
+          alignment: Alignment.centerLeft,
+          child: Text(
+            valeur,
+            maxLines: 1,
+            style: TextStyle(
+              color: couleur,
+              fontSize: 19 * k,
+              height: 1.15,
+              fontWeight: FontWeight.w700,
+              letterSpacing: -0.3,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  /// Jauge circulaire compacte pour le pourcentage de règlement dans le coin.
+  Widget _jaugeCirculaire({
+    required double regle,
+    required int pourcent,
+    required Color jauge,
+    required Color texteStatut,
+    required double k,
+  }) {
+    final double taille = 38 * k;
+    final double epaisseur = 3.6 * k;
+
+    return SizedBox(
+      width: taille,
+      height: taille,
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          CircularProgressIndicator(
+            value: regle > 0 ? regle : 0.0,
+            strokeWidth: epaisseur,
+            backgroundColor: const Color(0xFFDCE7F7),
+            valueColor: AlwaysStoppedAnimation<Color>(jauge),
+            strokeCap: StrokeCap.round,
+          ),
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Padding(
+              padding: const EdgeInsets.all(3),
+              child: Text(
+                '$pourcent%',
+                style: TextStyle(
+                  color: texteStatut,
+                  fontSize: 13 * k,
+                  height: 1.0,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: -0.4,
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

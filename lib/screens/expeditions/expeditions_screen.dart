@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:intl/intl.dart';
 import '../../controllers/expedition_controller.dart';
 import '../../models/expedition_model.dart';
 import '../../theme/app_theme.dart';
@@ -8,10 +9,26 @@ import '../../widgets/barre_segments.dart';
 import '../../widgets/carte_filtres.dart';
 import '../../widgets/glass_container.dart';
 import 'expedition_detail_screen.dart';
+import '../../widgets/scroll_infini.dart';
 import '../../widgets/scroll_reveal.dart';
 
 class ExpeditionsScreen extends StatelessWidget {
   const ExpeditionsScreen({super.key});
+
+  String _formatCurrency(num? amount) {
+    if (amount == null) return '0.00 DH';
+    final formatter = NumberFormat('#,##0.00', 'fr_FR');
+    return '${formatter.format(amount)} DH';
+  }
+
+  String _buildNatureAndFond(ExpeditionModel item) {
+    final nature = (item.nature != null &&
+            item.nature!.trim().isNotEmpty &&
+            item.nature != 'null')
+        ? item.nature!.trim()
+        : ((item.fond ?? 0) > 0 ? 'Fond' : 'Nature');
+    return '$nature : ${_formatCurrency(item.fond)}';
+  }
 
   void _showFilterDialog(BuildContext context, ExpeditionController ctrl) {
     final duCtrl = TextEditingController(text: ctrl.filterDu.value);
@@ -337,85 +354,48 @@ class ExpeditionsScreen extends StatelessWidget {
               );
             }
 
-            return RefreshIndicator(
-              color: AppTheme.primary,
-              backgroundColor: Colors.white,
-              onRefresh: () async {
-                if (expCtrl.activeTab.value == 0) {
-                  await expCtrl.fetchExpeditionsEncours();
-                } else {
-                  await expCtrl.fetchAllExpeditions();
-                }
-              },
-              child: ListView.separated(
-                // Nouvelle cle a chaque onglet : la revelation rejoue.
-                key: ValueKey<int>(expCtrl.activeTab.value),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 18,
-                  vertical: 8,
-                ),
-                itemCount: list.length,
-                separatorBuilder: (_, _) => const SizedBox(height: 10),
-                itemBuilder: (context, index) {
-                  final item = list[index];
-                  return ScrollReveal(
-                    index: index,
-                    child: _buildExpeditionCard(item),
-                  );
+            // Seul l'onglet « Toutes » est pagine ; « En cours » tient en
+            // un appel et n'a rien de plus a tirer.
+            final pagine = expCtrl.activeTab.value == 1;
+            final pied = pagine && expCtrl.isLoadingMore.value;
+
+            return ScrollInfini(
+              onFin: pagine ? expCtrl.chargerPlus : () {},
+              child: RefreshIndicator(
+                color: AppTheme.primary,
+                backgroundColor: Colors.white,
+                onRefresh: () async {
+                  if (expCtrl.activeTab.value == 0) {
+                    await expCtrl.fetchExpeditionsEncours();
+                  } else {
+                    await expCtrl.fetchAllExpeditions(resetPage: true);
+                  }
                 },
+                child: ListView.separated(
+                  // Nouvelle cle a chaque onglet : la revelation rejoue.
+                  key: ValueKey<int>(expCtrl.activeTab.value),
+                  padding: EdgeInsets.fromLTRB(
+                    18,
+                    8,
+                    18,
+                    8 + MediaQuery.paddingOf(context).bottom,
+                  ),
+                  itemCount: list.length + (pied ? 1 : 0),
+                  separatorBuilder: (_, _) => const SizedBox(height: 10),
+                  itemBuilder: (context, index) {
+                    if (index >= list.length) return const PiedChargement();
+                    final item = list[index];
+                    return ScrollReveal(
+                      index: index,
+                      child: _buildExpeditionCard(item),
+                    );
+                  },
+                ),
               ),
             );
           }),
         ),
 
-        // ─── PAGINATION BAR FOR ALL EXPEDITIONS ────────────────────────────
-        Obx(() {
-          if (expCtrl.activeTab.value == 1 && expCtrl.totalPages.value > 1) {
-            return Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
-              child: GlassContainer(
-                borderRadius: 16,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 14,
-                  vertical: 8,
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    IconButton(
-                      icon: const Icon(
-                        LucideIcons.chevronLeft,
-                        color: AppTheme.primary,
-                      ),
-                      onPressed: expCtrl.currentPage.value > 1
-                          ? expCtrl.previousPage
-                          : null,
-                    ),
-                    Text(
-                      'Page ${expCtrl.currentPage.value} / ${expCtrl.totalPages.value}',
-                      style: const TextStyle(
-                        color: Color(0xFF0F172A),
-                        fontSize: 13,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    IconButton(
-                      icon: const Icon(
-                        LucideIcons.chevronRight,
-                        color: AppTheme.primary,
-                      ),
-                      onPressed:
-                          expCtrl.currentPage.value < expCtrl.totalPages.value
-                          ? expCtrl.nextPage
-                          : null,
-                    ),
-                  ],
-                ),
-              ),
-            );
-          }
-          return const SizedBox.shrink();
-        }),
       ],
     );
   }
@@ -507,15 +487,22 @@ class ExpeditionsScreen extends StatelessWidget {
 
                   // ─── 1. DECLARATION NUMBER ──────────────────────────────
                   Positioned(
-                    left: w * 0.155,
-                    top: h * 0.08,
-                    child: Text(
-                      item.numDeclaration,
-                      style: TextStyle(
-                        color: const Color(0xFF0F172A),
-                        fontSize: h * 0.14,
-                        fontWeight: FontWeight.w900,
-                        letterSpacing: 0.4,
+                    left: w * 0.14,
+                    top: 0,
+                    height: h * 0.30,
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        item.numDeclaration.startsWith('N°') ||
+                                item.numDeclaration.startsWith("N'")
+                            ? item.numDeclaration
+                            : 'N° ${item.numDeclaration}',
+                        style: TextStyle(
+                          color: const Color(0xFF0284C7),
+                          fontSize: h * 0.10,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: 0.4,
+                        ),
                       ),
                     ),
                   ),
@@ -550,47 +537,101 @@ class ExpeditionsScreen extends StatelessWidget {
                     ),
                   ),
 
-                  // ─── 3. ORIGIN CITY (Below left pin) ────────────────────
+                  // ─── 3. ORIGIN & EXPÉDITEUR (Centered under left pin) ───
                   Positioned(
-                    left: w * 0.02,
-                    top: h * 0.58,
-                    width: w * 0.24,
-                    child: Text(
-                      (item.origine ?? 'CASABLANCA').toUpperCase(),
-                      textAlign: TextAlign.center,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        color: const Color(0xFF0F172A),
-                        fontSize: h * 0.095,
-                        fontWeight: FontWeight.w900,
-                        letterSpacing: 0.3,
+                    left: w * 0.12,
+                    top: h * 0.53,
+                    child: FractionalTranslation(
+                      translation: const Offset(-0.5, 0),
+                      child: SizedBox(
+                        width: w * 0.30,
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              (item.origine ?? 'CASABLANCA').toUpperCase(),
+                              textAlign: TextAlign.center,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                color: const Color(0xFF0F172A),
+                                fontSize: h * 0.084,
+                                fontWeight: FontWeight.w900,
+                                letterSpacing: 0.3,
+                              ),
+                            ),
+                            if (item.expediteur != null &&
+                                item.expediteur!.trim().isNotEmpty &&
+                                item.expediteur != 'null') ...[
+                              SizedBox(height: h * 0.006),
+                              Text(
+                                item.expediteur!.trim(),
+                                textAlign: TextAlign.center,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  color: const Color(0xFF334155),
+                                  fontSize: h * 0.072,
+                                  fontWeight: FontWeight.w700,
+                                  letterSpacing: -0.2,
+                                ),
+                              ),
+                            ],
+                          ],
+                        ),
                       ),
                     ),
                   ),
 
-                  // ─── 4. DESTINATION CITY (Below right pin) ──────────────
+                  // ─── 4. DESTINATION & DESTINATAIRE (Centered under right pin) ──
                   Positioned(
-                    right: w * 0.02,
-                    top: h * 0.58,
-                    width: w * 0.24,
-                    child: Text(
-                      (item.destination ?? 'DESTINATION').toUpperCase(),
-                      textAlign: TextAlign.center,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        color: const Color(0xFF0F172A),
-                        fontSize: h * 0.095,
-                        fontWeight: FontWeight.w900,
-                        letterSpacing: 0.3,
+                    left: w * 0.871,
+                    top: h * 0.53,
+                    child: FractionalTranslation(
+                      translation: const Offset(-0.5, 0),
+                      child: SizedBox(
+                        width: w * 0.30,
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              (item.destination ?? 'DESTINATION').toUpperCase(),
+                              textAlign: TextAlign.center,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                color: const Color(0xFF0F172A),
+                                fontSize: h * 0.084,
+                                fontWeight: FontWeight.w900,
+                                letterSpacing: 0.3,
+                              ),
+                            ),
+                            if (item.destinataire != null &&
+                                item.destinataire!.trim().isNotEmpty &&
+                                item.destinataire != 'null') ...[
+                              SizedBox(height: h * 0.006),
+                              Text(
+                                item.destinataire!.trim(),
+                                textAlign: TextAlign.center,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  color: const Color(0xFF334155),
+                                  fontSize: h * 0.072,
+                                  fontWeight: FontWeight.w700,
+                                  letterSpacing: -0.2,
+                                ),
+                              ),
+                            ],
+                          ],
+                        ),
                       ),
                     ),
                   ),
 
                   // ─── 5. COLIS COUNT ─────────────────────────────────────
                   Positioned(
-                    left: w * 0.085,
+                    left: w * 0.092,
                     top: h * 0.81,
                     child: Text(
                       '${item.colis ?? 1} colis',
@@ -604,7 +645,7 @@ class ExpeditionsScreen extends StatelessWidget {
 
                   // ─── 6. WEIGHT COUNT ────────────────────────────────────
                   Positioned(
-                    left: w * 0.265,
+                    left: w * 0.288,
                     top: h * 0.81,
                     child: Text(
                       '${item.poids ?? 0} kg',
@@ -616,24 +657,18 @@ class ExpeditionsScreen extends StatelessWidget {
                     ),
                   ),
 
-                  // ─── 7. PILL STATUS TEXT ────────────────────────────────
+                  // ─── 7. PILL NATURE & FOND ─────────────────────────────
                   Positioned(
-                    left: w * 0.61,
+                    left: w * 0.635,
                     right: w * 0.05,
                     top: h * 0.81,
                     child: Text(
-                      isLivree
-                          ? 'Colis livré'
-                          : (item.processus != null &&
-                                  item.processus!.trim().isNotEmpty &&
-                                  item.processus != 'null'
-                              ? item.processus!
-                              : 'Véhicule en déplacement...'),
+                      _buildNatureAndFond(item),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                         color: const Color(0xFF0284C7),
-                        fontSize: h * 0.082,
+                        fontSize: h * 0.080,
                         fontWeight: FontWeight.w700,
                       ),
                     ),

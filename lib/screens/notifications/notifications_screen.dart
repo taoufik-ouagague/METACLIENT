@@ -28,7 +28,7 @@ class NotificationsScreen extends StatelessWidget {
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
                 colors: [
-                  Color(0xFF1B7A94),
+                  Color(0xFF29B7D9),
                   AppTheme.primary,
                   Color(0xFF3FC1D8),
                 ],

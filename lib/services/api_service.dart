@@ -5,6 +5,11 @@ import 'package:http/http.dart' as http;
 import 'package:logger/logger.dart';
 import 'storage_service.dart';
 
+/// Taille d'un paquet de liste. Les ecrans n'ont pas de boutons de page : ils
+/// tirent le paquet suivant quand le scroll approche du bas, donc un petit
+/// nombre garde le premier affichage rapide.
+const int taillePagePaquet = 15;
+
 class ApiService {
   /// Journalisation des appels HTTP. Coupee par defaut : les reponses
   /// contiennent des donnees client (factures, destinataires, montants) et la

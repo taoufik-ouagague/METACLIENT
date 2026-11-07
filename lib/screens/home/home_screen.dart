@@ -1,5 +1,6 @@
 import 'dart:convert';
-import 'dart:ui';
+import 'dart:ui' as ui;
+import 'dart:ui' show ImageFilter;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -138,47 +139,44 @@ class _HomeScreenState extends State<HomeScreen> {
       body: Stack(
         fit: StackFit.expand,
         children: [
-          const AmbientBackground(),
-          // Le degrade appartient a la page, pas au bandeau : il traverse la
-          // barre (transparente) et s'eteint doucement plus bas, si bien que
-          // l'en-tete ne se lit plus comme un bloc rapporte.
+          // Fond de page glace : degrade vertical bleu tres pale -> blanc,
+          // et halos cyan autour de la zone des tuiles.
+          const _FondCorps(),
+          // Bandeau d'en-tete. Sa hauteur suit l'ecran : il couvre l'en-tete
+          // et la premiere carte, puis se fond dans le fond de page.
           Positioned(
             top: 0,
             left: 0,
             right: 0,
-            height: 330,
+            height: (MediaQuery.sizeOf(context).height * 0.46).clamp(
+              360.0,
+              560.0,
+            ),
             child: IgnorePointer(
               child: RepaintBoundary(
-                child: DecoratedBox(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [
-                        const Color(0xFF1B7A94),
-                        AppTheme.primary,
-                        const Color(0xFF3FC1D8),
-                        AppTheme.accentCyan.withValues(alpha: 0),
-                      ],
-                      stops: const [0.0, 0.20, 0.40, 1.0],
+                // Le fondu bas est un masque vertical : il s'applique sur
+                // toute la largeur, quel que soit le sens du degrade.
+                child: ShaderMask(
+                  blendMode: BlendMode.dstIn,
+                  shaderCallback: (zone) => const LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [Colors.white, Colors.white, Color(0x00FFFFFF)],
+                    stops: [0.0, 0.50, 1.0],
+                  ).createShader(zone),
+                  child: const DecoratedBox(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.centerLeft,
+                        end: Alignment.centerRight,
+                        colors: [
+                          Color(0xFF35B8D7),
+                          Color(0xFF079BCB),
+                          Color(0xFF35B9DC),
+                        ],
+                      ),
                     ),
-                  ),
-                  child: Stack(
-                    children: [
-                      Positioned(
-                        left: -60,
-                        top: -70,
-                        child: _halo(220, Colors.white.withValues(alpha: 0.18)),
-                      ),
-                      Positioned(
-                        right: -80,
-                        top: 10,
-                        child: _halo(
-                          240,
-                          AppTheme.accentCyan.withValues(alpha: 0.30),
-                        ),
-                      ),
-                    ],
+                    child: CustomPaint(painter: _VaguesEntete()),
                   ),
                 ),
               ),
@@ -613,12 +611,12 @@ class _HomeScreenState extends State<HomeScreen> {
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
                       colors: [
-                        const Color(0xFF1B7A94),
-                        AppTheme.primary,
-                        const Color(0xFF3FC1D8),
-                        AppTheme.accentCyan.withValues(alpha: 0),
+                        const Color(0xFF29B7D9),
+                        const Color(0xFF34BCDC),
+                        const Color(0xFF46CAE7),
+                        const Color(0xFF6DD5ED).withValues(alpha: 0),
                       ],
-                      stops: const [0.0, 0.22, 0.45, 1.0],
+                      stops: const [0.0, 0.25, 0.55, 1.0],
                     ),
                   ),
                   child: Stack(
@@ -978,6 +976,147 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+/// Les formes courbes du bandeau d'en-tete.
+///
+/// Trois couches de courbes de Bezier cubiques, toutes rapportees a la taille
+/// du bandeau pour rester justes sur tous les ecrans :
+///   1. une bande claire qui traverse en diagonale, du milieu gauche vers le
+///      haut droit ;
+///   2. une masse plus soutenue qui remonte depuis le bas droit ;
+///   3. une ondulation tres legere sur le bas, qui prepare le fondu.
+class _VaguesEntete extends CustomPainter {
+  const _VaguesEntete();
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final l = size.width;
+    final h = size.height;
+
+    // 1. Bande claire diagonale, entre deux courbes paralleles.
+    final bande = Path()
+      ..moveTo(0, h * 0.30)
+      ..cubicTo(l * 0.30, h * 0.22, l * 0.55, h * 0.05, l * 0.88, 0)
+      ..lineTo(l, 0)
+      ..lineTo(l, h * 0.07)
+      ..cubicTo(l * 0.72, h * 0.15, l * 0.42, h * 0.34, 0, h * 0.45)
+      ..close();
+    canvas.drawPath(
+      bande,
+      Paint()
+        ..shader = ui.Gradient.linear(Offset(0, h * 0.4), Offset(l, 0), [
+          Colors.white.withValues(alpha: 0.05),
+          Colors.white.withValues(alpha: 0.20),
+        ]),
+    );
+
+    // 2. Masse soutenue en bas a droite.
+    final masse = Path()
+      ..moveTo(l * 0.30, h)
+      ..cubicTo(l * 0.52, h * 0.66, l * 0.76, h * 0.44, l, h * 0.30)
+      ..lineTo(l, h)
+      ..close();
+    canvas.drawPath(
+      masse,
+      Paint()
+        ..shader = ui.Gradient.linear(Offset(l, h * 0.30), Offset(l * 0.4, h), [
+          const Color(0xFF0688B8).withValues(alpha: 0.22),
+          const Color(0xFF0688B8).withValues(alpha: 0),
+        ]),
+    );
+
+    // 3. Ondulation claire du bas.
+    final onde = Path()
+      ..moveTo(0, h * 0.62)
+      ..cubicTo(l * 0.32, h * 0.50, l * 0.64, h * 0.66, l, h * 0.46)
+      ..lineTo(l, h)
+      ..lineTo(0, h)
+      ..close();
+    canvas.drawPath(
+      onde,
+      Paint()..color = Colors.white.withValues(alpha: 0.07),
+    );
+  }
+
+  @override
+  bool shouldRepaint(_VaguesEntete oldDelegate) => false;
+}
+
+/// Fond de page sous le bandeau : glace bleutee qui blanchit vers le bas, et
+/// lumiere ambiante cyan autour des tuiles.
+///
+/// Remplace ici l'AmbientBackground partage, que le menu lateral garde.
+class _FondCorps extends StatelessWidget {
+  const _FondCorps();
+
+  @override
+  Widget build(BuildContext context) {
+    final taille = MediaQuery.sizeOf(context);
+    final l = taille.width;
+    final h = taille.height;
+
+    Widget halo(double diametre, Color couleur) => Container(
+      width: diametre,
+      height: diametre,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        gradient: RadialGradient(
+          colors: [couleur, couleur.withValues(alpha: 0)],
+          stops: const [0.0, 1.0],
+        ),
+      ),
+    );
+
+    return RepaintBoundary(
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          const DecoratedBox(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Color(0xFFD7F3FC),
+                  Color(0xFFEAF8FC),
+                  Color(0xFFF5FBFD),
+                  Color(0xFFFFFFFF),
+                ],
+                stops: [0.0, 0.38, 0.70, 1.0],
+              ),
+            ),
+          ),
+          // Lumiere ambiante : derriere la grille de tuiles, a droite puis a
+          // gauche, pour que le verre ait quelque chose a laisser passer.
+          Positioned(
+            right: -l * 0.35,
+            top: h * 0.30,
+            child: halo(
+              l * 1.1,
+              const Color(0xFF7FD8F0).withValues(alpha: 0.30),
+            ),
+          ),
+          Positioned(
+            left: -l * 0.45,
+            top: h * 0.52,
+            child: halo(
+              l * 1.0,
+              const Color(0xFF9BE2F4).withValues(alpha: 0.24),
+            ),
+          ),
+          Positioned(
+            right: -l * 0.20,
+            bottom: -l * 0.30,
+            child: halo(
+              l * 0.9,
+              const Color(0xFFBFEDF8).withValues(alpha: 0.22),
+            ),
+          ),
+        ],
       ),
     );
   }

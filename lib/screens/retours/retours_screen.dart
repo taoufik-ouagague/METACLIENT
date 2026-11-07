@@ -9,7 +9,7 @@ import '../../widgets/barre_segments.dart';
 import '../../widgets/carte_accent.dart';
 import '../../widgets/carte_filtres.dart';
 import '../../widgets/etiquette_valeur.dart';
-import '../../widgets/status_badge.dart';
+import '../../widgets/scroll_infini.dart';
 import '../../widgets/scroll_reveal.dart';
 import '../../widgets/info_rows_card.dart';
 
@@ -154,8 +154,8 @@ class RetoursScreen extends StatelessWidget {
               ),
               child: BarreSegments(
                 libelles: [
-                  'Chèques / Traites (${retourCtrl.retoursCCCT.length})',
-                  'Retours BL / Factures (${retourCtrl.retoursBL.length})',
+                  'Chèques / Traites (${retourCtrl.totalElementsCCCT.value})',
+                  'Retours BL / Factures (${retourCtrl.totalElementsBL.value})',
                 ],
                 index: retourCtrl.activeTab.value,
                 onChange: (i) => retourCtrl.activeTab.value = i,
@@ -282,32 +282,40 @@ class RetoursScreen extends StatelessWidget {
               );
             }
 
-            return RefreshIndicator(
-              color: AppTheme.primary,
-              backgroundColor: Colors.white,
-              onRefresh: () async {
-                if (retourCtrl.activeTab.value == 0) {
-                  await retourCtrl.fetchRetoursCCCT();
-                } else {
-                  await retourCtrl.fetchRetoursBL();
-                }
-              },
-              child: ListView.separated(
-                // Nouvelle cle a chaque onglet : la revelation rejoue.
-                key: ValueKey<int>(retourCtrl.activeTab.value),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 18,
-                  vertical: 8,
-                ),
-                itemCount: list.length,
-                separatorBuilder: (_, _) => const SizedBox(height: 10),
-                itemBuilder: (context, index) {
-                  final item = list[index];
-                  return ScrollReveal(
-                    index: index,
-                    child: _buildRetourCard(context, item),
-                  );
+            final pied = retourCtrl.isLoadingMore.value;
+
+            return ScrollInfini(
+              onFin: retourCtrl.chargerPlus,
+              child: RefreshIndicator(
+                color: AppTheme.primary,
+                backgroundColor: Colors.white,
+                onRefresh: () async {
+                  if (retourCtrl.activeTab.value == 0) {
+                    await retourCtrl.fetchRetoursCCCT(resetPage: true);
+                  } else {
+                    await retourCtrl.fetchRetoursBL(resetPage: true);
+                  }
                 },
+                child: ListView.separated(
+                  // Nouvelle cle a chaque onglet : la revelation rejoue.
+                  key: ValueKey<int>(retourCtrl.activeTab.value),
+                  padding: EdgeInsets.fromLTRB(
+                    18,
+                    8,
+                    18,
+                    8 + MediaQuery.paddingOf(context).bottom,
+                  ),
+                  itemCount: list.length + (pied ? 1 : 0),
+                  separatorBuilder: (_, _) => const SizedBox(height: 10),
+                  itemBuilder: (context, index) {
+                    if (index >= list.length) return const PiedChargement();
+                    final item = list[index];
+                    return ScrollReveal(
+                      index: index,
+                      child: _buildRetourCard(context, item),
+                    );
+                  },
+                ),
               ),
             );
           }),
@@ -391,136 +399,184 @@ class RetoursScreen extends StatelessWidget {
   Widget _buildRetourCard(BuildContext context, RetourFondModel item) {
     final isMoney = item.fond != null && item.fond! > 0;
 
-    // Une seule teinte : les deux natures sont deja distinguees par l'icone
-    // (jetons ou document) et par le libelle.
+    // Couleurs relevees au pixel sur la maquette.
+    const bleu = Color(0xFF007EBE);
+    const bleuVif = Color(0xFF1263BF);
+    const encre = Color(0xFF000A3C);
+    const gris = Color(0xFF637D9B);
+    const vert = Color(0xFF00927A);
+
+    // Les tailles de la maquette (1774 px pour ~366 pt) ramenees a la hauteur
+    // des cartes d'expedition, w x 334/953.
+    const k = 0.77;
+    const serre = 1.15;
+
     return CarteAccent(
-      teinte: AppTheme.primary,
+      teinte: bleu,
       icone: isMoney ? LucideIcons.coins : LucideIcons.fileText,
+      fondTeinte: false,
+      fond: const Color(0xFFEFF8FE),
+      rayon: 24,
+      ombres: [
+        BoxShadow(
+          color: const Color(0xFF269BC4).withValues(alpha: 0.20),
+          blurRadius: 22,
+          offset: const Offset(0, 9),
+        ),
+      ],
+      couleurFiligrane: const Color(0xFFD9EAFB).withValues(alpha: 0.35),
+      tailleFiligrane: 92 * k,
+      basFiligrane: 56 * k,
       onTap: () => _ouvrirFiche(context, item),
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(20, 16, 16, 16),
+        padding: const EdgeInsets.fromLTRB(14, 11 * k, 12, 9 * k),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // ─── En-tete : icone, declaration, n° piece, nature ───────────
             Row(
               children: [
                 Container(
-                  padding: const EdgeInsets.all(8),
+                  width: 42 * k,
+                  height: 42 * k,
                   decoration: BoxDecoration(
-                    color: AppTheme.primary.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(10),
+                    color: const Color(0xFF9FDEF6),
+                    borderRadius: BorderRadius.circular(10 * k),
                   ),
                   child: Icon(
                     isMoney ? LucideIcons.coins : LucideIcons.fileText,
-                    color: AppTheme.primary,
-                    size: 18,
+                    color: const Color(0xFF0786B9),
+                    size: 24 * k,
                   ),
                 ),
-                const SizedBox(width: 10),
+                const SizedBox(width: 11),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        'Décl: ${item.numDeclaration ?? "—"}',
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          color: Color(0xFF0F172A),
-                          fontSize: 14.5,
-                          fontWeight: FontWeight.w800,
+                      FittedBox(
+                        fit: BoxFit.scaleDown,
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          'Décl: ${item.numDeclaration ?? "—"}',
+                          maxLines: 1,
+                          style: const TextStyle(
+                            color: encre,
+                            fontSize: 21 * k,
+                            height: serre,
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: -0.2,
+                          ),
                         ),
                       ),
                       if (valeurRenseignee(item.numPiece)) ...[
-                        const SizedBox(height: 2),
-                        EtiquetteValeur(
-                          intitule: 'N° pièce : ',
-                          valeur: '${item.numPiece}',
-                          couleur: const Color(0xFF7C3AED),
-                          taille: 12,
-                        ),
-                      ],
-                      if (item.bordereau != null) ...[
-                        const SizedBox(height: 2),
-                        EtiquetteValeur(
-                          intitule: 'Bordereau : ',
-                          valeur: '${item.bordereau}',
-                          couleur: const Color(0xFF4F46E5),
-                          taille: 11.5,
+                        SizedBox(height: 2 * k),
+                        FittedBox(
+                          fit: BoxFit.scaleDown,
+                          alignment: Alignment.centerLeft,
+                          child: EtiquetteValeur(
+                            intitule: 'N° pièce : ',
+                            valeur: '${item.numPiece}',
+                            couleur: bleuVif,
+                            couleurIntitule: gris,
+                            taille: 16 * k,
+                          ),
                         ),
                       ],
                     ],
                   ),
                 ),
                 const SizedBox(width: 8),
-                StatusBadge(status: item.nature),
+                _badgeNature(item.nature, k),
               ],
             ),
-            const SizedBox(height: 12),
-            const Divider(color: Color(0xFFE2E8F0), height: 1),
-            const SizedBox(height: 12),
+            SizedBox(height: 7 * k),
+            const Divider(color: Color(0xFFC9E3F4), height: 1),
+            SizedBox(height: 7 * k),
 
+            // ─── Destinataire et montant ──────────────────────────────────
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
+                      Text(
                         'Destinataire',
                         style: TextStyle(
-                          color: Color(0xFF64748B),
-                          fontSize: 11.5,
+                          color: const Color(0xFF506B91),
+                          fontSize: 16 * k,
+                          height: serre,
+                          fontWeight: FontWeight.w500,
                         ),
                       ),
-                      const SizedBox(height: 2),
-                      RichText(
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        text: TextSpan(
-                          children: [
-                            TextSpan(
-                              text: item.destinataire ?? '—',
+                      SizedBox(height: 1 * k),
+                      // Le nom et la ville, separes d'un filet : sur une
+                      // seule ligne de texte, la ville se perdait.
+                      Row(
+                        children: [
+                          Flexible(
+                            child: Text(
+                              item.destinataire ?? '—',
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
                               style: const TextStyle(
-                                color: Color(0xFF0F172A),
-                                fontSize: 13,
+                                color: encre,
+                                fontSize: 19 * k,
+                                height: serre,
+                                fontWeight: FontWeight.w700,
+                                letterSpacing: -0.3,
+                              ),
+                            ),
+                          ),
+                          Container(
+                            width: 1,
+                            height: 16 * k,
+                            margin: EdgeInsets.symmetric(horizontal: 8 * k),
+                            color: const Color(0xFF9BB8D6),
+                          ),
+                          Flexible(
+                            child: Text(
+                              item.destination ?? '—',
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                color: Color(0xFF0082BF),
+                                fontSize: 17 * k,
+                                height: serre,
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
-                            TextSpan(
-                              text: '  ${item.destination ?? "—"}',
-                              style: const TextStyle(
-                                color: Color(0xFF0284C7),
-                                fontSize: 12.5,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
                 ),
                 if (isMoney) ...[
-                  const SizedBox(width: 8),
+                  SizedBox(width: 10 * k),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
-                      const Text(
+                      Text(
                         'Montant Fond',
                         style: TextStyle(
-                          color: Color(0xFF64748B),
-                          fontSize: 11.5,
+                          color: const Color(0xFF637B99),
+                          fontSize: 16 * k,
+                          height: serre,
+                          fontWeight: FontWeight.w500,
                         ),
                       ),
-                      const SizedBox(height: 2),
+                      SizedBox(height: 1 * k),
                       Text(
                         _formatCurrency(item.fond),
-                        style: const TextStyle(
-                          color: AppTheme.primary,
-                          fontSize: 14.5,
-                          fontWeight: FontWeight.w800,
+                        style: TextStyle(
+                          color: bleu,
+                          fontSize: 20 * k,
+                          height: serre,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: -0.4,
                         ),
                       ),
                     ],
@@ -529,34 +585,50 @@ class RetoursScreen extends StatelessWidget {
               ],
             ),
 
-            if (item.dateRemise != null ||
+            // ─── Banque et encaissement ───────────────────────────────────
+            if (item.banque != null ||
                 item.dateEncaissement != null ||
-                item.banque != null) ...[
-              const SizedBox(height: 8),
+                item.dateRemise != null) ...[
+              SizedBox(height: 8 * k),
+              // Wrap et non Row : la date d'encaissement doit se lire en
+              // entier, quitte a passer a la ligne quand la banque est longue.
               Wrap(
-                spacing: 14,
-                runSpacing: 4,
+                spacing: 12 * k,
+                runSpacing: 5 * k,
+                crossAxisAlignment: WrapCrossAlignment.center,
                 children: [
                   if (item.banque != null)
-                    EtiquetteValeur(
-                      intitule: 'Banque : ',
-                      valeur: item.banque!,
-                      couleur: const Color(0xFF4F46E5),
-                      taille: 11.5,
+                    _mentionJeton(
+                      LucideIcons.landmark,
+                      const Color(0xFFC2EDFC),
+                      const Color(0xFF0086CA),
+                      'Banque : ',
+                      item.banque!,
+                      const Color(0xFF0560D2),
+                      const Color(0xFF6D809C),
+                      k,
                     ),
                   if (item.dateEncaissement != null)
-                    EtiquetteValeur(
-                      intitule: 'Encaissé : ',
-                      valeur: item.dateEncaissement!,
-                      couleur: const Color(0xFF059669),
-                      taille: 11.5,
-                    ),
-                  if (item.dateRemise != null)
-                    EtiquetteValeur(
-                      intitule: 'Remis : ',
-                      valeur: item.dateRemise!,
-                      couleur: const Color(0xFFD97706),
-                      taille: 11.5,
+                    _mentionJeton(
+                      LucideIcons.check,
+                      const Color(0xFFC1F0E4),
+                      const Color(0xFF00A486),
+                      'Encaissé : ',
+                      item.dateEncaissement!,
+                      vert,
+                      const Color(0xFF415C7D),
+                      k,
+                    )
+                  else if (item.dateRemise != null)
+                    _mentionJeton(
+                      LucideIcons.check,
+                      const Color(0xFFC1F0E4),
+                      const Color(0xFF00A486),
+                      'Remis : ',
+                      item.dateRemise!,
+                      vert,
+                      const Color(0xFF415C7D),
+                      k,
                     ),
                 ],
               ),
@@ -564,6 +636,62 @@ class RetoursScreen extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+
+  /// Badge de nature, contour bleu et fond pale.
+  Widget _badgeNature(String nature, double k) {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 10 * k, vertical: 5 * k),
+      decoration: BoxDecoration(
+        color: const Color(0xFFBBE8FA),
+        borderRadius: BorderRadius.circular(25),
+        border: Border.all(color: const Color(0xFF7FCDEE)),
+      ),
+      child: Text(
+        nature,
+        style: TextStyle(
+          color: const Color(0xFF0083BF),
+          fontSize: 14 * k,
+          height: 1.15,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+    );
+  }
+
+  /// Jeton colore suivi de son intitule et de sa valeur.
+  Widget _mentionJeton(
+    IconData icone,
+    Color fondJeton,
+    Color teinteJeton,
+    String intitule,
+    String valeur,
+    Color couleur,
+    Color couleurIntitule,
+    double k,
+  ) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          width: 26 * k,
+          height: 26 * k,
+          decoration: BoxDecoration(
+            color: fondJeton,
+            borderRadius: BorderRadius.circular(8 * k),
+          ),
+          child: Icon(icone, color: teinteJeton, size: 15 * k),
+        ),
+        SizedBox(width: 7 * k),
+        EtiquetteValeur(
+          intitule: intitule,
+          valeur: valeur,
+          couleur: couleur,
+          couleurIntitule: couleurIntitule,
+          taille: 17 * k,
+        ),
+      ],
     );
   }
 }

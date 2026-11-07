@@ -21,6 +21,10 @@ class FactureController extends GetxController {
   final RxInt currentPage = 1.obs;
   final RxInt totalPages = 1.obs;
   final RxInt totalElements = 0.obs;
+  /// Vrai pendant qu'une page suivante arrive : la liste reste a l'ecran et
+  /// un rond s'ajoute en pied, au lieu du voile plein ecran.
+  final RxBool isLoadingMore = false.obs;
+
   final RxString filterStatut = 'tous'.obs; // 'tous', 'cloture', 'en cours'
 
   @override
@@ -30,6 +34,22 @@ class FactureController extends GetxController {
       fetchFacturesInstances();
       fetchAllFactures();
     }
+  }
+
+  /// Echeance d'une facture.
+  ///
+  /// L'API des factures en instance ne la renvoie pas, celle de la liste
+  /// complete si : on la reprend de la, par identifiant. Null si la facture
+  /// n'est pas dans la page chargee.
+  String? echeanceDe(FactureModel f) {
+    if ((f.dateEcheance ?? '').trim().isNotEmpty) return f.dateEcheance;
+    for (final autre in allFactures) {
+      if (autre.idFacture == f.idFacture &&
+          (autre.dateEcheance ?? '').trim().isNotEmpty) {
+        return autre.dateEcheance;
+      }
+    }
+    return null;
   }
 
   Future<void> fetchFacturesInstances() async {
@@ -53,17 +73,25 @@ class FactureController extends GetxController {
     }
   }
 
-  Future<void> fetchAllFactures({bool resetPage = false}) async {
+  Future<void> fetchAllFactures({
+    bool resetPage = false,
+    bool ajout = false,
+  }) async {
     if (resetPage) currentPage.value = 1;
+    final page = ajout ? currentPage.value + 1 : currentPage.value;
 
     try {
-      isLoading.value = true;
+      if (ajout) {
+        isLoadingMore.value = true;
+      } else {
+        isLoading.value = true;
+      }
       final String? regle = filterStatut.value == 'tous'
           ? null
           : filterStatut.value;
       final res = await ApiService.getFactures(
-        page: currentPage.value,
-        pageSize: 20,
+        page: page,
+        pageSize: taillePagePaquet,
         regle: regle,
       );
 
@@ -71,7 +99,14 @@ class FactureController extends GetxController {
           .map((e) => FactureModel.fromJson(Map<String, dynamic>.from(e)))
           .toList();
 
-      allFactures.value = list;
+      if (ajout) {
+        allFactures.addAll(list);
+        // La page n'avance qu'une fois les lignes en place : un appel rate
+        // ne doit pas faire sauter un paquet au scroll suivant.
+        currentPage.value = page;
+      } else {
+        allFactures.value = list;
+      }
       totalPages.value = (res['totalPages'] as num?)?.toInt() ?? 1;
       totalElements.value = (res['totalElements'] as num?)?.toInt() ?? 0;
     } catch (e) {
@@ -83,7 +118,11 @@ class FactureController extends GetxController {
         colorText: Colors.white,
       );
     } finally {
-      isLoading.value = false;
+      if (ajout) {
+        isLoadingMore.value = false;
+      } else {
+        isLoading.value = false;
+      }
     }
   }
 
@@ -111,17 +150,13 @@ class FactureController extends GetxController {
     }
   }
 
-  void nextPage() {
-    if (currentPage.value < totalPages.value) {
-      currentPage.value++;
-      fetchAllFactures();
-    }
-  }
+  /// Reste-t-il des pages a tirer ?
+  bool get aPlusDePages => currentPage.value < totalPages.value;
 
-  void previousPage() {
-    if (currentPage.value > 1) {
-      currentPage.value--;
-      fetchAllFactures();
-    }
+  /// Tire le paquet suivant. Les gardes rendent l'appel gratuit : le scroll
+  /// la declenche a chaque frame passee pres du bas.
+  Future<void> chargerPlus() async {
+    if (isLoading.value || isLoadingMore.value || !aPlusDePages) return;
+    await fetchAllFactures(ajout: true);
   }
 }

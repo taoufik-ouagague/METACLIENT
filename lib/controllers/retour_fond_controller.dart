@@ -20,6 +20,15 @@ class RetourFondController extends GetxController {
   final RxInt pageBL = 1.obs;
   final RxInt totalPagesBL = 1.obs;
 
+  /// Total cote serveur, pas le nombre de lignes deja tirees : l'onglet
+  /// annonce la taille reelle du lot, qui ne bouge pas pendant le scroll.
+  final RxInt totalElementsCCCT = 0.obs;
+  final RxInt totalElementsBL = 0.obs;
+
+  /// Vrai pendant qu'une page suivante arrive : la liste reste a l'ecran et
+  /// un rond s'ajoute en pied, au lieu du voile plein ecran.
+  final RxBool isLoadingMore = false.obs;
+
   final RxString filterDu = ''.obs;
   final RxString filterAu = ''.obs;
   final RxString filterNumDeclaration = ''.obs;
@@ -53,11 +62,19 @@ class RetourFondController extends GetxController {
     }
   }
 
-  Future<void> fetchRetoursCCCT({bool resetPage = false}) async {
+  Future<void> fetchRetoursCCCT({
+    bool resetPage = false,
+    bool ajout = false,
+  }) async {
     if (resetPage) pageCCCT.value = 1;
+    final page = ajout ? pageCCCT.value + 1 : pageCCCT.value;
 
     try {
-      isLoading.value = true;
+      if (ajout) {
+        isLoadingMore.value = true;
+      } else {
+        isLoading.value = true;
+      }
       final du = filterDu.value.isEmpty ? null : filterDu.value;
       final au = filterAu.value.isEmpty ? null : filterAu.value;
       final numDec = filterNumDeclaration.value.isEmpty
@@ -72,8 +89,8 @@ class RetourFondController extends GetxController {
       final remis = filterRemis.value.isEmpty ? null : filterRemis.value;
 
       final res = await ApiService.getRetourFondCCCT(
-        page: pageCCCT.value,
-        pageSize: 20,
+        page: page,
+        pageSize: taillePagePaquet,
         du: du,
         au: au,
         numDeclaration: numDec,
@@ -86,20 +103,40 @@ class RetourFondController extends GetxController {
           .map((e) => RetourFondModel.fromJson(Map<String, dynamic>.from(e)))
           .toList();
 
-      retoursCCCT.value = list;
+      if (ajout) {
+        retoursCCCT.addAll(list);
+        // La page n'avance qu'une fois les lignes en place : un appel rate
+        // ne doit pas faire sauter un paquet au scroll suivant.
+        pageCCCT.value = page;
+      } else {
+        retoursCCCT.value = list;
+      }
       totalPagesCCCT.value = (res['totalPages'] as num?)?.toInt() ?? 1;
+      totalElementsCCCT.value = (res['totalElements'] as num?)?.toInt() ?? 0;
     } catch (e) {
       debugPrint('RetourFond CCCT error: $e');
     } finally {
-      isLoading.value = false;
+      if (ajout) {
+        isLoadingMore.value = false;
+      } else {
+        isLoading.value = false;
+      }
     }
   }
 
-  Future<void> fetchRetoursBL({bool resetPage = false}) async {
+  Future<void> fetchRetoursBL({
+    bool resetPage = false,
+    bool ajout = false,
+  }) async {
     if (resetPage) pageBL.value = 1;
+    final page = ajout ? pageBL.value + 1 : pageBL.value;
 
     try {
-      isLoading.value = true;
+      if (ajout) {
+        isLoadingMore.value = true;
+      } else {
+        isLoading.value = true;
+      }
       final du = filterDu.value.isEmpty ? null : filterDu.value;
       final au = filterAu.value.isEmpty ? null : filterAu.value;
       final numDec = filterNumDeclaration.value.isEmpty
@@ -114,8 +151,8 @@ class RetourFondController extends GetxController {
       final remis = filterRemis.value.isEmpty ? null : filterRemis.value;
 
       final res = await ApiService.getRetourFondBL(
-        page: pageBL.value,
-        pageSize: 20,
+        page: page,
+        pageSize: taillePagePaquet,
         du: du,
         au: au,
         numDeclaration: numDec,
@@ -128,12 +165,40 @@ class RetourFondController extends GetxController {
           .map((e) => RetourFondModel.fromJson(Map<String, dynamic>.from(e)))
           .toList();
 
-      retoursBL.value = list;
+      if (ajout) {
+        retoursBL.addAll(list);
+        // La page n'avance qu'une fois les lignes en place : un appel rate
+        // ne doit pas faire sauter un paquet au scroll suivant.
+        pageBL.value = page;
+      } else {
+        retoursBL.value = list;
+      }
       totalPagesBL.value = (res['totalPages'] as num?)?.toInt() ?? 1;
+      totalElementsBL.value = (res['totalElements'] as num?)?.toInt() ?? 0;
     } catch (e) {
       debugPrint('RetourFond BL error: $e');
     } finally {
-      isLoading.value = false;
+      if (ajout) {
+        isLoadingMore.value = false;
+      } else {
+        isLoading.value = false;
+      }
+    }
+  }
+
+  /// Reste-t-il des pages a tirer sur l'onglet affiche ?
+  bool get aPlusDePages => activeTab.value == 0
+      ? pageCCCT.value < totalPagesCCCT.value
+      : pageBL.value < totalPagesBL.value;
+
+  /// Tire le paquet suivant de l'onglet affiche. Les gardes rendent l'appel
+  /// gratuit : le scroll le declenche a chaque frame passee pres du bas.
+  Future<void> chargerPlus() async {
+    if (isLoading.value || isLoadingMore.value || !aPlusDePages) return;
+    if (activeTab.value == 0) {
+      await fetchRetoursCCCT(ajout: true);
+    } else {
+      await fetchRetoursBL(ajout: true);
     }
   }
 }

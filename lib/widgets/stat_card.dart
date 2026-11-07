@@ -62,178 +62,230 @@ class _StatCardState extends State<StatCard> {
     final accent = widget.color ?? AppTheme.primaryIcons;
     final vedette = widget.vedette;
 
-    final carte = GlassContainer(
-      borderRadius: 16,
-      // Teinte a peine posee : elle rattache la tuile a sa famille de couleur
-      // sans que la grille vire au bariole.
-      color: Color.alphaBlend(
-        accent.withValues(alpha: 0.05),
-        Colors.white.withValues(alpha: 0.88),
-      ),
-      padding: EdgeInsets.symmetric(
-        horizontal: vedette ? 17 : 13,
-        vertical: vedette ? 15 : 10,
-      ),
-      child: Stack(
-        clipBehavior: Clip.none,
-        children: [
-          // Icone fantome : un filigrane dans l'angle, pas un motif. Plus
-          // grande, elle passait derriere le libelle et se lisait comme un
-          // trait de plus ; on la rentre dans le coin pour n'en laisser qu'une
-          // amorce, que le ClipRRect du GlassContainer recoupe.
-          //
-          // La vedette s'en passe : son chiffre suffit a accrocher l'oeil, et
-          // le filigrane y restait assez grand pour se lire comme une forme.
-          if (!vedette)
-            Positioned(
-              right: -10,
-              bottom: -14,
-              child: Icon(
-                widget.icon,
-                size: 46,
-                color: accent.withValues(alpha: 0.055),
-              ),
-            ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Container(
-                    padding: EdgeInsets.all(vedette ? 8 : 6),
-                    decoration: BoxDecoration(
-                      color: accent.withValues(alpha: 0.12),
-                      borderRadius: BorderRadius.circular(vedette ? 12 : 10),
-                      border: Border.all(
-                        color: accent.withValues(alpha: 0.25),
-                        width: 1,
-                      ),
-                    ),
-                    child: Icon(
-                      widget.icon,
-                      color: accent,
-                      size: vedette ? 20 : 16,
-                    ),
-                  ),
-                  if (widget.subtitle != null)
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 6,
-                        vertical: 2,
-                      ),
-                      decoration: BoxDecoration(
-                        color: accent.withValues(alpha: 0.10),
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                      child: Text(
-                        widget.subtitle!,
-                        style: TextStyle(
-                          color: accent,
-                          fontSize: vedette ? 11 : 10,
-                          fontWeight: FontWeight.w600,
-                          letterSpacing: -0.2,
-                        ),
-                      ),
-                    ),
-                ],
-              ),
-              SizedBox(height: vedette ? 12 : 8),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Flexible(
-                    child: FittedBox(
-                      fit: BoxFit.scaleDown,
-                      alignment: Alignment.centerLeft,
-                      child: widget.chargement
-                          ? Squelette(
-                              width: vedette ? 150 : 58,
-                              height: vedette ? 31 : 19,
-                              radius: 7,
-                            )
-                          : _valeurAnimee(
-                              TextStyle(
-                                color: isLight
-                                    ? const Color(0xFF0F172A)
-                                    : Colors.white,
-                                fontSize: vedette ? 31 : 17,
-                                fontWeight: FontWeight.w800,
-                                letterSpacing: -0.5,
-                              ),
-                            ),
-                    ),
-                  ),
-                  if (vedette &&
-                      widget.complement != null &&
-                      !widget.chargement)
-                    Padding(
-                      padding: const EdgeInsets.only(left: 12, bottom: 4),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Flexible(
-                            child: Text(
-                              widget.complement!,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              textAlign: TextAlign.right,
-                              style: TextStyle(
-                                color: accent,
-                                fontSize: 12.5,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 2),
-                          Icon(
-                            Icons.chevron_right_rounded,
-                            size: 17,
-                            color: accent,
-                          ),
-                        ],
-                      ),
-                    ),
-                ],
-              ),
-              SizedBox(height: vedette ? 4 : 2),
-              if (widget.chargement)
-                const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 2),
-                  child: Squelette(height: 10, radius: 5),
-                )
-              else
-                Text(
-                  widget.title,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    color: isLight
-                        ? const Color(0xFF64748B)
-                        : Colors.white.withValues(alpha: 0.7),
-                    fontSize: vedette ? 13 : 11.5,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-            ],
+    final rayon = BorderRadius.circular(16);
+
+    // Les ombres sont posees ici, autour du GlassContainer : lui les met sur
+    // un Container place a l'interieur de son ClipRRect, qui les recoupe
+    // aussitot. Trois couches, du halo diffus au contact fin, pour que la
+    // tuile flotte au-dessus du degrade sans l'assombrir.
+    final carte = DecoratedBox(
+      decoration: BoxDecoration(
+        borderRadius: rayon,
+        boxShadow: [
+          BoxShadow(
+            color: AppTheme.primaryIcons.withValues(alpha: 0.13),
+            blurRadius: 30,
+            spreadRadius: -6,
+            offset: const Offset(0, 16),
           ),
-          // Filet d'accent au ras du bord bas : la couleur de la tuile se lit
-          // enfin d'un coup d'oeil, l'icone seule etait trop petite pour ca.
-          Positioned(
-            left: vedette ? -17 : -13,
-            right: vedette ? -17 : -13,
-            bottom: vedette ? -15 : -10,
-            child: Container(
-              height: 3,
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [accent, accent.withValues(alpha: 0.35)],
-                ),
-              ),
-            ),
+          BoxShadow(
+            color: const Color(0xFF1B3A5B).withValues(alpha: 0.08),
+            blurRadius: 16,
+            spreadRadius: -3,
+            offset: const Offset(0, 7),
+          ),
+          BoxShadow(
+            color: const Color(0xFF1B3A5B).withValues(alpha: 0.05),
+            blurRadius: 3,
+            offset: const Offset(0, 1),
           ),
         ],
+      ),
+      child: GlassContainer(
+        borderRadius: 16,
+        // Teinte a peine posee : elle rattache la tuile a sa famille de couleur
+        // sans que la grille vire au bariole.
+        // Translucide : le degrade du bandeau transparait et la tuile se lit
+        // comme du verre. A 0,88 elle etait pratiquement opaque.
+        color: Color.alphaBlend(
+          accent.withValues(alpha: 0.05),
+          Colors.white.withValues(alpha: 0.74),
+        ),
+        padding: EdgeInsets.symmetric(
+          horizontal: vedette ? 17 : 13,
+          vertical: vedette ? 15 : 10,
+        ),
+        child: Stack(
+          clipBehavior: Clip.none,
+          children: [
+            // Icone fantome : un filigrane dans l'angle, pas un motif. Plus
+            // grande, elle passait derriere le libelle et se lisait comme un
+            // trait de plus ; on la rentre dans le coin pour n'en laisser qu'une
+            // amorce, que le ClipRRect du GlassContainer recoupe.
+            //
+            // La vedette s'en passe : son chiffre suffit a accrocher l'oeil, et
+            // le filigrane y restait assez grand pour se lire comme une forme.
+            if (!vedette)
+              Positioned(
+                right: -10,
+                bottom: -14,
+                child: Icon(
+                  widget.icon,
+                  size: 46,
+                  color: accent.withValues(alpha: 0.055),
+                ),
+              ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Container(
+                      padding: EdgeInsets.all(vedette ? 8 : 6),
+                      decoration: BoxDecoration(
+                        color: accent.withValues(alpha: 0.12),
+                        borderRadius: BorderRadius.circular(vedette ? 12 : 10),
+                        border: Border.all(
+                          color: accent.withValues(alpha: 0.25),
+                          width: 1,
+                        ),
+                      ),
+                      child: Icon(
+                        widget.icon,
+                        color: accent,
+                        size: vedette ? 20 : 16,
+                      ),
+                    ),
+                    if (widget.subtitle != null)
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 6,
+                          vertical: 2,
+                        ),
+                        decoration: BoxDecoration(
+                          color: accent.withValues(alpha: 0.10),
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: Text(
+                          widget.subtitle!,
+                          style: TextStyle(
+                            color: accent,
+                            fontSize: vedette ? 11 : 10,
+                            fontWeight: FontWeight.w600,
+                            letterSpacing: -0.2,
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+                SizedBox(height: vedette ? 12 : 8),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Flexible(
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        alignment: Alignment.centerLeft,
+                        child: widget.chargement
+                            ? Squelette(
+                                width: vedette ? 150 : 58,
+                                height: vedette ? 31 : 19,
+                                radius: 7,
+                              )
+                            : _valeurAnimee(
+                                TextStyle(
+                                  color: isLight
+                                      ? const Color(0xFF0F172A)
+                                      : Colors.white,
+                                  fontSize: vedette ? 31 : 17,
+                                  fontWeight: FontWeight.w800,
+                                  letterSpacing: -0.5,
+                                ),
+                              ),
+                      ),
+                    ),
+                    if (vedette &&
+                        widget.complement != null &&
+                        !widget.chargement)
+                      Padding(
+                        padding: const EdgeInsets.only(left: 12, bottom: 4),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Flexible(
+                              child: Text(
+                                widget.complement!,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                textAlign: TextAlign.right,
+                                style: TextStyle(
+                                  color: accent,
+                                  fontSize: 12.5,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 2),
+                            Icon(
+                              Icons.chevron_right_rounded,
+                              size: 17,
+                              color: accent,
+                            ),
+                          ],
+                        ),
+                      ),
+                  ],
+                ),
+                SizedBox(height: vedette ? 4 : 2),
+                if (widget.chargement)
+                  const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 2),
+                    child: Squelette(height: 10, radius: 5),
+                  )
+                else
+                  Text(
+                    widget.title,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      color: isLight
+                          ? const Color(0xFF64748B)
+                          : Colors.white.withValues(alpha: 0.7),
+                      fontSize: vedette ? 13 : 11.5,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+              ],
+            ),
+            // Arete haute eclairee : un filet blanc tres fin suffit a donner
+            // l'epaisseur du verre.
+            Positioned(
+              left: vedette ? -17 : -13,
+              right: vedette ? -17 : -13,
+              top: vedette ? -15 : -10,
+              child: Container(
+                height: 1.4,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      Colors.white.withValues(alpha: 0),
+                      Colors.white.withValues(alpha: 0.95),
+                      Colors.white.withValues(alpha: 0),
+                    ],
+                    stops: const [0.0, 0.5, 1.0],
+                  ),
+                ),
+              ),
+            ),
+            // Filet d'accent au ras du bord bas : la couleur de la tuile se lit
+            // enfin d'un coup d'oeil, l'icone seule etait trop petite pour ca.
+            Positioned(
+              left: vedette ? -17 : -13,
+              right: vedette ? -17 : -13,
+              bottom: vedette ? -15 : -10,
+              child: Container(
+                height: 3,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [accent, accent.withValues(alpha: 0.35)],
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
 

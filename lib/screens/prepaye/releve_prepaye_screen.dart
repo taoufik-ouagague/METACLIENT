@@ -8,8 +8,8 @@ import '../../theme/app_theme.dart';
 import '../../widgets/barre_segments.dart';
 import '../../widgets/carte_filtres.dart';
 import '../../widgets/carte_liste.dart';
-import '../../widgets/glass_container.dart';
 import '../../widgets/etat_vide.dart';
+import '../../widgets/scroll_infini.dart';
 import '../../widgets/scroll_reveal.dart';
 
 class RelevePrepayeScreen extends StatelessWidget {
@@ -186,73 +186,36 @@ class RelevePrepayeScreen extends StatelessWidget {
               );
             }
 
-            return RefreshIndicator(
-              color: AppTheme.primary,
-              backgroundColor: Colors.white,
-              onRefresh: () => ctrl.fetchReleve(),
-              child: ListView.separated(
-                // Nouvelle cle a chaque bascule : la revelation rejoue.
-                key: ValueKey<String>(
-                  '${ctrl.filterSens.value}|${ctrl.filterDu.value}|${ctrl.filterAu.value}',
+            return ScrollInfini(
+              onFin: ctrl.chargerPlus,
+              child: RefreshIndicator(
+                color: AppTheme.primary,
+                backgroundColor: Colors.white,
+                onRefresh: () => ctrl.fetchReleve(resetPage: true),
+                child: ListView.separated(
+                  // Nouvelle cle a chaque bascule : la revelation rejoue.
+                  key: ValueKey<String>(
+                    '${ctrl.filterSens.value}|${ctrl.filterDu.value}|${ctrl.filterAu.value}',
+                  ),
+                  // Voir agences_screen : la barre flottante masque le bas.
+                  padding: EdgeInsets.fromLTRB(
+                    18,
+                    8,
+                    18,
+                    8 + MediaQuery.paddingOf(context).bottom,
+                  ),
+                  itemCount:
+                      liste.length + (ctrl.isLoadingMore.value ? 1 : 0),
+                  separatorBuilder: (_, _) => const SizedBox(height: 10),
+                  itemBuilder: (context, i) => i >= liste.length
+                      ? const PiedChargement()
+                      : ScrollReveal(index: i, child: _carteOperation(liste[i])),
                 ),
-                // Voir agences_screen : la barre flottante masque le bas.
-                padding: EdgeInsets.fromLTRB(
-                  18,
-                  8,
-                  18,
-                  8 + MediaQuery.paddingOf(context).bottom,
-                ),
-                itemCount: liste.length,
-                separatorBuilder: (_, _) => const SizedBox(height: 10),
-                itemBuilder: (context, i) =>
-                    ScrollReveal(index: i, child: _carteOperation(liste[i])),
               ),
             );
           }),
         ),
 
-        // ─── PAGINATION ────────────────────────────────────────────────────
-        Obx(() {
-          if (ctrl.totalPages.value <= 1) return const SizedBox.shrink();
-          return Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
-            child: GlassContainer(
-              borderRadius: 16,
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  IconButton(
-                    icon: const Icon(
-                      LucideIcons.chevronLeft,
-                      color: AppTheme.primary,
-                    ),
-                    onPressed: ctrl.currentPage.value > 1
-                        ? ctrl.pagePrecedente
-                        : null,
-                  ),
-                  Text(
-                    'Page ${ctrl.currentPage.value} / ${ctrl.totalPages.value}',
-                    style: const TextStyle(
-                      color: Color(0xFF0F172A),
-                      fontSize: 13,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                  IconButton(
-                    icon: const Icon(
-                      LucideIcons.chevronRight,
-                      color: AppTheme.primary,
-                    ),
-                    onPressed: ctrl.currentPage.value < ctrl.totalPages.value
-                        ? ctrl.pageSuivante
-                        : null,
-                  ),
-                ],
-              ),
-            ),
-          );
-        }),
       ],
     );
   }

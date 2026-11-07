@@ -270,14 +270,19 @@ class CarteFiltres extends StatelessWidget {
         ),
         const SizedBox(width: 14),
         Expanded(
-          child: Text(
-            titre,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: const TextStyle(
-              color: Color(0xFF0F172A),
-              fontSize: 22,
-              fontWeight: FontWeight.w800,
+          // Un titre long retrecit au lieu d'etre coupe : « Filtrer les
+          // expeditions » ne tient pas a 22pt la ou « les retours » passe.
+          child: FittedBox(
+            fit: BoxFit.scaleDown,
+            alignment: Alignment.centerLeft,
+            child: Text(
+              titre,
+              maxLines: 1,
+              style: const TextStyle(
+                color: Color(0xFF0F172A),
+                fontSize: 22,
+                fontWeight: FontWeight.w800,
+              ),
             ),
           ),
         ),

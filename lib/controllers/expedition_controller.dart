@@ -28,6 +28,10 @@ class ExpeditionController extends GetxController {
   final RxInt currentPage = 1.obs;
   final RxInt totalPages = 1.obs;
   final RxInt totalElements = 0.obs;
+  /// Vrai pendant qu'une page suivante arrive : la liste reste a l'ecran et
+  /// un rond s'ajoute en pied, au lieu du voile plein ecran.
+  final RxBool isLoadingMore = false.obs;
+
   final RxString searchQuery = ''.obs;
   final RxString filterDu = ''.obs;
   final RxString filterAu = ''.obs;
@@ -70,11 +74,19 @@ class ExpeditionController extends GetxController {
     }
   }
 
-  Future<void> fetchAllExpeditions({bool resetPage = false}) async {
+  Future<void> fetchAllExpeditions({
+    bool resetPage = false,
+    bool ajout = false,
+  }) async {
     if (resetPage) currentPage.value = 1;
+    final page = ajout ? currentPage.value + 1 : currentPage.value;
 
     try {
-      isLoading.value = true;
+      if (ajout) {
+        isLoadingMore.value = true;
+      } else {
+        isLoading.value = true;
+      }
       final du = filterDu.value.isEmpty ? null : filterDu.value;
       final au = filterAu.value.isEmpty ? null : filterAu.value;
       final numDec = searchQuery.value.isEmpty
@@ -86,8 +98,8 @@ class ExpeditionController extends GetxController {
       final fond = filterMntFond.value.trim();
 
       final res = await ApiService.getExpeditions(
-        page: currentPage.value,
-        pageSize: 20,
+        page: page,
+        pageSize: taillePagePaquet,
         du: du,
         au: au,
         numDeclaration: numDec,
@@ -101,7 +113,14 @@ class ExpeditionController extends GetxController {
           .map((e) => ExpeditionModel.fromJson(Map<String, dynamic>.from(e)))
           .toList();
 
-      allExpeditions.value = list;
+      if (ajout) {
+        allExpeditions.addAll(list);
+        // La page n'avance qu'une fois les lignes en place : un appel rate
+        // ne doit pas faire sauter un paquet au scroll suivant.
+        currentPage.value = page;
+      } else {
+        allExpeditions.value = list;
+      }
       totalPages.value = (res['totalPages'] as num?)?.toInt() ?? 1;
       totalElements.value = (res['totalElements'] as num?)?.toInt() ?? 0;
     } catch (e) {
@@ -113,7 +132,11 @@ class ExpeditionController extends GetxController {
         colorText: Colors.white,
       );
     } finally {
-      isLoading.value = false;
+      if (ajout) {
+        isLoadingMore.value = false;
+      } else {
+        isLoading.value = false;
+      }
     }
   }
 
@@ -193,17 +216,13 @@ class ExpeditionController extends GetxController {
     }
   }
 
-  void nextPage() {
-    if (currentPage.value < totalPages.value) {
-      currentPage.value++;
-      fetchAllExpeditions();
-    }
-  }
+  /// Reste-t-il des pages a tirer ?
+  bool get aPlusDePages => currentPage.value < totalPages.value;
 
-  void previousPage() {
-    if (currentPage.value > 1) {
-      currentPage.value--;
-      fetchAllExpeditions();
-    }
+  /// Tire le paquet suivant. Les gardes rendent l'appel gratuit : le scroll
+  /// la declenche a chaque frame passee pres du bas.
+  Future<void> chargerPlus() async {
+    if (isLoading.value || isLoadingMore.value || !aPlusDePages) return;
+    await fetchAllExpeditions(ajout: true);
   }
 }
