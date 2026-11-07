@@ -9,6 +9,7 @@ import '../../widgets/barre_segments.dart';
 import '../../widgets/carte_filtres.dart';
 import '../../widgets/carte_liste.dart';
 import '../../widgets/glass_container.dart';
+import '../../widgets/etat_vide.dart';
 import '../../widgets/scroll_reveal.dart';
 
 class RelevePrepayeScreen extends StatelessWidget {
@@ -178,22 +179,10 @@ class RelevePrepayeScreen extends StatelessWidget {
 
             final liste = ctrl.lignesAffichees;
             if (liste.isEmpty) {
-              return const Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      LucideIcons.wallet,
-                      color: Color(0xFFCBD5E1),
-                      size: 48,
-                    ),
-                    SizedBox(height: 12),
-                    Text(
-                      'Aucune opération sur la période',
-                      style: TextStyle(color: Color(0xFF64748B), fontSize: 14),
-                    ),
-                  ],
-                ),
+              return EtatVideRafraichissable(
+                icone: LucideIcons.wallet,
+                message: 'Aucune opération sur la période',
+                onRefresh: () => ctrl.fetchReleve(),
               );
             }
 

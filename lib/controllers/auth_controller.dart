@@ -4,10 +4,12 @@ import '../models/client_info_model.dart';
 import '../models/user_model.dart';
 import '../services/api_service.dart';
 import '../services/storage_service.dart';
+import 'agence_controller.dart';
 import 'crbt_controller.dart';
 import 'dashboard_controller.dart';
 import 'expedition_controller.dart';
 import 'facture_controller.dart';
+import 'prepaye_controller.dart';
 import 'retour_fond_controller.dart';
 
 class AuthController extends GetxController {
@@ -88,6 +90,14 @@ class AuthController extends GetxController {
         Get.find<CrbtController>().fetchExpeditionsCrbt();
         Get.find<CrbtController>().fetchChequesCrbt();
         Get.find<CrbtController>().fetchVirementsCrbt();
+      }
+      // Ces deux-la ne chargent qu'au onInit, qui tourne avant le login :
+      // sans ce rappel la page reste a zero jusqu'au prochain demarrage.
+      if (Get.isRegistered<PrepayeController>()) {
+        Get.find<PrepayeController>().fetchReleve(resetPage: true);
+      }
+      if (Get.isRegistered<AgenceController>()) {
+        Get.find<AgenceController>().fetchAgences();
       }
 
       Get.offAllNamed('/home');

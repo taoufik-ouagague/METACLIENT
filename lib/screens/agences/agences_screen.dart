@@ -5,6 +5,7 @@ import '../../controllers/agence_controller.dart';
 import '../../models/agence_model.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/carte_accent.dart';
+import '../../widgets/etat_vide.dart';
 import '../../widgets/scroll_reveal.dart';
 
 class AgencesScreen extends StatelessWidget {
@@ -139,22 +140,10 @@ class AgencesScreen extends StatelessWidget {
 
             final liste = ctrl.agencesAffichees;
             if (liste.isEmpty) {
-              return const Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      LucideIcons.mapPin,
-                      color: Color(0xFFCBD5E1),
-                      size: 48,
-                    ),
-                    SizedBox(height: 12),
-                    Text(
-                      'Aucune agence trouvée',
-                      style: TextStyle(color: Color(0xFF64748B), fontSize: 14),
-                    ),
-                  ],
-                ),
+              return EtatVideRafraichissable(
+                icone: LucideIcons.mapPin,
+                message: 'Aucune agence trouvée',
+                onRefresh: ctrl.fetchAgences,
               );
             }
 
