@@ -356,7 +356,6 @@ class RetoursScreen extends StatelessWidget {
     final lignes = [
       MapEntry('Nature', item.nature),
       MapEntry('Type d\'expédition', item.typeExpedition),
-      MapEntry('N° déclaration', item.numDeclaration),
       MapEntry('N° pièce', item.numPiece),
       MapEntry('Destinataire', item.destinataire),
       MapEntry('Destination', item.destination),
