@@ -265,83 +265,119 @@ class RetoursScreen extends StatelessWidget {
 
             // ─── APERÇU DÉTAILLÉ (À LA PLACE DE LA LISTE) OU LISTE COMPLETE ───
             Expanded(
-              child: Builder(builder: (_) {
-                if (selected != null) {
-                  return _buildRetourDetailView(
-                    context,
-                    selected,
-                    onClose: () => retourCtrl.selectedRetour.value = null,
+              child: AnimatedSwitcher(
+                duration: const Duration(milliseconds: 320),
+                switchInCurve: Curves.easeOutCubic,
+                switchOutCurve: Curves.easeInCubic,
+                transitionBuilder: (Widget child, Animation<double> animation) {
+                  final isDetail = child.key == const ValueKey('detail_view');
+                  final offsetTween = Tween<Offset>(
+                    begin: isDetail ? const Offset(0, 0.06) : const Offset(0, -0.03),
+                    end: Offset.zero,
                   );
-                }
-
-                if (retourCtrl.isLoading.value) {
-                  return const Center(
-                    child: CircularProgressIndicator(color: AppTheme.primary),
+                  final scaleTween = Tween<double>(
+                    begin: isDetail ? 0.96 : 0.98,
+                    end: 1.0,
                   );
-                }
 
-                final list = retourCtrl.activeTab.value == 0
-                    ? retourCtrl.retoursCCCTAffiches
-                    : retourCtrl.retoursBLAffiches;
-
-            if (list.isEmpty) {
-              return Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      LucideIcons.fileSearch,
-                      color: const Color(0xFFCBD5E1),
-                      size: 48,
+                  return FadeTransition(
+                    opacity: CurvedAnimation(
+                      parent: animation,
+                      curve: const Interval(0.0, 1.0, curve: Curves.easeOut),
                     ),
-                    const SizedBox(height: 12),
-                    const Text(
-                      'Aucun retour enregistré',
-                      style: TextStyle(color: Color(0xFF64748B), fontSize: 14),
+                    child: SlideTransition(
+                      position: offsetTween.animate(animation),
+                      child: ScaleTransition(
+                        scale: scaleTween.animate(animation),
+                        child: child,
+                      ),
                     ),
-                  ],
-                ),
-              );
-            }
-
-            final pied = retourCtrl.isLoadingMore.value;
-
-            return ScrollInfini(
-              onFin: retourCtrl.chargerPlus,
-              child: RefreshIndicator(
-                color: AppTheme.primary,
-                backgroundColor: Colors.white,
-                onRefresh: () async {
-                  if (retourCtrl.activeTab.value == 0) {
-                    await retourCtrl.fetchRetoursCCCT(resetPage: true);
-                  } else {
-                    await retourCtrl.fetchRetoursBL(resetPage: true);
-                  }
+                  );
                 },
-                child: ListView.separated(
-                  // Nouvelle cle a chaque onglet : la revelation rejoue.
-                  key: ValueKey<int>(retourCtrl.activeTab.value),
-                  padding: EdgeInsets.fromLTRB(
-                    18,
-                    8,
-                    18,
-                    8 + MediaQuery.paddingOf(context).bottom,
-                  ),
-                  itemCount: list.length + (pied ? 1 : 0),
-                  separatorBuilder: (_, _) => const SizedBox(height: 10),
-                  itemBuilder: (context, index) {
-                    if (index >= list.length) return const PiedChargement();
-                    final item = list[index];
-                    return ScrollReveal(
-                      index: index,
-                      child: _buildRetourCard(context, item),
-                    );
-                  },
-                ),
+                child: selected != null
+                    ? KeyedSubtree(
+                        key: const ValueKey('detail_view'),
+                        child: _buildRetourDetailView(
+                          context,
+                          selected,
+                          onClose: () => retourCtrl.selectedRetour.value = null,
+                        ),
+                      )
+                    : KeyedSubtree(
+                        key: const ValueKey('list_view'),
+                        child: Builder(builder: (_) {
+                          if (retourCtrl.isLoading.value) {
+                            return const Center(
+                              child: CircularProgressIndicator(color: AppTheme.primary),
+                            );
+                          }
+
+                          final list = retourCtrl.activeTab.value == 0
+                              ? retourCtrl.retoursCCCTAffiches
+                              : retourCtrl.retoursBLAffiches;
+
+                          if (list.isEmpty) {
+                            return Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    LucideIcons.fileSearch,
+                                    color: const Color(0xFFCBD5E1),
+                                    size: 48,
+                                  ),
+                                  const SizedBox(height: 12),
+                                  const Text(
+                                    'Aucun retour enregistré',
+                                    style: TextStyle(
+                                      color: Color(0xFF64748B),
+                                      fontSize: 14,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          }
+
+                          final pied = retourCtrl.isLoadingMore.value;
+
+                          return ScrollInfini(
+                            onFin: retourCtrl.chargerPlus,
+                            child: RefreshIndicator(
+                              color: AppTheme.primary,
+                              backgroundColor: Colors.white,
+                              onRefresh: () async {
+                                if (retourCtrl.activeTab.value == 0) {
+                                  await retourCtrl.fetchRetoursCCCT(resetPage: true);
+                                } else {
+                                  await retourCtrl.fetchRetoursBL(resetPage: true);
+                                }
+                              },
+                              child: ListView.separated(
+                                key: ValueKey<int>(retourCtrl.activeTab.value),
+                                padding: EdgeInsets.fromLTRB(
+                                  18,
+                                  8,
+                                  18,
+                                  8 + MediaQuery.paddingOf(context).bottom,
+                                ),
+                                itemCount: list.length + (pied ? 1 : 0),
+                                separatorBuilder: (_, _) => const SizedBox(height: 10),
+                                itemBuilder: (context, index) {
+                                  if (index >= list.length) return const PiedChargement();
+                                  final item = list[index];
+                                  return ScrollReveal(
+                                    index: index,
+                                    child: _buildRetourCard(context, item),
+                                  );
+                                },
+                              ),
+                            ),
+                          );
+                        }),
+                      ),
               ),
-            );
-          }),
-        ),
+            ),
       ],
     ),
   );
