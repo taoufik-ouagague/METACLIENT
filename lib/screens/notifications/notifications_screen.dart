@@ -54,88 +54,26 @@ class NotificationsScreen extends StatelessWidget {
                 padding: const EdgeInsets.fromLTRB(14, 4, 14, 0),
                 child: Column(
                   children: [
-                    // Barre de navigation (Retour, Titre, Action Tout marquer lu)
+                    // Barre de navigation (Retour, Titre)
                     Row(
                       children: [
                         _buildNavButton(
                           icon: LucideIcons.arrowLeft,
                           onTap: () => Get.back<void>(),
                         ),
-                        const SizedBox(width: 10),
-                        Expanded(
-                          child: Row(
-                            children: [
-                              Text(
-                                'Notifications',
-                                style: GoogleFonts.poppins(
-                                  color: Colors.white,
-                                  fontSize: 18.5,
-                                  fontWeight: FontWeight.w800,
-                                  letterSpacing: 0.2,
-                                ),
-                              ),
-                              const SizedBox(width: 8),
-                              Obx(() {
-                                final unread = controller.unreadCount;
-                                if (unread == 0) return const SizedBox.shrink();
-                                return Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 8,
-                                    vertical: 2,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(12),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.black.withValues(alpha: 0.12),
-                                        blurRadius: 4,
-                                        offset: const Offset(0, 1),
-                                      ),
-                                    ],
-                                  ),
-                                  child: Text(
-                                    '$unread',
-                                    style: GoogleFonts.poppins(
-                                      color: AppTheme.primary,
-                                      fontSize: 11.5,
-                                      fontWeight: FontWeight.w800,
-                                    ),
-                                  ),
-                                );
-                              }),
-                            ],
+                        const SizedBox(width: 12),
+                        Text(
+                          'Notifications',
+                          style: GoogleFonts.poppins(
+                            color: Colors.white,
+                            fontSize: 19,
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: 0.2,
                           ),
                         ),
-                        // Bouton marquer tout comme lu
-                        Obx(() {
-                          if (controller.unreadCount == 0) {
-                            return const SizedBox.shrink();
-                          }
-                          return controller.isMarkingAll.value
-                              ? const SizedBox(
-                                  width: 36,
-                                  height: 36,
-                                  child: Center(
-                                    child: SizedBox(
-                                      width: 18,
-                                      height: 18,
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 2,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                  ),
-                                )
-                              : _buildNavButton(
-                                  icon: LucideIcons.checkCheck,
-                                  tooltip: 'Tout marquer comme lu',
-                                  onTap: () => controller.markAllAsRead(),
-                                );
-                        }),
                       ],
                     ),
-                    const SizedBox(height: 10),
+                    const SizedBox(height: 12),
                     // Filtres : Toutes / Non lues
                     _buildFilterTabs(controller),
                   ],
@@ -417,67 +355,22 @@ class NotificationsScreen extends StatelessWidget {
     );
   }
 
-  // ─── FOND AMBIANT AVEC VAGUES CYANS LUMINEUSES (STYLE MOCKUP) ────────────
+  // ─── FOND AVEC LES VAGUES ORGANIQUES EXACTES DU MOCKUP ────────────────────
   Widget _buildBackground(BuildContext context) {
-    final size = MediaQuery.sizeOf(context);
-    final w = size.width;
-    final h = size.height;
-
-    Widget halo(double diametre, Color couleur) => Container(
-          width: diametre,
-          height: diametre,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            gradient: RadialGradient(
-              colors: [couleur, couleur.withValues(alpha: 0)],
-              stops: const [0.0, 1.0],
-            ),
-          ),
-        );
-
-    return RepaintBoundary(
-      child: Stack(
-        fit: StackFit.expand,
-        children: [
-          const DecoratedBox(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [
-                  Color(0xFFD7F3FC),
-                  Color(0xFFEAF8FC),
-                  Color(0xFFF5FBFD),
-                  Color(0xFFFFFFFF),
-                ],
-                stops: [0.0, 0.38, 0.70, 1.0],
-              ),
-            ),
-          ),
-          Positioned(
-            right: -w * 0.30,
-            top: h * 0.18,
-            child: halo(w * 0.95, const Color(0xFF7FD8F0).withValues(alpha: 0.35)),
-          ),
-          Positioned(
-            left: -w * 0.40,
-            bottom: h * 0.05,
-            child: halo(w * 0.90, const Color(0xFF9BE2F4).withValues(alpha: 0.30)),
-          ),
-          Positioned(
-            right: -w * 0.22,
-            bottom: -w * 0.25,
-            child: halo(w * 0.85, const Color(0xFFBFEDF8).withValues(alpha: 0.32)),
-          ),
-        ],
+    return const RepaintBoundary(
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: Color(0xFFF7FAFD),
+        ),
+        child: CustomPaint(
+          painter: _VaguesMockupPainter(),
+        ),
       ),
     );
   }
 
   // ─── ÉTAT VIDE (IDENTIQUE AU MOCKUP) ───────────────────────────────────────
   Widget _buildEmptyState(NotificationController controller) {
-    final nonLues = controller.nonLuesSeulement.value;
-
     return RefreshIndicator(
       color: AppTheme.primary,
       backgroundColor: Colors.white,
@@ -488,38 +381,35 @@ class NotificationsScreen extends StatelessWidget {
         ),
         children: [
           SizedBox(
-            height: MediaQuery.sizeOf(Get.context!).height * 0.52,
+            height: MediaQuery.sizeOf(Get.context!).height * 0.55,
             child: Center(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  // Illustration 3D cloche coupée avec rayons
                   Image.asset(
                     'assets/img/empty_notification_3d.png',
-                    width: 175,
-                    height: 175,
+                    width: 185,
+                    height: 185,
                     fit: BoxFit.contain,
                   ),
-                  const SizedBox(height: 18),
+                  const SizedBox(height: 22),
                   Text(
-                    nonLues ? 'Aucune notification non lue' : 'Aucune notification',
+                    'Aucune notification',
                     textAlign: TextAlign.center,
                     style: GoogleFonts.poppins(
                       color: const Color(0xFF1E293B),
-                      fontSize: 20,
+                      fontSize: 22,
                       fontWeight: FontWeight.w700,
                       letterSpacing: -0.3,
                     ),
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 10),
                   Text(
-                    nonLues
-                        ? 'Toutes vos notifications ont déjà été consultées.'
-                        : 'Vous n\'avez aucune notification\npour le moment.',
+                    'Vous n\'avez aucune notification\npour le moment.',
                     textAlign: TextAlign.center,
                     style: GoogleFonts.poppins(
                       color: const Color(0xFF64748B),
-                      fontSize: 14,
+                      fontSize: 14.5,
                       height: 1.5,
                       fontWeight: FontWeight.w400,
                     ),
@@ -590,4 +480,48 @@ class NotificationsScreen extends StatelessWidget {
     }
     return DateFormat('dd/MM/yyyy HH:mm').format(dt);
   }
+}
+
+/// Peintre personnalisé pour reproduire exactement les vagues organiques du mockup
+class _VaguesMockupPainter extends CustomPainter {
+  const _VaguesMockupPainter();
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final w = size.width;
+    final h = size.height;
+
+    final wavePaint1 = Paint()
+      ..color = const Color(0xFFE2F3FD)
+      ..style = PaintingStyle.fill;
+
+    final wavePaint2 = Paint()
+      ..color = const Color(0xFFD8EFFC)
+      ..style = PaintingStyle.fill;
+
+    // 1. Vague en haut à droite (Top-right wave)
+    final pathTopRight = Path()
+      ..moveTo(w, h * 0.17)
+      ..cubicTo(w * 0.72, h * 0.20, w * 0.65, h * 0.28, w, h * 0.32)
+      ..close();
+    canvas.drawPath(pathTopRight, wavePaint1);
+
+    // 2. Vague en bas à gauche (Bottom-left wave)
+    final pathBottomLeft = Path()
+      ..moveTo(0, h * 0.72)
+      ..cubicTo(w * 0.32, h * 0.75, w * 0.38, h * 0.86, 0, h * 0.94)
+      ..close();
+    canvas.drawPath(pathBottomLeft, wavePaint1);
+
+    // 3. Vague en bas à droite (Bottom-right wave)
+    final pathBottomRight = Path()
+      ..moveTo(w * 0.38, h)
+      ..cubicTo(w * 0.58, h * 0.86, w * 0.80, h * 0.88, w, h * 0.81)
+      ..lineTo(w, h)
+      ..close();
+    canvas.drawPath(pathBottomRight, wavePaint2);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
