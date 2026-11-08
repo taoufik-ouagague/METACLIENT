@@ -26,7 +26,7 @@ class NotificationsScreen extends StatelessWidget {
     final topPadding = MediaQuery.paddingOf(context).top;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFEFF3F8),
+      backgroundColor: const Color(0xFFF7FAFD),
       body: Stack(
         fit: StackFit.expand,
         children: [
@@ -34,49 +34,54 @@ class NotificationsScreen extends StatelessWidget {
           _buildBackground(context),
 
           // ─── BANDEAU SUPÉRIEUR DÉGRADÉ (STYLE METACLIENT) ────────────────
-          Container(
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
             height: topPadding + 124,
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  Color(0xFF29B7D9),
-                  AppTheme.primary,
-                  Color(0xFF3FC1D8),
-                ],
-              ),
-              borderRadius: BorderRadius.vertical(bottom: Radius.circular(30)),
-            ),
-            child: SafeArea(
-              bottom: false,
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(14, 4, 14, 0),
-                child: Column(
-                  children: [
-                    // Barre de navigation (Retour, Titre)
-                    Row(
-                      children: [
-                        _buildNavButton(
-                          icon: LucideIcons.arrowLeft,
-                          onTap: () => Get.back<void>(),
-                        ),
-                        const SizedBox(width: 12),
-                        Text(
-                          'Notifications',
-                          style: GoogleFonts.poppins(
-                            color: Colors.white,
-                            fontSize: 19,
-                            fontWeight: FontWeight.w700,
-                            letterSpacing: 0.2,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 12),
-                    // Filtres : Toutes / Non lues
-                    _buildFilterTabs(controller),
+            child: Container(
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    Color(0xFF29B7D9),
+                    AppTheme.primary,
+                    Color(0xFF3FC1D8),
                   ],
+                ),
+                borderRadius: BorderRadius.vertical(bottom: Radius.circular(30)),
+              ),
+              child: SafeArea(
+                bottom: false,
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(14, 4, 14, 0),
+                  child: Column(
+                    children: [
+                      // Barre de navigation (Retour, Titre)
+                      Row(
+                        children: [
+                          _buildNavButton(
+                            icon: LucideIcons.arrowLeft,
+                            onTap: () => Get.back<void>(),
+                          ),
+                          const SizedBox(width: 12),
+                          Text(
+                            'Notifications',
+                            style: GoogleFonts.poppins(
+                              color: Colors.white,
+                              fontSize: 19,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: 0.2,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                      // Filtres : Toutes / Non lues
+                      _buildFilterTabs(controller),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -375,50 +380,57 @@ class NotificationsScreen extends StatelessWidget {
       color: AppTheme.primary,
       backgroundColor: Colors.white,
       onRefresh: () => controller.fetchNotifications(showLoading: false),
-      child: ListView(
-        physics: const AlwaysScrollableScrollPhysics(
-          parent: BouncingScrollPhysics(),
-        ),
-        children: [
-          SizedBox(
-            height: MediaQuery.sizeOf(Get.context!).height * 0.55,
-            child: Center(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Image.asset(
-                    'assets/img/empty_notification_3d.png',
-                    width: 185,
-                    height: 185,
-                    fit: BoxFit.contain,
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          return SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(
+              parent: BouncingScrollPhysics(),
+            ),
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                minHeight: constraints.maxHeight,
+              ),
+              child: Center(
+                child: Padding(
+                  padding: const EdgeInsets.only(bottom: 30),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Image.asset(
+                        'assets/img/empty_notification_3d.png',
+                        width: 200,
+                        height: 195,
+                        fit: BoxFit.contain,
+                      ),
+                      const SizedBox(height: 22),
+                      Text(
+                        'Aucune notification',
+                        textAlign: TextAlign.center,
+                        style: GoogleFonts.poppins(
+                          color: const Color(0xFF071B36),
+                          fontSize: 22,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: -0.3,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      Text(
+                        'Vous n\'avez aucune notification\npour le moment.',
+                        textAlign: TextAlign.center,
+                        style: GoogleFonts.poppins(
+                          color: const Color(0xFF384964),
+                          fontSize: 14.5,
+                          height: 1.5,
+                          fontWeight: FontWeight.w400,
+                        ),
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 22),
-                  Text(
-                    'Aucune notification',
-                    textAlign: TextAlign.center,
-                    style: GoogleFonts.poppins(
-                      color: const Color(0xFF1E293B),
-                      fontSize: 22,
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: -0.3,
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  Text(
-                    'Vous n\'avez aucune notification\npour le moment.',
-                    textAlign: TextAlign.center,
-                    style: GoogleFonts.poppins(
-                      color: const Color(0xFF64748B),
-                      fontSize: 14.5,
-                      height: 1.5,
-                      fontWeight: FontWeight.w400,
-                    ),
-                  ),
-                ],
+                ),
               ),
             ),
-          ),
-        ],
+          );
+        },
       ),
     );
   }
@@ -501,15 +513,15 @@ class _VaguesMockupPainter extends CustomPainter {
 
     // 1. Vague en haut à droite (Top-right wave)
     final pathTopRight = Path()
-      ..moveTo(w, h * 0.17)
-      ..cubicTo(w * 0.72, h * 0.20, w * 0.65, h * 0.28, w, h * 0.32)
+      ..moveTo(w, h * 0.19)
+      ..cubicTo(w * 0.68, h * 0.22, w * 0.64, h * 0.29, w, h * 0.33)
       ..close();
     canvas.drawPath(pathTopRight, wavePaint1);
 
     // 2. Vague en bas à gauche (Bottom-left wave)
     final pathBottomLeft = Path()
-      ..moveTo(0, h * 0.72)
-      ..cubicTo(w * 0.32, h * 0.75, w * 0.38, h * 0.86, 0, h * 0.94)
+      ..moveTo(0, h * 0.74)
+      ..cubicTo(w * 0.34, h * 0.77, w * 0.38, h * 0.88, 0, h * 0.94)
       ..close();
     canvas.drawPath(pathBottomLeft, wavePaint1);
 
