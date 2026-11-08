@@ -13,6 +13,7 @@ import 'screens/home/home_screen.dart';
 import 'screens/login_screen.dart';
 import 'screens/splash_screen.dart';
 import 'services/api_service.dart';
+import 'services/fcm_service.dart';
 import 'services/storage_service.dart';
 import 'theme/app_theme.dart';
 
@@ -22,6 +23,7 @@ void main() async {
   // Initialize Local Storage & Networking Services
   await StorageService.init();
   ApiService.init();
+  await AppChannel.instance.init();
 
   runApp(const MetaClientApp());
 }

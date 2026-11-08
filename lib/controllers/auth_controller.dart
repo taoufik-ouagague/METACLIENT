@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import '../models/client_info_model.dart';
 import '../models/user_model.dart';
 import '../services/api_service.dart';
+import '../services/fcm_service.dart';
 import '../services/storage_service.dart';
 import 'agence_controller.dart';
 import 'crbt_controller.dart';
@@ -18,10 +19,15 @@ class AuthController extends GetxController {
   final Rxn<UserModel> currentUser = Rxn<UserModel>();
   final Rxn<ClientInfoModel> clientInfo = Rxn<ClientInfoModel>();
   final RxnString profilePhoto = RxnString();
+  final RxString fcmToken = ''.obs;
 
   @override
   void onInit() {
     super.onInit();
+    AppChannel.instance.onTokenRefresh((newToken) {
+      fcmToken.value = newToken;
+      syncFcmToken();
+    });
     checkAuthStatus();
   }
 
@@ -40,6 +46,7 @@ class AuthController extends GetxController {
         token: token,
       );
       fetchClientInfo();
+      syncFcmToken();
     }
   }
 
@@ -100,6 +107,9 @@ class AuthController extends GetxController {
         Get.find<AgenceController>().fetchAgences();
       }
 
+      // Récupérer et associer le token FCM à la session connectée
+      syncFcmToken();
+
       Get.offAllNamed('/home');
       return true;
     } catch (e) {
@@ -113,6 +123,28 @@ class AuthController extends GetxController {
       return false;
     } finally {
       isLoading.value = false;
+    }
+  }
+
+  /// Récupère et synchronise le token FCM avec le serveur
+  Future<void> syncFcmToken() async {
+    try {
+      final token = await AppChannel.instance.getTokenAsync();
+      if (token != null && token.isNotEmpty) {
+        fcmToken.value = token;
+        debugPrint('📲 [FCM] Token actif pour la session : $token');
+
+        if (isLoggedIn.value && StorageService.hasToken()) {
+          try {
+            await ApiService.updateFcmToken(token);
+            debugPrint('✅ [FCM] Token mobile enregistré auprès du serveur.');
+          } catch (e) {
+            debugPrint('⚠️ [FCM] Impossible d\'enregistrer le token serveur : $e');
+          }
+        }
+      }
+    } catch (e) {
+      debugPrint('⚠️ [FCM] Erreur synchronisation token : $e');
     }
   }
 

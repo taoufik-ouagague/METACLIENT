@@ -436,6 +436,18 @@ class ApiService {
     return _handleResponse(response);
   }
 
+  // ─── FCM TOKEN ──────────────────────────────────────────────────────────────
+  // API Post : /api/securite/users/updateFcmToken
+  static Future<Map<String, dynamic>> updateFcmToken(String fcmToken) async {
+    final url = Uri.parse('$baseUrl/api/securite/users/updateFcmToken');
+    final response = await http.post(
+      url,
+      headers: _buildHeaders(),
+      body: jsonEncode({'fcmToken': fcmToken}),
+    );
+    return _handleResponse(response);
+  }
+
   // Helper response handler
   static Map<String, dynamic> _handleResponse(http.Response response) {
     final bodyString = utf8.decode(response.bodyBytes);
