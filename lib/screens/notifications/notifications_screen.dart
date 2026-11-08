@@ -28,7 +28,11 @@ class NotificationsScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: const Color(0xFFEFF3F8),
       body: Stack(
+        fit: StackFit.expand,
         children: [
+          // ─── FOND AVEC VAGUES AMBIANTES CYANS (STYLE METACLIENT) ────────
+          _buildBackground(context),
+
           // ─── BANDEAU SUPÉRIEUR DÉGRADÉ (STYLE METACLIENT) ────────────────
           Container(
             height: topPadding + 124,
@@ -413,7 +417,64 @@ class NotificationsScreen extends StatelessWidget {
     );
   }
 
-  // ─── ÉTAT VIDE ─────────────────────────────────────────────────────────────
+  // ─── FOND AMBIANT AVEC VAGUES CYANS LUMINEUSES (STYLE MOCKUP) ────────────
+  Widget _buildBackground(BuildContext context) {
+    final size = MediaQuery.sizeOf(context);
+    final w = size.width;
+    final h = size.height;
+
+    Widget halo(double diametre, Color couleur) => Container(
+          width: diametre,
+          height: diametre,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            gradient: RadialGradient(
+              colors: [couleur, couleur.withValues(alpha: 0)],
+              stops: const [0.0, 1.0],
+            ),
+          ),
+        );
+
+    return RepaintBoundary(
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          const DecoratedBox(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Color(0xFFD7F3FC),
+                  Color(0xFFEAF8FC),
+                  Color(0xFFF5FBFD),
+                  Color(0xFFFFFFFF),
+                ],
+                stops: [0.0, 0.38, 0.70, 1.0],
+              ),
+            ),
+          ),
+          Positioned(
+            right: -w * 0.30,
+            top: h * 0.18,
+            child: halo(w * 0.95, const Color(0xFF7FD8F0).withValues(alpha: 0.35)),
+          ),
+          Positioned(
+            left: -w * 0.40,
+            bottom: h * 0.05,
+            child: halo(w * 0.90, const Color(0xFF9BE2F4).withValues(alpha: 0.30)),
+          ),
+          Positioned(
+            right: -w * 0.22,
+            bottom: -w * 0.25,
+            child: halo(w * 0.85, const Color(0xFFBFEDF8).withValues(alpha: 0.32)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ─── ÉTAT VIDE (IDENTIQUE AU MOCKUP) ───────────────────────────────────────
   Widget _buildEmptyState(NotificationController controller) {
     final nonLues = controller.nonLuesSeulement.value;
 
@@ -427,105 +488,40 @@ class NotificationsScreen extends StatelessWidget {
         ),
         children: [
           SizedBox(
-            height: MediaQuery.sizeOf(Get.context!).height * 0.45,
+            height: MediaQuery.sizeOf(Get.context!).height * 0.52,
             child: Center(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  // Icône avec halo lumineux et sphère en verre dégradé
-                  Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      // 1. Halo extérieur lumineux
-                      Container(
-                        width: 110,
-                        height: 110,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          gradient: RadialGradient(
-                            colors: [
-                              const Color(0xFF29B7D9).withValues(alpha: 0.18),
-                              const Color(0xFF29B7D9).withValues(alpha: 0.0),
-                            ],
-                          ),
-                        ),
-                      ),
-                      // 2. Anneau fin extérieur
-                      Container(
-                        width: 92,
-                        height: 92,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: const Color(0xFF29B7D9).withValues(alpha: 0.22),
-                            width: 1.5,
-                          ),
-                        ),
-                      ),
-                      // 3. Cercle central en verre dégradé avec ombre
-                      Container(
-                        width: 76,
-                        height: 76,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          gradient: const LinearGradient(
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                            colors: [
-                              Colors.white,
-                              Color(0xFFE0F6FD),
-                              Color(0xFFC8F0FA),
-                            ],
-                          ),
-                          border: Border.all(
-                            color: Colors.white,
-                            width: 2.2,
-                          ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: const Color(0xFF0F172A).withValues(alpha: 0.06),
-                              blurRadius: 18,
-                              offset: const Offset(0, 8),
-                            ),
-                            BoxShadow(
-                              color: const Color(0xFF29B7D9).withValues(alpha: 0.30),
-                              blurRadius: 24,
-                              spreadRadius: -2,
-                              offset: const Offset(0, 10),
-                            ),
-                          ],
-                        ),
-                        child: Center(
-                          child: ShaderMask(
-                            blendMode: BlendMode.srcIn,
-                            shaderCallback: (bounds) => const LinearGradient(
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                              colors: [
-                                Color(0xFF29B7D9),
-                                AppTheme.primary,
-                                Color(0xFF0284C7),
-                              ],
-                            ).createShader(bounds),
-                            child: const Icon(
-                              LucideIcons.bellOff,
-                              size: 34,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
+                  // Illustration 3D cloche coupée avec rayons
+                  Image.asset(
+                    'assets/img/empty_notification_3d.png',
+                    width: 175,
+                    height: 175,
+                    fit: BoxFit.contain,
                   ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 18),
                   Text(
                     nonLues ? 'Aucune notification non lue' : 'Aucune notification',
                     textAlign: TextAlign.center,
                     style: GoogleFonts.poppins(
                       color: const Color(0xFF1E293B),
-                      fontSize: 16.5,
+                      fontSize: 20,
                       fontWeight: FontWeight.w700,
-                      letterSpacing: -0.2,
+                      letterSpacing: -0.3,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    nonLues
+                        ? 'Toutes vos notifications ont déjà été consultées.'
+                        : 'Vous n\'avez aucune notification\npour le moment.',
+                    textAlign: TextAlign.center,
+                    style: GoogleFonts.poppins(
+                      color: const Color(0xFF64748B),
+                      fontSize: 14,
+                      height: 1.5,
+                      fontWeight: FontWeight.w400,
                     ),
                   ),
                 ],
