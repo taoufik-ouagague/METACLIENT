@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -65,6 +66,13 @@ class AppChannel {
     if (_token != null && _token!.isNotEmpty) return _token;
 
     try {
+      if (Platform.isIOS) {
+        final apns = await FirebaseMessaging.instance.getAPNSToken();
+        if (apns == null) {
+          _logger.d('ℹ️ [FCM] Aucun token APNs actif sur iOS (simulateur ou compte non configuré). Token FCM non requis.');
+          return null;
+        }
+      }
       // ignore: deprecated_member_use
       _token = await FirebaseMessaging.instance.getToken();
       if (_token != null) {
@@ -207,6 +215,16 @@ class AppChannel {
   /// Récupère et sauvegarde le token FCM
   Future<String?> _fetchAndPersistToken() async {
     try {
+      if (Platform.isIOS) {
+        final apns = await FirebaseMessaging.instance.getAPNSToken();
+        if (apns == null) {
+          _logger.i(
+            'ℹ️ [FCM] Aucun APNs token détecté sur iOS (simulateur ou compte Apple Developer non actif). '
+            'La génération FCM est ignorée sur iOS et active sur Android.',
+          );
+          return null;
+        }
+      }
       // ignore: deprecated_member_use
       _token = await FirebaseMessaging.instance.getToken();
       if (_token != null && _token!.isNotEmpty) {
