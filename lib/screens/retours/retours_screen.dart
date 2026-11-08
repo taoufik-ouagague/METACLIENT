@@ -343,8 +343,10 @@ class RetoursScreen extends StatelessWidget {
           }),
         ),
       ],
-    );
-  }
+    ),
+  );
+});
+}
 
   Widget _buildRetourDetailView(
     BuildContext context,
