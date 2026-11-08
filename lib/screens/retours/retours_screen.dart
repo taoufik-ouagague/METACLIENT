@@ -385,101 +385,162 @@ class RetoursScreen extends StatelessWidget {
       MapEntry('Date de remise', item.dateRemise),
     ].where((e) => valeurRenseignee(e.value)).toList();
 
+    final isMoney = item.fond != null && item.fond! > 0;
+    const bleu = Color(0xFF007EBE);
     final bottomPad = MediaQuery.paddingOf(context).bottom;
 
     return Padding(
       padding: EdgeInsets.fromLTRB(16, 6, 16, 12 + bottomPad),
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: const Color(0xFFEFF8FE),
           borderRadius: BorderRadius.circular(24),
+          border: Border.all(color: Colors.white, width: 1.5),
           boxShadow: [
             BoxShadow(
-              color: const Color(0xFF0F172A).withValues(alpha: 0.06),
-              blurRadius: 18,
-              offset: const Offset(0, 4),
+              color: const Color(0xFF269BC4).withValues(alpha: 0.20),
+              blurRadius: 22,
+              offset: const Offset(0, 9),
             ),
           ],
         ),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(24),
-          child: Column(
+          child: Stack(
             children: [
-              // ─── En-tête : Icône cyan, Titre + trait cyan, Bouton retour chevron ───
-              Padding(
-                padding: const EdgeInsets.fromLTRB(16, 16, 16, 14),
-                child: Row(
-                  children: [
-                    Container(
-                      width: 44,
-                      height: 44,
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFE0F2FE),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: const Center(
-                        child: Icon(
-                          LucideIcons.fileText,
-                          color: Color(0xFF0284C7),
-                          size: 22,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 14),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            'Retour N° ${item.numDeclaration ?? ''}',
-                            style: GoogleFonts.poppins(
-                              color: const Color(0xFF0F172A),
-                              fontSize: 17,
-                              fontWeight: FontWeight.w700,
-                              letterSpacing: -0.2,
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          const SizedBox(height: 5),
-                          Container(
-                            width: 32,
-                            height: 3,
-                            decoration: BoxDecoration(
-                              color: const Color(0xFF0284C7),
-                              borderRadius: BorderRadius.circular(2),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Material(
-                      color: Colors.transparent,
-                      shape: const CircleBorder(),
-                      child: InkWell(
-                        customBorder: const CircleBorder(),
-                        onTap: onClose,
-                        child: Container(
-                          width: 34,
-                          height: 34,
-                          decoration: const BoxDecoration(
-                            color: Color(0xFFEBF5FB),
-                            shape: BoxShape.circle,
-                          ),
-                          child: const Icon(
-                            LucideIcons.chevronLeft,
-                            color: Color(0xFF0F172A),
-                            size: 18,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
+              // ─── Filigrane comme dans les cartes CT/BL ───────────────────
+              Positioned(
+                right: -25,
+                bottom: 25,
+                child: Icon(
+                  isMoney ? LucideIcons.coins : LucideIcons.fileText,
+                  size: 160,
+                  color: const Color(0xFFD9EAFB).withValues(alpha: 0.35),
                 ),
               ),
 
-              const Divider(height: 1, thickness: 1, color: Color(0xFFF1F5F9)),
+              // ─── Arête haute éclairée (reflet de verre) ────────────────────
+              Positioned(
+                left: 0,
+                right: 0,
+                top: 0,
+                child: Container(
+                  height: 1.5,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        Colors.white.withValues(alpha: 0),
+                        Colors.white.withValues(alpha: 0.95),
+                        Colors.white.withValues(alpha: 0),
+                      ],
+                      stops: const [0.0, 0.5, 1.0],
+                    ),
+                  ),
+                ),
+              ),
+
+              // ─── Filet vertical cyan à gauche ─────────────────────────────
+              Positioned(
+                left: 0,
+                top: 0,
+                bottom: 0,
+                child: Container(
+                  width: 4.5,
+                  decoration: const BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        Color(0xFF007EBE),
+                        Color(0xFF29B7D9),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+
+              // ─── Contenu (En-tête + Lignes) ────────────────────────────────
+              Column(
+                children: [
+                  // ─── En-tête : Icône cyan, Titre + trait cyan, Bouton retour chevron ───
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(18, 16, 16, 14),
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 44,
+                          height: 44,
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF9FDEF6),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Center(
+                            child: Icon(
+                              isMoney ? LucideIcons.coins : LucideIcons.fileText,
+                              color: const Color(0xFF0786B9),
+                              size: 22,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 14),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                'Retour N° ${item.numDeclaration ?? ''}',
+                                style: GoogleFonts.poppins(
+                                  color: const Color(0xFF000A3C),
+                                  fontSize: 17,
+                                  fontWeight: FontWeight.w700,
+                                  letterSpacing: -0.2,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              const SizedBox(height: 5),
+                              Container(
+                                width: 32,
+                                height: 3,
+                                decoration: BoxDecoration(
+                                  color: bleu,
+                                  borderRadius: BorderRadius.circular(2),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Material(
+                          color: Colors.transparent,
+                          shape: const CircleBorder(),
+                          child: InkWell(
+                            customBorder: const CircleBorder(),
+                            onTap: onClose,
+                            child: Container(
+                              width: 34,
+                              height: 34,
+                              decoration: BoxDecoration(
+                                color: Colors.white.withValues(alpha: 0.85),
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                  color: const Color(0xFFD6E7F4),
+                                  width: 1,
+                                ),
+                              ),
+                              child: const Icon(
+                                LucideIcons.chevronLeft,
+                                color: Color(0xFF000A3C),
+                                size: 18,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  const Divider(height: 1, thickness: 1, color: Color(0xFFD9EAF8)),
 
               // ─── Lignes du tableau avec icônes cyan ───────────────────────
               Expanded(
@@ -510,7 +571,7 @@ class RetoursScreen extends StatelessWidget {
                             child: Text(
                               ligne.key,
                               style: GoogleFonts.poppins(
-                                color: const Color(0xFF64748B),
+                                color: const Color(0xFF637D9B),
                                 fontSize: 13,
                                 fontWeight: FontWeight.w500,
                               ),
@@ -522,7 +583,7 @@ class RetoursScreen extends StatelessWidget {
                               ligne.value!,
                               textAlign: TextAlign.end,
                               style: GoogleFonts.poppins(
-                                color: const Color(0xFF0F172A),
+                                color: const Color(0xFF000A3C),
                                 fontSize: 13.5,
                                 fontWeight: FontWeight.w700,
                               ),
@@ -536,10 +597,12 @@ class RetoursScreen extends StatelessWidget {
               ),
             ],
           ),
-        ),
+        ],
       ),
-    );
-  }
+    ),
+  ),
+);
+}
 
   IconData _resolveRetourIcon(String key) {
     final k = key.toLowerCase();
