@@ -12,6 +12,7 @@ import 'table_expedition_screen.dart';
 import '../../widgets/visionneuse_document.dart';
 import '../../widgets/status_badge.dart';
 import '../../widgets/scroll_reveal.dart';
+import '../../widgets/vagues_background.dart';
 
 class ExpeditionDetailScreen extends StatefulWidget {
   final int idExpedition;
@@ -58,9 +59,15 @@ class _ExpeditionDetailScreenState extends State<ExpeditionDetailScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFEFF3F8),
-      body: Obx(() {
-        if (_controller.isLoadingDetail.value) {
+      backgroundColor: const Color(0xFFF7FAFD),
+      body: Stack(
+        fit: StackFit.expand,
+        children: [
+          // ─── FOND AVEC VAGUES AMBIANTES CYANS (STYLE METACLIENT) ────────
+          const VaguesBackground(),
+
+          Obx(() {
+            if (_controller.isLoadingDetail.value) {
           return const Center(
             child: CircularProgressIndicator(color: AppTheme.primary),
           );
@@ -184,6 +191,8 @@ class _ExpeditionDetailScreenState extends State<ExpeditionDetailScreen> {
           ],
         );
       }),
+        ],
+      ),
     );
   }
 

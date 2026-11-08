@@ -7,6 +7,7 @@ import '../../theme/app_theme.dart';
 import '../../widgets/scroll_reveal.dart';
 import '../../widgets/carte_liste.dart';
 import '../../widgets/info_rows_card.dart';
+import '../../widgets/vagues_background.dart';
 
 /// Un tableau de l'expedition en pleine page.
 ///
@@ -129,9 +130,11 @@ class _TableExpeditionScreenState extends State<TableExpeditionScreen> {
     // coins arrondis, contenu pose par-dessus. Les six tableaux partagent
     // cette identite plutot qu'une couleur chacun.
     return Scaffold(
-      backgroundColor: const Color(0xFFEFF3F8),
+      backgroundColor: const Color(0xFFF7FAFD),
       body: Stack(
+        fit: StackFit.expand,
         children: [
+          const VaguesBackground(),
           _entete(lignes.length),
           SafeArea(
             bottom: false,
