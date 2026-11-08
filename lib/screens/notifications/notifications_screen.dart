@@ -7,6 +7,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import '../../controllers/notification_controller.dart';
 import '../../models/notification_model.dart';
 import '../../theme/app_theme.dart';
+import '../../widgets/barre_segments.dart';
 import '../../widgets/carte_liste.dart';
 import '../../widgets/scroll_reveal.dart';
 
@@ -30,7 +31,7 @@ class NotificationsScreen extends StatelessWidget {
         children: [
           // ─── BANDEAU SUPÉRIEUR DÉGRADÉ (STYLE METACLIENT) ────────────────
           Container(
-            height: topPadding + 115,
+            height: topPadding + 124,
             decoration: const BoxDecoration(
               gradient: LinearGradient(
                 begin: Alignment.topLeft,
@@ -141,7 +142,7 @@ class NotificationsScreen extends StatelessWidget {
 
           // ─── LISTE DES NOTIFICATIONS ──────────────────────────────────────
           Padding(
-            padding: EdgeInsets.only(top: topPadding + 120),
+            padding: EdgeInsets.only(top: topPadding + 130),
             child: Obx(() {
               if (controller.isLoading.value && controller.notifications.isEmpty) {
                 return const Center(
@@ -215,79 +216,38 @@ class NotificationsScreen extends StatelessWidget {
         : btn;
   }
 
-  // ─── ONGLETS DE FILTRE (TOUTES / NON LUES) ──────────────────────────────────
+  // ─── ONGLETS DE FILTRE (TOUTES / NON LUES - MÊME STYLE QUE EN COURS / TOUTES) ───
   Widget _buildFilterTabs(NotificationController controller) {
     return Obx(() {
-      final nonLues = controller.nonLuesSeulement.value;
       final total = controller.notifications.length;
       final unread = controller.unreadCount;
 
       return Container(
-        height: 38,
-        padding: const EdgeInsets.all(3),
+        height: 48,
+        padding: const EdgeInsets.all(4),
         decoration: BoxDecoration(
-          color: Colors.black.withValues(alpha: 0.14),
-          borderRadius: BorderRadius.circular(19),
-        ),
-        child: Row(
-          children: [
-            Expanded(
-              child: _buildFilterTabItem(
-                label: 'Toutes ($total)',
-                isActive: !nonLues,
-                onTap: () => controller.nonLuesSeulement.value = false,
-              ),
-            ),
-            const SizedBox(width: 4),
-            Expanded(
-              child: _buildFilterTabItem(
-                label: 'Non lues ($unread)',
-                isActive: nonLues,
-                badgeCount: unread,
-                onTap: () => controller.nonLuesSeulement.value = true,
-              ),
+          color: Colors.white.withValues(alpha: 0.85),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: Colors.white, width: 1.5),
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0xFF0F172A).withValues(alpha: 0.04),
+              blurRadius: 10,
+              offset: const Offset(0, 2),
             ),
           ],
         ),
+        child: BarreSegments(
+          libelles: [
+            'Toutes ($total)',
+            'Non lues ($unread)',
+          ],
+          index: controller.nonLuesSeulement.value ? 1 : 0,
+          onChange: (i) => controller.nonLuesSeulement.value = (i == 1),
+          tailleTexte: 13,
+        ),
       );
     });
-  }
-
-  Widget _buildFilterTabItem({
-    required String label,
-    required bool isActive,
-    required VoidCallback onTap,
-    int? badgeCount,
-  }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 220),
-        curve: Curves.easeOutCubic,
-        alignment: Alignment.center,
-        decoration: BoxDecoration(
-          color: isActive ? Colors.white : Colors.transparent,
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: isActive
-              ? [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.08),
-                    blurRadius: 6,
-                    offset: const Offset(0, 2),
-                  ),
-                ]
-              : null,
-        ),
-        child: Text(
-          label,
-          style: GoogleFonts.poppins(
-            color: isActive ? AppTheme.primary : Colors.white.withValues(alpha: 0.90),
-            fontSize: 12.5,
-            fontWeight: isActive ? FontWeight.w700 : FontWeight.w500,
-          ),
-        ),
-      ),
-    );
   }
 
   // ─── CARTE DE NOTIFICATION ─────────────────────────────────────────────────
