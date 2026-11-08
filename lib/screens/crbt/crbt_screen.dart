@@ -13,6 +13,7 @@ import '../../widgets/status_badge.dart';
 
 import 'cheque_detail_screen.dart';
 import 'virement_detail_screen.dart';
+import '../../widgets/scroll_infini.dart';
 import '../../widgets/scroll_reveal.dart';
 
 class CrbtScreen extends StatelessWidget {
@@ -60,9 +61,9 @@ class CrbtScreen extends StatelessWidget {
               ),
               child: BarreSegments(
                 libelles: [
-                  'Expéditions (${crbtCtrl.expeditionsCrbt.length})',
-                  'Chèques (${crbtCtrl.chequesCrbt.length})',
-                  'Virements (${crbtCtrl.virementsCrbt.length})',
+                  'Expéditions (${crbtCtrl.totalElementsExpeditions.value})',
+                  'Chèques (${crbtCtrl.totalElementsCheques.value})',
+                  'Virements (${crbtCtrl.totalElementsVirements.value})',
                 ],
                 index: crbtCtrl.activeTab.value,
                 onChange: (i) => crbtCtrl.activeTab.value = i,
@@ -74,7 +75,7 @@ class CrbtScreen extends StatelessWidget {
 
         const SizedBox(height: 6),
 
-        // ─── LIST CONTENT ──────────────────────────────────────────────────
+        // ─── LIST CONTENT AVEC SCROLL INFINI & PULL-TO-REFRESH ──────────────
         Expanded(
           child: Obx(() {
             if (crbtCtrl.isLoading.value) {
@@ -83,13 +84,33 @@ class CrbtScreen extends StatelessWidget {
               );
             }
 
-            if (crbtCtrl.activeTab.value == 0) {
-              return _buildExpeditionsList(crbtCtrl);
-            } else if (crbtCtrl.activeTab.value == 1) {
-              return _buildChequesList(context, crbtCtrl);
-            } else {
-              return _buildVirementsList(context, crbtCtrl);
-            }
+            final pied = crbtCtrl.isLoadingMore.value;
+
+            return ScrollInfini(
+              onFin: crbtCtrl.chargerPlus,
+              child: RefreshIndicator(
+                color: AppTheme.primary,
+                backgroundColor: Colors.white,
+                onRefresh: () async {
+                  switch (crbtCtrl.activeTab.value) {
+                    case 0:
+                      await crbtCtrl.fetchExpeditionsCrbt(resetPage: true);
+                      break;
+                    case 1:
+                      await crbtCtrl.fetchChequesCrbt(resetPage: true);
+                      break;
+                    case 2:
+                      await crbtCtrl.fetchVirementsCrbt(resetPage: true);
+                      break;
+                  }
+                },
+                child: switch (crbtCtrl.activeTab.value) {
+                  0 => _buildExpeditionsList(context, crbtCtrl, pied),
+                  1 => _buildChequesList(context, crbtCtrl, pied),
+                  _ => _buildVirementsList(context, crbtCtrl, pied),
+                },
+              ),
+            );
           }),
         ),
       ],
@@ -116,23 +137,50 @@ class CrbtScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildExpeditionsList(CrbtController ctrl) {
+  Widget _buildExpeditionsList(
+    BuildContext context,
+    CrbtController ctrl,
+    bool pied,
+  ) {
     if (ctrl.expeditionsCrbt.isEmpty) {
-      return const Center(
-        child: Text(
-          'Aucune expédition CRBT trouvée',
-          style: TextStyle(color: Color(0xFF64748B), fontSize: 14),
-        ),
+      return ListView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        children: [
+          SizedBox(height: MediaQuery.of(context).size.height * 0.25),
+          const Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  LucideIcons.packageOpen,
+                  color: Color(0xFFCBD5E1),
+                  size: 48,
+                ),
+                SizedBox(height: 12),
+                Text(
+                  'Aucune expédition CRBT trouvée',
+                  style: TextStyle(color: Color(0xFF64748B), fontSize: 14),
+                ),
+              ],
+            ),
+          ),
+        ],
       );
     }
 
     return ListView.separated(
       // Nouvelle cle a chaque onglet : la revelation rejoue.
       key: const ValueKey<String>('expeditionsCrbt'),
-      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
-      itemCount: ctrl.expeditionsCrbt.length,
+      padding: EdgeInsets.fromLTRB(
+        18,
+        8,
+        18,
+        8 + MediaQuery.paddingOf(context).bottom,
+      ),
+      itemCount: ctrl.expeditionsCrbt.length + (pied ? 1 : 0),
       separatorBuilder: (_, _) => const SizedBox(height: 10),
       itemBuilder: (context, idx) {
+        if (idx >= ctrl.expeditionsCrbt.length) return const PiedChargement();
         final item = ctrl.expeditionsCrbt[idx];
         return ScrollReveal(
           index: idx,
@@ -245,23 +293,50 @@ class CrbtScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildChequesList(BuildContext context, CrbtController ctrl) {
+  Widget _buildChequesList(
+    BuildContext context,
+    CrbtController ctrl,
+    bool pied,
+  ) {
     if (ctrl.chequesCrbt.isEmpty) {
-      return const Center(
-        child: Text(
-          'Aucun chèque CRBT trouvé',
-          style: TextStyle(color: Color(0xFF64748B), fontSize: 14),
-        ),
+      return ListView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        children: [
+          SizedBox(height: MediaQuery.of(context).size.height * 0.25),
+          const Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  LucideIcons.banknote,
+                  color: Color(0xFFCBD5E1),
+                  size: 48,
+                ),
+                SizedBox(height: 12),
+                Text(
+                  'Aucun chèque CRBT trouvé',
+                  style: TextStyle(color: Color(0xFF64748B), fontSize: 14),
+                ),
+              ],
+            ),
+          ),
+        ],
       );
     }
 
     return ListView.separated(
       // Nouvelle cle a chaque onglet : la revelation rejoue.
       key: const ValueKey<String>('chequesCrbt'),
-      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
-      itemCount: ctrl.chequesCrbt.length,
+      padding: EdgeInsets.fromLTRB(
+        18,
+        8,
+        18,
+        8 + MediaQuery.paddingOf(context).bottom,
+      ),
+      itemCount: ctrl.chequesCrbt.length + (pied ? 1 : 0),
       separatorBuilder: (_, _) => const SizedBox(height: 10),
       itemBuilder: (context, idx) {
+        if (idx >= ctrl.chequesCrbt.length) return const PiedChargement();
         final item = ctrl.chequesCrbt[idx];
         return ScrollReveal(
           index: idx,
@@ -358,23 +433,50 @@ class CrbtScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildVirementsList(BuildContext context, CrbtController ctrl) {
+  Widget _buildVirementsList(
+    BuildContext context,
+    CrbtController ctrl,
+    bool pied,
+  ) {
     if (ctrl.virementsCrbt.isEmpty) {
-      return const Center(
-        child: Text(
-          'Aucun ordre de virement trouvé',
-          style: TextStyle(color: Color(0xFF64748B), fontSize: 14),
-        ),
+      return ListView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        children: [
+          SizedBox(height: MediaQuery.of(context).size.height * 0.25),
+          const Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  LucideIcons.arrowUpRight,
+                  color: Color(0xFFCBD5E1),
+                  size: 48,
+                ),
+                SizedBox(height: 12),
+                Text(
+                  'Aucun ordre de virement trouvé',
+                  style: TextStyle(color: Color(0xFF64748B), fontSize: 14),
+                ),
+              ],
+            ),
+          ),
+        ],
       );
     }
 
     return ListView.separated(
       // Nouvelle cle a chaque onglet : la revelation rejoue.
       key: const ValueKey<String>('virementsCrbt'),
-      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
-      itemCount: ctrl.virementsCrbt.length,
+      padding: EdgeInsets.fromLTRB(
+        18,
+        8,
+        18,
+        8 + MediaQuery.paddingOf(context).bottom,
+      ),
+      itemCount: ctrl.virementsCrbt.length + (pied ? 1 : 0),
       separatorBuilder: (_, _) => const SizedBox(height: 10),
       itemBuilder: (context, idx) {
+        if (idx >= ctrl.virementsCrbt.length) return const PiedChargement();
         final item = ctrl.virementsCrbt[idx];
         return ScrollReveal(
           index: idx,

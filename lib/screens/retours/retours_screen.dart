@@ -41,7 +41,7 @@ class RetoursScreen extends StatelessWidget {
 
     Get.dialog(
       CarteFiltres(
-        titre: 'Filtrer les retours',
+        titre: 'Filtres',
         contenu: [
           // Les deux bornes de date tiennent sur une ligne.
           Row(

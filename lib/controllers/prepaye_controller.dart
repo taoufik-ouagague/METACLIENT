@@ -109,8 +109,18 @@ class PrepayeController extends GetxController {
       } else {
         lignes.value = liste;
       }
-      totalPages.value = (res['totalPages'] as num?)?.toInt() ?? 1;
-      totalElements.value = (res['totalElements'] as num?)?.toInt() ?? 0;
+      final tp = (res['totalPages'] ?? res['total_pages']) as num?;
+      final te =
+          (res['totalElements'] ?? res['total_elements'] ?? res['total']) as num?;
+      totalElements.value = te?.toInt() ?? lignes.length;
+      if (tp != null && tp.toInt() > 0) {
+        totalPages.value = tp.toInt();
+      } else if (te != null && te.toInt() > 0) {
+        totalPages.value = (te.toInt() / taillePagePaquet).ceil();
+      } else {
+        totalPages.value =
+            liste.length >= taillePagePaquet ? page + 1 : page;
+      }
     } catch (e) {
       Get.snackbar(
         'Relevé indisponible',

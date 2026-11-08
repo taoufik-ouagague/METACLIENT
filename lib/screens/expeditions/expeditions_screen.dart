@@ -48,7 +48,7 @@ class ExpeditionsScreen extends StatelessWidget {
 
     Get.dialog(
       CarteFiltres(
-        titre: 'Filtrer les expéditions',
+        titre: 'Filtres',
         contenu: [
           // Les deux bornes de date tiennent sur une ligne.
           Row(

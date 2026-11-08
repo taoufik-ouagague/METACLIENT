@@ -107,8 +107,18 @@ class FactureController extends GetxController {
       } else {
         allFactures.value = list;
       }
-      totalPages.value = (res['totalPages'] as num?)?.toInt() ?? 1;
-      totalElements.value = (res['totalElements'] as num?)?.toInt() ?? 0;
+      final tp = (res['totalPages'] ?? res['total_pages']) as num?;
+      final te =
+          (res['totalElements'] ?? res['total_elements'] ?? res['total']) as num?;
+      totalElements.value = te?.toInt() ?? allFactures.length;
+      if (tp != null && tp.toInt() > 0) {
+        totalPages.value = tp.toInt();
+      } else if (te != null && te.toInt() > 0) {
+        totalPages.value = (te.toInt() / taillePagePaquet).ceil();
+      } else {
+        totalPages.value =
+            list.length >= taillePagePaquet ? page + 1 : page;
+      }
     } catch (e) {
       Get.snackbar(
         'Erreur de chargement',

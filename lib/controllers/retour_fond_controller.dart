@@ -114,8 +114,18 @@ class RetourFondController extends GetxController {
       } else {
         retoursCCCT.value = list;
       }
-      totalPagesCCCT.value = (res['totalPages'] as num?)?.toInt() ?? 1;
-      totalElementsCCCT.value = (res['totalElements'] as num?)?.toInt() ?? 0;
+      final tp = (res['totalPages'] ?? res['total_pages']) as num?;
+      final te =
+          (res['totalElements'] ?? res['total_elements'] ?? res['total']) as num?;
+      totalElementsCCCT.value = te?.toInt() ?? retoursCCCT.length;
+      if (tp != null && tp.toInt() > 0) {
+        totalPagesCCCT.value = tp.toInt();
+      } else if (te != null && te.toInt() > 0) {
+        totalPagesCCCT.value = (te.toInt() / taillePagePaquet).ceil();
+      } else {
+        totalPagesCCCT.value =
+            list.length >= taillePagePaquet ? page + 1 : page;
+      }
     } catch (e) {
       debugPrint('RetourFond CCCT error: $e');
     } finally {
@@ -176,8 +186,18 @@ class RetourFondController extends GetxController {
       } else {
         retoursBL.value = list;
       }
-      totalPagesBL.value = (res['totalPages'] as num?)?.toInt() ?? 1;
-      totalElementsBL.value = (res['totalElements'] as num?)?.toInt() ?? 0;
+      final tp = (res['totalPages'] ?? res['total_pages']) as num?;
+      final te =
+          (res['totalElements'] ?? res['total_elements'] ?? res['total']) as num?;
+      totalElementsBL.value = te?.toInt() ?? retoursBL.length;
+      if (tp != null && tp.toInt() > 0) {
+        totalPagesBL.value = tp.toInt();
+      } else if (te != null && te.toInt() > 0) {
+        totalPagesBL.value = (te.toInt() / taillePagePaquet).ceil();
+      } else {
+        totalPagesBL.value =
+            list.length >= taillePagePaquet ? page + 1 : page;
+      }
     } catch (e) {
       debugPrint('RetourFond BL error: $e');
     } finally {

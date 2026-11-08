@@ -8,7 +8,6 @@ import '../../models/facture_model.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/info_rows_card.dart';
 import '../../widgets/carte_liste.dart';
-import '../../widgets/glass_container.dart';
 import '../../widgets/scroll_reveal.dart';
 import '../../widgets/vagues_background.dart';
 
@@ -52,153 +51,155 @@ class _FactureDetailScreenState extends State<FactureDetailScreen> {
   Widget build(BuildContext context) {
     final f = widget.facture;
 
-    // Meme mise en page que le detail d'expedition : bandeau degrade, cartes
-    // posees dessus.
     return Scaffold(
       backgroundColor: const Color(0xFFF7FAFD),
       body: Stack(
         children: [
           const Positioned.fill(child: VaguesBackground()),
-          _entete(f),
-          SafeArea(
-            bottom: false,
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.fromLTRB(18, 104, 18, 28),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // ─── HERO INVOICE CARD ──────────────────────────────────────────
-                  GlassContainer(
-                    borderRadius: 24,
-                    padding: const EdgeInsets.all(20),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // Le numero, la date et le statut sont deja dans le bandeau.
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            _buildAmountCol(
-                              'Montant HT',
-                              _formatCurrency(f.mntHt),
-                            ),
-                            _buildAmountCol('TVA', _formatCurrency(f.mntTva)),
-                            _buildAmountCol(
-                              'Montant TTC',
-                              _formatCurrency(f.mntTtc),
-                              isBold: true,
-                            ),
-                          ],
-                        ),
+          Obx(() {
+            final detail = _controller.selectedDetail.value;
+            final avoirs = detail?.avoirs ?? [];
+            final reglements = detail?.reglements ?? [];
 
-                        const SizedBox(height: 16),
-                        const Divider(color: Color(0xFFE2E8F0), height: 1),
-                        const SizedBox(height: 16),
-
-                        // Ce qui a deja ete paye, et la date limite.
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            _buildAmountCol(
-                              'Montant réglé',
-                              _formatCurrency(f.mntRegle),
-                            ),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.end,
-                              children: [
-                                const Text(
-                                  'Échéance :',
-                                  style: TextStyle(
-                                    color: Color(0xFF64748B),
-                                    fontSize: 12,
-                                  ),
-                                ),
-                                const SizedBox(height: 2),
-                                Text(
-                                  f.dateEcheance ?? '—',
-                                  style: const TextStyle(
-                                    color: Color(0xFF0F172A),
-                                    fontSize: 13.5,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-
-                        const SizedBox(height: 14),
-
-                        // Le solde reste le chiffre qu'on vient chercher.
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Column(
+            return Column(
+              children: [
+                // Bandeau et carte de synthese fixes : meme logique que VirementDetailScreen
+                Stack(
+                  children: [
+                    _entete(f),
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(
+                        18,
+                        MediaQuery.paddingOf(context).top + 134 - 30,
+                        18,
+                        0,
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // ─── HERO INVOICE CARD ──────────────────────────────────────────
+                          CarteListe(
+                            borderRadius: 22,
+                            padding: const EdgeInsets.all(18),
+                            child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                const Text(
-                                  'Solde restant dû :',
-                                  style: TextStyle(
-                                    color: Color(0xFF64748B),
-                                    fontSize: 13,
-                                  ),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    _buildAmountCol(
+                                      'Montant HT',
+                                      _formatCurrency(f.mntHt),
+                                    ),
+                                    _buildAmountCol(
+                                      'TVA',
+                                      _formatCurrency(f.mntTva),
+                                    ),
+                                    _buildAmountCol(
+                                      'Montant TTC',
+                                      _formatCurrency(f.mntTtc),
+                                      isBold: true,
+                                    ),
+                                  ],
                                 ),
-                                const SizedBox(height: 2),
-                                Text(
-                                  _formatCurrency(f.solde),
-                                  style: TextStyle(
-                                    color: (f.solde != null && f.solde! > 0)
-                                        ? AppTheme.statusDanger
-                                        : AppTheme.statusSuccess,
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.w900,
-                                  ),
+                                const SizedBox(height: 12),
+                                const Divider(
+                                  color: Color(0xFFEDF2F7),
+                                  height: 1,
+                                ),
+                                const SizedBox(height: 12),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    _buildAmountCol(
+                                      'Montant réglé',
+                                      _formatCurrency(f.mntRegle),
+                                    ),
+                                    Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.end,
+                                      children: [
+                                        const Text(
+                                          'Échéance :',
+                                          style: TextStyle(
+                                            color: Color(0xFF64748B),
+                                            fontSize: 11.5,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 2),
+                                        Text(
+                                          f.dateEcheance ?? '—',
+                                          style: const TextStyle(
+                                            color: Color(0xFF0F172A),
+                                            fontSize: 13,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 10),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        const Text(
+                                          'Solde restant dû :',
+                                          style: TextStyle(
+                                            color: Color(0xFF64748B),
+                                            fontSize: 12,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 2),
+                                        Text(
+                                          _formatCurrency(f.solde),
+                                          style: TextStyle(
+                                            color:
+                                                (f.solde != null &&
+                                                        f.solde! > 0)
+                                                    ? AppTheme.statusDanger
+                                                    : AppTheme.statusSuccess,
+                                            fontSize: 18.5,
+                                            fontWeight: FontWeight.w800,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
                                 ),
                               ],
                             ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  const SizedBox(height: 24),
-
-                  // ─── AVOIRS & RÈGLEMENTS (deux volets d'une même carte) ─────────
-                  Obx(() {
-                    final detail = _controller.selectedDetail.value;
-                    final avoirs = detail?.avoirs ?? [];
-                    final reglements = detail?.reglements ?? [];
-                    final isCurrentEmpty = (_volet == 0 && avoirs.isEmpty) ||
-                        (_volet == 1 && reglements.isEmpty);
-
-                    return Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _selecteurVolet(avoirs.length, reglements.length),
-                        const SizedBox(height: 12),
-                        AnimatedContainer(
-                          duration: const Duration(milliseconds: 250),
-                          curve: Curves.easeInOut,
-                          height: isCurrentEmpty ? 120 : 300,
-                          child: PageView(
-                            controller: _voletController,
-                            onPageChanged: (i) => setState(() => _volet = i),
-                            children: [
-                              _voletAvoirs(avoirs),
-                              _voletReglements(reglements),
-                            ],
                           ),
-                        ),
-                      ],
-                    );
-                  }),
-
-                  const SizedBox(height: 20),
-                ],
-              ),
-            ),
-          ),
+                          const SizedBox(height: 12),
+                          // ─── SELECTEUR VOLET (Avoirs / Reglements) ───
+                          _selecteurVolet(avoirs.length, reglements.length),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                // ─── AVOIRS & RÈGLEMENTS (remplit le reste de l'écran avec vagues visibles au fond) ───
+                Expanded(
+                  child: PageView(
+                    controller: _voletController,
+                    onPageChanged: (i) => setState(() => _volet = i),
+                    children: [
+                      _voletAvoirs(avoirs),
+                      _voletReglements(reglements),
+                    ],
+                  ),
+                ),
+              ],
+            );
+          }),
           // Pose au-dessus du scroll : dans le bandeau il serait inaccessible.
           Positioned(
             top: 0,
@@ -556,25 +557,32 @@ class _FactureDetailScreenState extends State<FactureDetailScreen> {
   }
 
   Widget _voletVide(String message) {
-    return GlassContainer(
-      borderRadius: 18,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
-      child: Center(
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.only(bottom: 30),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
-              LucideIcons.inbox,
-              size: 26,
-              color: const Color(0xFF94A3B8).withValues(alpha: 0.65),
+            Container(
+              width: 52,
+              height: 52,
+              decoration: BoxDecoration(
+                color: AppTheme.primary.withValues(alpha: 0.08),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                LucideIcons.inbox,
+                size: 26,
+                color: AppTheme.primary,
+              ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 12),
             Text(
               message,
               textAlign: TextAlign.center,
               style: const TextStyle(
                 color: Color(0xFF64748B),
-                fontSize: 12.5,
+                fontSize: 13.5,
                 fontWeight: FontWeight.w500,
               ),
             ),

@@ -311,30 +311,33 @@ class CarteFiltres extends StatelessWidget {
     return Row(
       children: [
         Expanded(
-          flex: 2,
           child: GestureDetector(
             onTap: onReinitialiser,
             behavior: HitTestBehavior.opaque,
             child: Container(
-              padding: const EdgeInsets.symmetric(vertical: 15),
+              padding: const EdgeInsets.symmetric(vertical: 14),
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(_rayonCapsule),
+                border: Border.all(
+                  color: const Color(0xFFE2E8F0),
+                  width: 1.2,
+                ),
               ),
               child: const Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(
                     LucideIcons.rotateCcw,
-                    size: 18,
+                    size: 17,
                     color: Color(0xFF42526A),
                   ),
-                  SizedBox(width: 8),
+                  SizedBox(width: 7),
                   Text(
                     'Réinitialiser',
                     style: TextStyle(
                       color: Color(0xFF42526A),
-                      fontSize: 15,
+                      fontSize: 14,
                       fontWeight: FontWeight.w700,
                     ),
                   ),
@@ -345,12 +348,11 @@ class CarteFiltres extends StatelessWidget {
         ),
         const SizedBox(width: 12),
         Expanded(
-          flex: 3,
           child: GestureDetector(
             onTap: onAppliquer,
             behavior: HitTestBehavior.opaque,
             child: Container(
-              padding: const EdgeInsets.symmetric(vertical: 15),
+              padding: const EdgeInsets.symmetric(vertical: 14),
               decoration: BoxDecoration(
                 gradient: AppTheme.primaryGradient,
                 borderRadius: BorderRadius.circular(_rayonCapsule),
@@ -367,15 +369,15 @@ class CarteFiltres extends StatelessWidget {
                 children: [
                   Icon(
                     LucideIcons.checkCircle2,
-                    size: 19,
+                    size: 18,
                     color: Colors.white,
                   ),
-                  SizedBox(width: 9),
+                  SizedBox(width: 7),
                   Text(
                     'Appliquer',
                     style: TextStyle(
                       color: Colors.white,
-                      fontSize: 15,
+                      fontSize: 14.5,
                       fontWeight: FontWeight.w800,
                     ),
                   ),

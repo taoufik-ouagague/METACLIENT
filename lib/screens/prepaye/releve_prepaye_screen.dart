@@ -29,7 +29,7 @@ class RelevePrepayeScreen extends StatelessWidget {
 
     Get.dialog(
       CarteFiltres(
-        titre: 'Filtrer le relevé',
+        titre: 'Filtres',
         contenu: [
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
