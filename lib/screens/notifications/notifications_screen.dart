@@ -29,10 +29,9 @@ class NotificationsScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: const Color(0xFFF7FAFD),
       body: Stack(
-        fit: StackFit.expand,
         children: [
           // ─── FOND AVEC VAGUES AMBIANTES CYANS (STYLE METACLIENT) ────────
-          const VaguesBackground(),
+          const Positioned.fill(child: VaguesBackground()),
 
           // ─── BANDEAU SUPÉRIEUR DÉGRADÉ (STYLE METACLIENT) ────────────────
           Positioned(

@@ -61,10 +61,9 @@ class _ExpeditionDetailScreenState extends State<ExpeditionDetailScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFFF7FAFD),
       body: Stack(
-        fit: StackFit.expand,
         children: [
           // ─── FOND AVEC VAGUES AMBIANTES CYANS (STYLE METACLIENT) ────────
-          const VaguesBackground(),
+          const Positioned.fill(child: VaguesBackground()),
 
           Obx(() {
             if (_controller.isLoadingDetail.value) {
@@ -178,13 +177,17 @@ class _ExpeditionDetailScreenState extends State<ExpeditionDetailScreen> {
                 ),
               ),
             ),
-            SafeArea(
-              bottom: false,
-              child: Align(
-                alignment: Alignment.topLeft,
-                child: IconButton(
-                  icon: const Icon(LucideIcons.arrowLeft, color: Colors.white),
-                  onPressed: () => Get.back<void>(),
+            Positioned(
+              top: 0,
+              left: 0,
+              child: SafeArea(
+                bottom: false,
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 6),
+                  child: IconButton(
+                    icon: const Icon(LucideIcons.arrowLeft, color: Colors.white),
+                    onPressed: () => Get.back<void>(),
+                  ),
                 ),
               ),
             ),

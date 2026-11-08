@@ -43,9 +43,8 @@ class _VirementDetailScreenState extends State<VirementDetailScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFFF7FAFD),
       body: Stack(
-        fit: StackFit.expand,
         children: [
-          const VaguesBackground(),
+          const Positioned.fill(child: VaguesBackground()),
           Column(
             children: [
               // Bandeau et carte de synthese fixes : la liste defile dessous
@@ -418,20 +417,25 @@ class _VirementDetailScreenState extends State<VirementDetailScreen> {
             ],
           ),
           // Pose au-dessus du scroll : dans le bandeau il serait inaccessible.
-          SafeArea(
-            bottom: false,
-            child: Padding(
-              padding: const EdgeInsets.only(left: 6),
-              child: SizedBox(
-                height: 48,
-                child: Align(
-                  alignment: Alignment.centerLeft,
-                  child: IconButton(
-                    icon: const Icon(
-                      LucideIcons.arrowLeft,
-                      color: Colors.white,
+          Positioned(
+            top: 0,
+            left: 0,
+            child: SafeArea(
+              bottom: false,
+              child: Padding(
+                padding: const EdgeInsets.only(left: 6),
+                child: SizedBox(
+                  width: 48,
+                  height: 48,
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: IconButton(
+                      icon: const Icon(
+                        LucideIcons.arrowLeft,
+                        color: Colors.white,
+                      ),
+                      onPressed: () => Get.back<void>(),
                     ),
-                    onPressed: () => Get.back<void>(),
                   ),
                 ),
               ),

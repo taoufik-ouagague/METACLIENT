@@ -132,9 +132,8 @@ class _TableExpeditionScreenState extends State<TableExpeditionScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFFF7FAFD),
       body: Stack(
-        fit: StackFit.expand,
         children: [
-          const VaguesBackground(),
+          const Positioned.fill(child: VaguesBackground()),
           _entete(lignes.length),
           SafeArea(
             bottom: false,
@@ -165,20 +164,25 @@ class _TableExpeditionScreenState extends State<TableExpeditionScreen> {
           ),
           // Le bouton de retour est pose au-dessus du contenu : dans le
           // bandeau il passerait sous la zone defilante.
-          SafeArea(
-            bottom: false,
-            child: Padding(
-              padding: const EdgeInsets.only(left: 6),
-              child: SizedBox(
-                height: 60,
-                child: Align(
-                  alignment: Alignment.centerLeft,
-                  child: IconButton(
-                    icon: const Icon(
-                      LucideIcons.arrowLeft,
-                      color: Colors.white,
+          Positioned(
+            top: 0,
+            left: 0,
+            child: SafeArea(
+              bottom: false,
+              child: Padding(
+                padding: const EdgeInsets.only(left: 6),
+                child: SizedBox(
+                  width: 48,
+                  height: 60,
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: IconButton(
+                      icon: const Icon(
+                        LucideIcons.arrowLeft,
+                        color: Colors.white,
+                      ),
+                      onPressed: () => Get.back<void>(),
                     ),
-                    onPressed: () => Get.back<void>(),
                   ),
                 ),
               ),
