@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../../controllers/retour_fond_controller.dart';
@@ -328,72 +329,229 @@ class RetoursScreen extends StatelessWidget {
     showModalBottomSheet<void>(
       context: context,
       backgroundColor: Colors.transparent,
+      barrierColor: Colors.black.withValues(alpha: 0.06),
       isScrollControlled: true,
-      builder: (_) => DraggableScrollableSheet(
-        initialChildSize: 0.75,
-        minChildSize: 0.4,
-        maxChildSize: 0.95,
-        expand: false,
-        builder: (_, controleur) => Container(
-          decoration: const BoxDecoration(
-            color: Color(0xFFF8FAFC),
-            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-          ),
-          child: ListView(
-            controller: controleur,
-            padding: const EdgeInsets.fromLTRB(18, 10, 18, 28),
+      useSafeArea: true,
+      builder: (ctx) => _buildRetourDetailSheet(ctx, item),
+    );
+  }
+
+  Widget _buildRetourDetailSheet(BuildContext ctx, RetourFondModel item) {
+    final lignes = [
+      MapEntry('Nature', item.nature),
+      MapEntry('Type d\'expédition', item.typeExpedition),
+      MapEntry('N° déclaration', item.numDeclaration),
+      MapEntry('N° pièce', item.numPiece),
+      MapEntry('Destinataire', item.destinataire),
+      MapEntry('Destination', item.destination),
+      MapEntry('Port', item.port),
+      MapEntry('Mode de règlement', item.modereglement),
+      MapEntry('Banque', item.banque),
+      MapEntry('Date d\'envoi', item.dateEnvoi),
+      MapEntry('Date d\'encaissement', item.dateEncaissement),
+      MapEntry(
+        'Montant HT',
+        item.mntHt == null ? null : _formatCurrency(item.mntHt),
+      ),
+      MapEntry(
+        'Montant TTC',
+        item.mntTtc == null ? null : _formatCurrency(item.mntTtc),
+      ),
+      MapEntry(
+        'Fond',
+        item.fond == null ? null : _formatCurrency(item.fond),
+      ),
+      MapEntry('N° expédition', item.idExpedition?.toString()),
+      MapEntry('Bordereau', item.bordereau),
+      MapEntry('Réf. bordereau', item.cfkBrd?.toString()),
+      MapEntry('Date de réception', item.dateReception),
+      MapEntry('Date d\'affectation', item.dateAffectation),
+      MapEntry('Date de remise', item.dateRemise),
+    ].where((e) => valeurRenseignee(e.value)).toList();
+
+    final screenHeight = MediaQuery.sizeOf(ctx).height;
+    final bottomPad = MediaQuery.paddingOf(ctx).bottom;
+
+    return Padding(
+      padding: EdgeInsets.fromLTRB(16, 0, 16, 14 + bottomPad),
+      child: Container(
+        constraints: BoxConstraints(
+          maxHeight: screenHeight * 0.79,
+        ),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(24),
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0xFF0F172A).withValues(alpha: 0.08),
+              blurRadius: 28,
+              offset: const Offset(0, 8),
+            ),
+          ],
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
-              Center(
-                child: Container(
-                  width: 42,
-                  height: 4,
-                  margin: const EdgeInsets.only(bottom: 18),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFCBD5E1),
-                    borderRadius: BorderRadius.circular(2),
-                  ),
+              // ─── En-tête : Icône cyan, Titre + trait cyan, Bouton retour chevron ───
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 16, 16, 14),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 44,
+                      height: 44,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFE0F2FE),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: const Center(
+                        child: Icon(
+                          LucideIcons.fileText,
+                          color: Color(0xFF0284C7),
+                          size: 22,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 14),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            'Retour N° ${item.numDeclaration ?? ''}',
+                            style: GoogleFonts.poppins(
+                              color: const Color(0xFF0F172A),
+                              fontSize: 17,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: -0.2,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          const SizedBox(height: 5),
+                          Container(
+                            width: 32,
+                            height: 3,
+                            decoration: BoxDecoration(
+                              color: const Color(0xFF0284C7),
+                              borderRadius: BorderRadius.circular(2),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Material(
+                      color: Colors.transparent,
+                      shape: const CircleBorder(),
+                      child: InkWell(
+                        customBorder: const CircleBorder(),
+                        onTap: () => Navigator.of(ctx).pop(),
+                        child: Container(
+                          width: 34,
+                          height: 34,
+                          decoration: const BoxDecoration(
+                            color: Color(0xFFEBF5FB),
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(
+                            LucideIcons.chevronLeft,
+                            color: Color(0xFF0F172A),
+                            size: 18,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              InfoRowsCard(
-                titre: 'Retour N° ${item.numDeclaration}',
-                icone: LucideIcons.fileText,
-                lignes: [
-                  MapEntry('Nature', item.nature),
-                  MapEntry('Type d\'expédition', item.typeExpedition),
-                  MapEntry('N° déclaration', item.numDeclaration),
-                  MapEntry('N° pièce', item.numPiece),
-                  MapEntry('Bordereau', item.bordereau),
-                  MapEntry('Réf. bordereau', item.cfkBrd?.toString()),
-                  MapEntry('Destinataire', item.destinataire),
-                  MapEntry('Destination', item.destination),
-                  MapEntry('Port', item.port),
-                  MapEntry('Mode de règlement', item.modereglement),
-                  MapEntry('Banque', item.banque),
-                  MapEntry('Date d\'envoi', item.dateEnvoi),
-                  MapEntry('Date de réception', item.dateReception),
-                  MapEntry('Date d\'affectation', item.dateAffectation),
-                  MapEntry('Date d\'encaissement', item.dateEncaissement),
-                  MapEntry('Date de remise', item.dateRemise),
-                  MapEntry(
-                    'Montant HT',
-                    item.mntHt == null ? null : _formatCurrency(item.mntHt),
+
+              const Divider(height: 1, thickness: 1, color: Color(0xFFF1F5F9)),
+
+              // ─── Lignes du tableau avec icônes cyan ───────────────────────
+              Flexible(
+                child: ListView.separated(
+                  shrinkWrap: true,
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                  physics: const BouncingScrollPhysics(),
+                  itemCount: lignes.length,
+                  separatorBuilder: (_, _) => const Divider(
+                    height: 1,
+                    thickness: 1,
+                    color: Color(0xFFF1F5F9),
                   ),
-                  MapEntry(
-                    'Montant TTC',
-                    item.mntTtc == null ? null : _formatCurrency(item.mntTtc),
-                  ),
-                  MapEntry(
-                    'Fond',
-                    item.fond == null ? null : _formatCurrency(item.fond),
-                  ),
-                  MapEntry('N° expédition', item.idExpedition?.toString()),
-                ],
+                  itemBuilder: (_, index) {
+                    final ligne = lignes[index];
+                    final icone = _resolveRetourIcon(ligne.key);
+
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 9.5),
+                      child: Row(
+                        children: [
+                          Icon(
+                            icone,
+                            size: 18,
+                            color: const Color(0xFF0284C7),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Text(
+                              ligne.key,
+                              style: GoogleFonts.poppins(
+                                color: const Color(0xFF64748B),
+                                fontSize: 13,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 10),
+                          Flexible(
+                            child: Text(
+                              ligne.value!,
+                              textAlign: TextAlign.end,
+                              style: GoogleFonts.poppins(
+                                color: const Color(0xFF0F172A),
+                                fontSize: 13.5,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                ),
               ),
             ],
           ),
         ),
       ),
     );
+  }
+
+  IconData _resolveRetourIcon(String key) {
+    final k = key.toLowerCase();
+    if (k.contains('nature')) return LucideIcons.sprout;
+    if (k.contains('type')) return LucideIcons.layers;
+    if (k.contains('déclaration') || k.contains('declaration')) return LucideIcons.hash;
+    if (k.contains('pièce') || k.contains('piece')) return LucideIcons.puzzle;
+    if (k.contains('destinataire')) return LucideIcons.landmark;
+    if (k.contains('destination')) return LucideIcons.user;
+    if (k.contains('port')) return LucideIcons.truck;
+    if (k.contains('règlement') || k.contains('reglement')) return LucideIcons.creditCard;
+    if (k.contains('banque')) return LucideIcons.landmark;
+    if (k.contains('envoi')) return LucideIcons.calendar;
+    if (k.contains('encaissement')) return LucideIcons.calendarCheck;
+    if (k.contains('réception') || k.contains('reception')) return LucideIcons.calendarClock;
+    if (k.contains('affectation')) return LucideIcons.calendarPlus;
+    if (k.contains('remise')) return LucideIcons.calendarCheck2;
+    if (k.contains('ht') || k.contains('ttc')) return LucideIcons.coins;
+    if (k.contains('fond')) return LucideIcons.wallet;
+    if (k.contains('expédition') || k.contains('expedition')) return LucideIcons.hash;
+    if (k.contains('bordereau')) return LucideIcons.fileSpreadsheet;
+    return LucideIcons.fileText;
   }
 
   Widget _buildRetourCard(BuildContext context, RetourFondModel item) {
