@@ -11,6 +11,9 @@ class RetourFondController extends GetxController {
   // Active Tab: 0 = Chèques & Traites (CC/CT), 1 = BL & Factures
   final RxInt activeTab = 0.obs;
 
+  /// Retour sélectionné pour afficher le détail à la place de la liste
+  final Rxn<RetourFondModel> selectedRetour = Rxn<RetourFondModel>();
+
   final RxList<RetourFondModel> retoursCCCT = <RetourFondModel>[].obs;
   final RxList<RetourFondModel> retoursBL = <RetourFondModel>[].obs;
 

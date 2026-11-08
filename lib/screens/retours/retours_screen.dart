@@ -139,129 +139,150 @@ class RetoursScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final retourCtrl = Get.find<RetourFondController>();
 
-    return Column(
-      children: [
-        // ─── TOP TABS (CC/CT vs BL/FACTURES) ──────────────────────────────
-        Padding(
-          padding: const EdgeInsets.fromLTRB(18, 12, 18, 10),
-          child: Obx(
-            () => Container(
-              height: 48,
-              padding: const EdgeInsets.all(4),
-              decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.7),
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: const Color(0xFFE2E8F0)),
-              ),
-              child: BarreSegments(
-                libelles: [
-                  'Chèques / Traites (${retourCtrl.totalElementsCCCT.value})',
-                  'Retours BL / Factures (${retourCtrl.totalElementsBL.value})',
-                ],
-                index: retourCtrl.activeTab.value,
-                onChange: (i) => retourCtrl.activeTab.value = i,
+    return Obx(() {
+      final selected = retourCtrl.selectedRetour.value;
+
+      return PopScope(
+        canPop: selected == null,
+        onPopInvokedWithResult: (didPop, _) {
+          if (!didPop && retourCtrl.selectedRetour.value != null) {
+            retourCtrl.selectedRetour.value = null;
+          }
+        },
+        child: Column(
+          children: [
+            // ─── TOP TABS (CC/CT vs BL/FACTURES) ──────────────────────────────
+            Padding(
+              padding: const EdgeInsets.fromLTRB(18, 12, 18, 10),
+              child: Container(
+                height: 48,
+                padding: const EdgeInsets.all(4),
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.7),
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: const Color(0xFFE2E8F0)),
+                ),
+                child: BarreSegments(
+                  libelles: [
+                    'Chèques / Traites (${retourCtrl.totalElementsCCCT.value})',
+                    'Retours BL / Factures (${retourCtrl.totalElementsBL.value})',
+                  ],
+                  index: retourCtrl.activeTab.value,
+                  onChange: (i) {
+                    retourCtrl.selectedRetour.value = null;
+                    retourCtrl.activeTab.value = i;
+                  },
+                ),
               ),
             ),
-          ),
-        ),
 
-        // ─── RECHERCHE RAPIDE PAR N° DE DÉCLARATION ───────────────────────
-        Padding(
-          padding: const EdgeInsets.fromLTRB(18, 2, 18, 2),
-          child: Row(
-            children: [
-              Expanded(
-                child: TextField(
-                  controller:
-                      TextEditingController(
-                          text: retourCtrl.filterNumDeclaration.value,
-                        )
-                        ..selection = TextSelection.collapsed(
-                          offset: retourCtrl.filterNumDeclaration.value.length,
+            // ─── RECHERCHE RAPIDE PAR N° DE DÉCLARATION ───────────────────────
+            Padding(
+              padding: const EdgeInsets.fromLTRB(18, 2, 18, 2),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller:
+                          TextEditingController(
+                              text: retourCtrl.filterNumDeclaration.value,
+                            )
+                            ..selection = TextSelection.collapsed(
+                              offset: retourCtrl.filterNumDeclaration.value.length,
+                            ),
+                      style: const TextStyle(
+                        color: Color(0xFF0F172A),
+                        fontSize: 13.5,
+                      ),
+                      textInputAction: TextInputAction.search,
+                      onSubmitted: (v) {
+                        retourCtrl.selectedRetour.value = null;
+                        retourCtrl.filterNumDeclaration.value = v.trim();
+                        retourCtrl.fetchRetoursCCCT(resetPage: true);
+                        retourCtrl.fetchRetoursBL(resetPage: true);
+                      },
+                      decoration: InputDecoration(
+                        hintText: 'N° déclaration...',
+                        hintStyle: const TextStyle(
+                          color: Color(0xFF94A3B8),
+                          fontSize: 13.5,
                         ),
-                  style: const TextStyle(
-                    color: Color(0xFF0F172A),
-                    fontSize: 13.5,
-                  ),
-                  textInputAction: TextInputAction.search,
-                  onSubmitted: (v) {
-                    retourCtrl.filterNumDeclaration.value = v.trim();
-                    retourCtrl.fetchRetoursCCCT(resetPage: true);
-                    retourCtrl.fetchRetoursBL(resetPage: true);
-                  },
-                  decoration: InputDecoration(
-                    hintText: 'N° déclaration...',
-                    hintStyle: const TextStyle(
-                      color: Color(0xFF94A3B8),
-                      fontSize: 13.5,
-                    ),
-                    prefixIcon: const Icon(
-                      LucideIcons.search,
-                      color: AppTheme.primary,
-                      size: 18,
-                    ),
-                    isDense: true,
-                    filled: true,
-                    fillColor: Colors.white.withValues(alpha: 0.9),
-                    contentPadding: const EdgeInsets.symmetric(vertical: 12),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(14),
-                      borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(14),
-                      borderSide: const BorderSide(
-                        color: AppTheme.primary,
-                        width: 1.5,
+                        prefixIcon: const Icon(
+                          LucideIcons.search,
+                          color: AppTheme.primary,
+                          size: 18,
+                        ),
+                        isDense: true,
+                        filled: true,
+                        fillColor: Colors.white.withValues(alpha: 0.9),
+                        contentPadding: const EdgeInsets.symmetric(vertical: 12),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(14),
+                          borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(14),
+                          borderSide: const BorderSide(
+                            color: AppTheme.primary,
+                            width: 1.5,
+                          ),
+                        ),
                       ),
                     ),
                   ),
-                ),
-              ),
-              const SizedBox(width: 8),
-              // Bouton plein, comme la pastille de l'onglet : en creux et
-              // teinte, il se confondait avec le champ de recherche.
-              GestureDetector(
-                onTap: () => _showFilterDialog(context, retourCtrl),
-                child: Container(
-                  width: 46,
-                  height: 46,
-                  decoration: BoxDecoration(
-                    gradient: AppTheme.primaryGradient,
-                    borderRadius: BorderRadius.circular(14),
-                    boxShadow: [
-                      BoxShadow(
-                        color: AppTheme.primary.withValues(alpha: 0.32),
-                        blurRadius: 12,
-                        offset: const Offset(0, 5),
+                  const SizedBox(width: 8),
+                  GestureDetector(
+                    onTap: () {
+                      retourCtrl.selectedRetour.value = null;
+                      _showFilterDialog(context, retourCtrl);
+                    },
+                    child: Container(
+                      width: 46,
+                      height: 46,
+                      decoration: BoxDecoration(
+                        gradient: AppTheme.primaryGradient,
+                        borderRadius: BorderRadius.circular(14),
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppTheme.primary.withValues(alpha: 0.32),
+                            blurRadius: 12,
+                            offset: const Offset(0, 5),
+                          ),
+                        ],
                       ),
-                    ],
+                      child: const Icon(
+                        LucideIcons.filter,
+                        color: Colors.white,
+                        size: 19,
+                      ),
+                    ),
                   ),
-                  child: const Icon(
-                    LucideIcons.filter,
-                    color: Colors.white,
-                    size: 19,
-                  ),
-                ),
+                ],
               ),
-            ],
-          ),
-        ),
+            ),
 
-        const SizedBox(height: 6),
+            const SizedBox(height: 6),
 
-        // ─── LIST CONTENT ──────────────────────────────────────────────────
-        Expanded(
-          child: Obx(() {
-            if (retourCtrl.isLoading.value) {
-              return const Center(
-                child: CircularProgressIndicator(color: AppTheme.primary),
-              );
-            }
+            // ─── APERÇU DÉTAILLÉ (À LA PLACE DE LA LISTE) OU LISTE COMPLETE ───
+            Expanded(
+              child: Builder(builder: (_) {
+                if (selected != null) {
+                  return _buildRetourDetailView(
+                    context,
+                    selected,
+                    onClose: () => retourCtrl.selectedRetour.value = null,
+                  );
+                }
 
-            final list = retourCtrl.activeTab.value == 0
-                ? retourCtrl.retoursCCCTAffiches
-                : retourCtrl.retoursBLAffiches;
+                if (retourCtrl.isLoading.value) {
+                  return const Center(
+                    child: CircularProgressIndicator(color: AppTheme.primary),
+                  );
+                }
+
+                final list = retourCtrl.activeTab.value == 0
+                    ? retourCtrl.retoursCCCTAffiches
+                    : retourCtrl.retoursBLAffiches;
 
             if (list.isEmpty) {
               return Center(
@@ -325,18 +346,11 @@ class RetoursScreen extends StatelessWidget {
     );
   }
 
-  void _ouvrirFiche(BuildContext context, RetourFondModel item) {
-    showModalBottomSheet<void>(
-      context: context,
-      backgroundColor: Colors.transparent,
-      barrierColor: Colors.black.withValues(alpha: 0.06),
-      isScrollControlled: true,
-      useSafeArea: true,
-      builder: (ctx) => _buildRetourDetailSheet(ctx, item),
-    );
-  }
-
-  Widget _buildRetourDetailSheet(BuildContext ctx, RetourFondModel item) {
+  Widget _buildRetourDetailView(
+    BuildContext context,
+    RetourFondModel item, {
+    required VoidCallback onClose,
+  }) {
     final lignes = [
       MapEntry('Nature', item.nature),
       MapEntry('Type d\'expédition', item.typeExpedition),
@@ -369,30 +383,25 @@ class RetoursScreen extends StatelessWidget {
       MapEntry('Date de remise', item.dateRemise),
     ].where((e) => valeurRenseignee(e.value)).toList();
 
-    final screenHeight = MediaQuery.sizeOf(ctx).height;
-    final bottomPad = MediaQuery.paddingOf(ctx).bottom;
+    final bottomPad = MediaQuery.paddingOf(context).bottom;
 
     return Padding(
-      padding: EdgeInsets.fromLTRB(16, 0, 16, 14 + bottomPad),
+      padding: EdgeInsets.fromLTRB(16, 6, 16, 12 + bottomPad),
       child: Container(
-        constraints: BoxConstraints(
-          maxHeight: screenHeight * 0.79,
-        ),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(24),
           boxShadow: [
             BoxShadow(
-              color: const Color(0xFF0F172A).withValues(alpha: 0.08),
-              blurRadius: 28,
-              offset: const Offset(0, 8),
+              color: const Color(0xFF0F172A).withValues(alpha: 0.06),
+              blurRadius: 18,
+              offset: const Offset(0, 4),
             ),
           ],
         ),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(24),
           child: Column(
-            mainAxisSize: MainAxisSize.min,
             children: [
               // ─── En-tête : Icône cyan, Titre + trait cyan, Bouton retour chevron ───
               Padding(
@@ -448,7 +457,7 @@ class RetoursScreen extends StatelessWidget {
                       shape: const CircleBorder(),
                       child: InkWell(
                         customBorder: const CircleBorder(),
-                        onTap: () => Navigator.of(ctx).pop(),
+                        onTap: onClose,
                         child: Container(
                           width: 34,
                           height: 34,
@@ -471,9 +480,8 @@ class RetoursScreen extends StatelessWidget {
               const Divider(height: 1, thickness: 1, color: Color(0xFFF1F5F9)),
 
               // ─── Lignes du tableau avec icônes cyan ───────────────────────
-              Flexible(
+              Expanded(
                 child: ListView.separated(
-                  shrinkWrap: true,
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
                   physics: const BouncingScrollPhysics(),
                   itemCount: lignes.length,
@@ -585,7 +593,7 @@ class RetoursScreen extends StatelessWidget {
       couleurFiligrane: const Color(0xFFD9EAFB).withValues(alpha: 0.35),
       tailleFiligrane: 92 * k,
       basFiligrane: 56 * k,
-      onTap: () => _ouvrirFiche(context, item),
+      onTap: () => Get.find<RetourFondController>().selectedRetour.value = item,
       child: Padding(
         padding: const EdgeInsets.fromLTRB(14, 11 * k, 12, 9 * k),
         child: Column(
