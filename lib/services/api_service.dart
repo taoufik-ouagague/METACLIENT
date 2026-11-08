@@ -437,9 +437,9 @@ class ApiService {
   }
 
   // ─── FCM TOKEN ──────────────────────────────────────────────────────────────
-  // API Post : /api/securite/users/updateFcmToken
+  // API Post : /api/clientmobile/updateFcmToken
   static Future<Map<String, dynamic>> updateFcmToken(String fcmToken) async {
-    final url = Uri.parse('$baseUrl/api/securite/users/updateFcmToken');
+    final url = Uri.parse('$baseUrl/api/clientmobile/updateFcmToken');
     final response = await http.post(
       url,
       headers: _buildHeaders(),
