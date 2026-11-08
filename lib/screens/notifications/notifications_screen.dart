@@ -432,27 +432,100 @@ class NotificationsScreen extends StatelessWidget {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Container(
-                    width: 72,
-                    height: 72,
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF29B7D9).withValues(alpha: 0.12),
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(
-                      LucideIcons.bellOff,
-                      size: 32,
-                      color: Color(0xFF29B7D9),
-                    ),
+                  // Icône avec halo lumineux et sphère en verre dégradé
+                  Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      // 1. Halo extérieur lumineux
+                      Container(
+                        width: 110,
+                        height: 110,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          gradient: RadialGradient(
+                            colors: [
+                              const Color(0xFF29B7D9).withValues(alpha: 0.18),
+                              const Color(0xFF29B7D9).withValues(alpha: 0.0),
+                            ],
+                          ),
+                        ),
+                      ),
+                      // 2. Anneau fin extérieur
+                      Container(
+                        width: 92,
+                        height: 92,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: const Color(0xFF29B7D9).withValues(alpha: 0.22),
+                            width: 1.5,
+                          ),
+                        ),
+                      ),
+                      // 3. Cercle central en verre dégradé avec ombre
+                      Container(
+                        width: 76,
+                        height: 76,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          gradient: const LinearGradient(
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                            colors: [
+                              Colors.white,
+                              Color(0xFFE0F6FD),
+                              Color(0xFFC8F0FA),
+                            ],
+                          ),
+                          border: Border.all(
+                            color: Colors.white,
+                            width: 2.2,
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: const Color(0xFF0F172A).withValues(alpha: 0.06),
+                              blurRadius: 18,
+                              offset: const Offset(0, 8),
+                            ),
+                            BoxShadow(
+                              color: const Color(0xFF29B7D9).withValues(alpha: 0.30),
+                              blurRadius: 24,
+                              spreadRadius: -2,
+                              offset: const Offset(0, 10),
+                            ),
+                          ],
+                        ),
+                        child: Center(
+                          child: ShaderMask(
+                            blendMode: BlendMode.srcIn,
+                            shaderCallback: (bounds) => const LinearGradient(
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                              colors: [
+                                Color(0xFF29B7D9),
+                                AppTheme.primary,
+                                Color(0xFF0284C7),
+                              ],
+                            ).createShader(bounds),
+                            child: const Icon(
+                              LucideIcons.bellOff,
+                              size: 34,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 20),
                   Text(
                     nonLues ? 'Aucune notification non lue' : 'Aucune notification',
                     textAlign: TextAlign.center,
                     style: GoogleFonts.poppins(
-                      color: const Color(0xFF64748B),
-                      fontSize: 14.5,
-                      fontWeight: FontWeight.w600,
+                      color: const Color(0xFF1E293B),
+                      fontSize: 16.5,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: -0.2,
                     ),
                   ),
                 ],
