@@ -417,79 +417,49 @@ class NotificationsScreen extends StatelessWidget {
   Widget _buildEmptyState(NotificationController controller) {
     final nonLues = controller.nonLuesSeulement.value;
 
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 24),
-        child: CarteListe(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 38),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                width: 68,
-                height: 68,
-                decoration: BoxDecoration(
-                  color: AppTheme.primary.withValues(alpha: 0.10),
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                    color: AppTheme.primary.withValues(alpha: 0.25),
-                    width: 1.5,
-                  ),
-                ),
-                child: Icon(
-                  LucideIcons.bellOff,
-                  size: 32,
-                  color: AppTheme.primary.withValues(alpha: 0.70),
-                ),
-              ),
-              const SizedBox(height: 18),
-              Text(
-                nonLues ? 'Aucune notification non lue' : 'Aucune notification',
-                textAlign: TextAlign.center,
-                style: GoogleFonts.poppins(
-                  color: const Color(0xFF1E293B),
-                  fontSize: 16,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                nonLues
-                    ? 'Vous êtes à jour ! Toutes vos notifications ont déjà été consultées.'
-                    : 'Vos alertes d\'expédition, livraisons et actualités apparaîtront ici dès leur réception.',
-                textAlign: TextAlign.center,
-                style: GoogleFonts.poppins(
-                  color: const Color(0xFF64748B),
-                  fontSize: 12.5,
-                  height: 1.45,
-                ),
-              ),
-              const SizedBox(height: 18),
-              OutlinedButton.icon(
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: AppTheme.primary,
-                  side: const BorderSide(color: AppTheme.primary, width: 1.2),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 10,
-                  ),
-                ),
-                icon: const Icon(LucideIcons.refreshCw, size: 14),
-                label: Text(
-                  'Actualiser',
-                  style: GoogleFonts.poppins(
-                    fontSize: 12.5,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                onPressed: () => controller.fetchNotifications(showLoading: true),
-              ),
-            ],
-          ),
+    return RefreshIndicator(
+      color: AppTheme.primary,
+      backgroundColor: Colors.white,
+      onRefresh: () => controller.fetchNotifications(showLoading: false),
+      child: ListView(
+        physics: const AlwaysScrollableScrollPhysics(
+          parent: BouncingScrollPhysics(),
         ),
+        children: [
+          SizedBox(
+            height: MediaQuery.sizeOf(Get.context!).height * 0.45,
+            child: Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    width: 72,
+                    height: 72,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF29B7D9).withValues(alpha: 0.12),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(
+                      LucideIcons.bellOff,
+                      size: 32,
+                      color: Color(0xFF29B7D9),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    nonLues ? 'Aucune notification non lue' : 'Aucune notification',
+                    textAlign: TextAlign.center,
+                    style: GoogleFonts.poppins(
+                      color: const Color(0xFF64748B),
+                      fontSize: 14.5,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
