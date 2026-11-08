@@ -8,7 +8,6 @@ import '../../controllers/notification_controller.dart';
 import '../../models/notification_model.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/barre_segments.dart';
-import '../../widgets/carte_liste.dart';
 import '../../widgets/scroll_reveal.dart';
 import '../../widgets/vagues_background.dart';
 
@@ -204,158 +203,143 @@ class NotificationsScreen extends StatelessWidget {
     NotificationModel item,
   ) {
     final isUnread = !item.isRead;
-    final iconData = _resolveIcon(item);
-    final accentColor = _resolveAccentColor(item);
-    final hasRoot = item.root.trim().isNotEmpty;
+    final style = _resolveNotifStyle(item);
 
-    return CarteListe(
-      borderRadius: 18,
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
-      onTap: () => controller.handleNotificationClick(item),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Icône stylisée avec halo doux
-          Container(
-            width: 42,
-            height: 42,
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  accentColor.withValues(alpha: isUnread ? 0.20 : 0.10),
-                  accentColor.withValues(alpha: isUnread ? 0.10 : 0.04),
-                ],
-              ),
-              shape: BoxShape.circle,
-              border: Border.all(
-                color: accentColor.withValues(alpha: isUnread ? 0.40 : 0.20),
-                width: 1.2,
-              ),
-            ),
-            child: Icon(
-              iconData,
-              color: accentColor,
-              size: 20,
-            ),
+    return Container(
+      decoration: BoxDecoration(
+        color: const Color(0xFFEDF6FD),
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(
+          color: Colors.white,
+          width: 1.5,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF0F2B48).withValues(alpha: 0.04),
+            blurRadius: 14,
+            offset: const Offset(0, 3),
           ),
-          const SizedBox(width: 12),
-
-          // Contenu texte (Titre, Message, Date, Badge)
-          Expanded(
-            child: Column(
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(22),
+          onTap: () => controller.handleNotificationClick(item),
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Titre + Indicateur de statut
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Expanded(
-                      child: Text(
-                        item.title.isNotEmpty ? item.title : 'Notification',
-                        style: GoogleFonts.poppins(
-                          color: const Color(0xFF0F172A),
-                          fontSize: 14,
-                          fontWeight: isUnread ? FontWeight.w700 : FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 6),
-                    if (isUnread)
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 7,
-                          vertical: 2,
-                        ),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF29B7D9).withValues(alpha: 0.14),
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(
-                            color: const Color(0xFF29B7D9).withValues(alpha: 0.35),
-                            width: 0.8,
+                // Icône squircle aux coins arrondis
+                Container(
+                  width: 54,
+                  height: 54,
+                  decoration: BoxDecoration(
+                    color: style.iconBg,
+                    borderRadius: BorderRadius.circular(18),
+                  ),
+                  child: Center(
+                    child: style.isDelivery
+                        ? _buildFastDeliveryIcon(style.iconColor)
+                        : Icon(
+                            style.icon ?? LucideIcons.bell,
+                            color: style.iconColor,
+                            size: 24,
                           ),
-                        ),
-                        child: Text(
-                          'Non vue',
-                          style: GoogleFonts.poppins(
-                            color: const Color(0xFF0284C7),
-                            fontSize: 10,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                      )
-                    else
-                      Icon(
-                        LucideIcons.check,
-                        size: 14,
-                        color: Colors.grey.shade400,
-                      ),
-                  ],
-                ),
-                const SizedBox(height: 5),
-
-                // Corps du message
-                Text(
-                  item.message,
-                  style: GoogleFonts.poppins(
-                    color: isUnread ? const Color(0xFF334155) : const Color(0xFF64748B),
-                    fontSize: 12.5,
-                    height: 1.42,
-                    fontWeight: isUnread ? FontWeight.w500 : FontWeight.w400,
                   ),
                 ),
+                const SizedBox(width: 14),
 
-                const SizedBox(height: 8),
-
-                // Ligne du bas : Date & Lien d'accès
-                Row(
-                  children: [
-                    if (item.date != null) ...[
-                      Icon(
-                        LucideIcons.clock,
-                        size: 11,
-                        color: Colors.grey.shade400,
-                      ),
-                      const SizedBox(width: 4),
-                      Text(
-                        _formatDate(item.date!),
-                        style: GoogleFonts.poppins(
-                          color: const Color(0xFF94A3B8),
-                          fontSize: 11,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      const Spacer(),
-                    ] else
-                      const Spacer(),
-
-                    if (hasRoot)
+                // Contenu texte (Titre, Message + Chevron, Horodatage)
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Titre + Point bleu non-lu
                       Row(
-                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          Text(
-                            'Consulter',
-                            style: GoogleFonts.poppins(
-                              color: AppTheme.primary,
-                              fontSize: 11.5,
-                              fontWeight: FontWeight.w700,
+                          Expanded(
+                            child: Text(
+                              item.title.isNotEmpty ? item.title : 'Notification',
+                              style: GoogleFonts.poppins(
+                                color: const Color(0xFF0A1E3F),
+                                fontSize: 16,
+                                fontWeight: FontWeight.w700,
+                                letterSpacing: -0.1,
+                              ),
                             ),
                           ),
-                          const SizedBox(width: 2),
+                          if (isUnread) ...[
+                            const SizedBox(width: 8),
+                            Container(
+                              width: 8.5,
+                              height: 8.5,
+                              decoration: const BoxDecoration(
+                                color: Color(0xFF2B82DE),
+                                shape: BoxShape.circle,
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
+                      const SizedBox(height: 5),
+
+                      // Corps du message + flèche chevron à droite
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Expanded(
+                            child: Text(
+                              item.message,
+                              style: GoogleFonts.poppins(
+                                color: const Color(0xFF334A68),
+                                fontSize: 13.5,
+                                height: 1.38,
+                                fontWeight: FontWeight.w400,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 10),
                           const Icon(
                             LucideIcons.chevronRight,
-                            size: 13,
-                            color: AppTheme.primary,
+                            size: 20,
+                            color: Color(0xFF2B82DE),
                           ),
                         ],
                       ),
-                  ],
+
+                      // Ligne du bas : Date avec icône horloge
+                      if (item.displayDate != null) ...[
+                        const SizedBox(height: 10),
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(
+                              LucideIcons.clock,
+                              size: 14,
+                              color: Color(0xFF2B82DE),
+                            ),
+                            const SizedBox(width: 6),
+                            Text(
+                              _formatDate(item.displayDate!),
+                              style: GoogleFonts.poppins(
+                                color: const Color(0xFF334A68),
+                                fontSize: 12,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ],
+                  ),
                 ),
               ],
             ),
           ),
-        ],
+        ),
       ),
     );
   }
@@ -412,61 +396,120 @@ class NotificationsScreen extends StatelessWidget {
   }
 
   // ─── UTILS DE STYLING DES NOTIFICATIONS ────────────────────────────────────
-  IconData _resolveIcon(NotificationModel item) {
+  Widget _buildFastDeliveryIcon(Color color) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            Container(
+              width: 7,
+              height: 2,
+              decoration: BoxDecoration(
+                color: color,
+                borderRadius: BorderRadius.circular(1),
+              ),
+            ),
+            const SizedBox(height: 2.5),
+            Container(
+              width: 11,
+              height: 2,
+              decoration: BoxDecoration(
+                color: color,
+                borderRadius: BorderRadius.circular(1),
+              ),
+            ),
+            const SizedBox(height: 2.5),
+            Container(
+              width: 6,
+              height: 2,
+              decoration: BoxDecoration(
+                color: color,
+                borderRadius: BorderRadius.circular(1),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(width: 2.5),
+        Icon(
+          Icons.local_shipping_rounded,
+          size: 26,
+          color: color,
+        ),
+      ],
+    );
+  }
+
+  ({IconData? icon, Color iconColor, Color iconBg, bool isDelivery}) _resolveNotifStyle(
+    NotificationModel item,
+  ) {
     final title = item.title.toLowerCase();
     final body = item.message.toLowerCase();
     final root = item.root.toLowerCase();
 
+    // Livraison / Expédition (exactement comme le mockup image 1 : camion bleu)
     if (root.contains('/expedition') ||
         title.contains('livraison') ||
+        body.contains('livraison') ||
         body.contains('livrée') ||
         body.contains('expédition')) {
-      return LucideIcons.package;
+      return (
+        icon: null,
+        iconColor: const Color(0xFF1B64A7),
+        iconBg: const Color(0xFFD6EEFD),
+        isDelivery: true,
+      );
     }
+    // Facture
     if (title.contains('facture') || body.contains('facture')) {
-      return LucideIcons.receipt;
+      return (
+        icon: LucideIcons.receipt,
+        iconColor: const Color(0xFF4F46E5),
+        iconBg: const Color(0xFFE0E7FF),
+        isDelivery: false,
+      );
     }
+    // CRBT / Paiement
     if (title.contains('crbt') ||
         title.contains('paiement') ||
         title.contains('virement') ||
         title.contains('chèque')) {
-      return LucideIcons.banknote;
+      return (
+        icon: LucideIcons.banknote,
+        iconColor: const Color(0xFF0D9488),
+        iconBg: const Color(0xFFCCFBF1),
+        isDelivery: false,
+      );
     }
-    return LucideIcons.bell;
-  }
-
-  Color _resolveAccentColor(NotificationModel item) {
-    final title = item.title.toLowerCase();
-    final body = item.message.toLowerCase();
-    final root = item.root.toLowerCase();
-
-    if (root.contains('/expedition') ||
-        title.contains('livraison') ||
-        body.contains('expédition')) {
-      return const Color(0xFF0284C7); // Cyan / Sky Blue
-    }
-    if (title.contains('facture')) {
-      return const Color(0xFF6366F1); // Indigo
-    }
-    if (title.contains('crbt') || title.contains('paiement')) {
-      return const Color(0xFF10B981); // Emerald
-    }
-    return const Color(0xFFF59E0B); // Amber / Orange
+    // Défaut
+    return (
+      icon: LucideIcons.bell,
+      iconColor: const Color(0xFF1B64A7),
+      iconBg: const Color(0xFFD6EEFD),
+      isDelivery: false,
+    );
   }
 
   String _formatDate(DateTime dt) {
     final now = DateTime.now();
-    final diff = now.difference(dt);
+    final timeStr = DateFormat('HH:mm').format(dt);
+    final isToday =
+        dt.year == now.year && dt.month == now.month && dt.day == now.day;
+    final yesterday = now.subtract(const Duration(days: 1));
+    final isYesterday = dt.year == yesterday.year &&
+        dt.month == yesterday.month &&
+        dt.day == yesterday.day;
 
-    if (diff.inMinutes < 1) return 'À l\'instant';
-    if (diff.inMinutes < 60) return 'Il y a ${diff.inMinutes} min';
-    if (diff.inHours < 24 && dt.day == now.day) {
-      return 'Aujourd\'hui à ${DateFormat('HH:mm').format(dt)}';
+    if (isToday) {
+      return 'Aujourd\'hui • $timeStr';
+    } else if (isYesterday) {
+      return 'Hier • $timeStr';
+    } else {
+      return '${DateFormat('dd/MM/yyyy').format(dt)} • $timeStr';
     }
-    if (diff.inDays == 1 || (diff.inHours < 48 && dt.day == now.day - 1)) {
-      return 'Hier à ${DateFormat('HH:mm').format(dt)}';
-    }
-    return DateFormat('dd/MM/yyyy HH:mm').format(dt);
   }
 }
 

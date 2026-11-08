@@ -291,11 +291,11 @@ class _HomeScreenState extends State<HomeScreen> {
           final notifCtrl = Get.isRegistered<NotificationController>()
               ? Get.find<NotificationController>()
               : null;
-          final hasUnread = (notifCtrl?.unreadCount ?? 0) > 0;
+          final unreadCount = notifCtrl?.unreadCount ?? 0;
 
           return _appBarGlassButton(
             icon: LucideIcons.bell,
-            hasBadge: hasUnread,
+            badgeCount: unreadCount,
             onTap: () => Get.to<void>(
               () => const NotificationsScreen(),
               transition: Transition.cupertino,
@@ -397,58 +397,95 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _appBarGlassButton({
     required IconData icon,
     required VoidCallback onTap,
+    int badgeCount = 0,
     bool hasBadge = false,
   }) {
-    return Container(
+    final count = badgeCount > 0 ? badgeCount : (hasBadge ? 1 : 0);
+
+    return SizedBox(
       width: 40,
       height: 40,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        boxShadow: [
-          BoxShadow(
-            color: AppTheme.primary.withValues(alpha: 0.08),
-            blurRadius: 10,
-            offset: const Offset(0, 3),
-          ),
-        ],
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(20),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-          child: Material(
-            color: Colors.white.withValues(alpha: 0.24),
-            shape: CircleBorder(
-              side: BorderSide(
-                color: Colors.white.withValues(alpha: 0.50),
-                width: 1.3,
+      child: Stack(
+        clipBehavior: Clip.none,
+        alignment: Alignment.center,
+        children: [
+          Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              boxShadow: [
+                BoxShadow(
+                  color: AppTheme.primary.withValues(alpha: 0.08),
+                  blurRadius: 10,
+                  offset: const Offset(0, 3),
+                ),
+              ],
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(20),
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+                child: Material(
+                  color: Colors.white.withValues(alpha: 0.24),
+                  shape: CircleBorder(
+                    side: BorderSide(
+                      color: Colors.white.withValues(alpha: 0.50),
+                      width: 1.3,
+                    ),
+                  ),
+                  child: InkWell(
+                    customBorder: const CircleBorder(),
+                    onTap: onTap,
+                    child: Center(
+                      child: Icon(icon, color: Colors.white, size: 18),
+                    ),
+                  ),
+                ),
               ),
             ),
-            child: InkWell(
-              customBorder: const CircleBorder(),
-              onTap: onTap,
-              child: Stack(
-                alignment: Alignment.center,
-                children: [
-                  Icon(icon, color: Colors.white, size: 18),
-                  if (hasBadge)
-                    Positioned(
-                      top: 8,
-                      right: 8,
-                      child: Container(
-                        width: 7,
-                        height: 7,
-                        decoration: const BoxDecoration(
-                          color: AppTheme.primaryIcons,
-                          shape: BoxShape.circle,
-                        ),
+          ),
+          if (count > 0)
+            Positioned(
+              top: -3,
+              right: -3,
+              child: IgnorePointer(
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 4.5, vertical: 1.5),
+                  constraints: const BoxConstraints(
+                    minWidth: 18,
+                    minHeight: 18,
+                  ),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFEF4444),
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(
+                      color: Colors.white,
+                      width: 1.6,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xFFEF4444).withValues(alpha: 0.5),
+                        blurRadius: 6,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: Center(
+                    child: Text(
+                      count > 99 ? '99+' : '$count',
+                      style: GoogleFonts.poppins(
+                        color: Colors.white,
+                        fontSize: 9.5,
+                        fontWeight: FontWeight.w700,
+                        height: 1.0,
                       ),
                     ),
-                ],
+                  ),
+                ),
               ),
             ),
-          ),
-        ),
+        ],
       ),
     );
   }
