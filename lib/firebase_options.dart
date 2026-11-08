@@ -41,19 +41,21 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyC8X7u62K6k--GQg1Tg5hmZcECIL2tRoC4',
-    appId: '1:1087493296240:android:cf824cc1f6338ff8f464b5',
-    messagingSenderId: '1087493296240',
-    projectId: 'metafleet-02',
-    storageBucket: 'metafleet-02.firebasestorage.app',
+    apiKey: 'AIzaSyAcr0vWxbMQ978D6_XOwlIeO6vW1vY7GD8',
+    appId: '1:355245444574:android:9e54131bf6b4083abc614f',
+    messagingSenderId: '355245444574',
+    projectId: 'metaclient',
+    storageBucket: 'metaclient.firebasestorage.app',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyBw7McfanZwBev3unzZgr0yRxyj25DtRpc',
-    appId: '1:1087493296240:ios:b2b5f6ee8aa0dd07f464b5',
-    messagingSenderId: '1087493296240',
-    projectId: 'metafleet-02',
-    storageBucket: 'metafleet-02.firebasestorage.app',
+    apiKey: 'AIzaSyCUThIET2vnfsBPUReQHzujlbR3WF9L-2k',
+    appId: '1:355245444574:ios:bd671d0a03421473bc614f',
+    messagingSenderId: '355245444574',
+    projectId: 'metaclient',
+    storageBucket: 'metaclient.firebasestorage.app',
+    iosClientId: '355245444574-a9v6p3dfedk7nlhrgqp5eqlv13m0algq.apps.googleusercontent.com',
     iosBundleId: 'com.kaytech.metaclient.metaclient',
   );
+
 }

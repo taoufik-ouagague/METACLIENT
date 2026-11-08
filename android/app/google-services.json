@@ -1,26 +1,36 @@
 {
   "project_info": {
-    "project_number": "1087493296240",
-    "project_id": "metafleet-02",
-    "storage_bucket": "metafleet-02.firebasestorage.app"
+    "project_number": "355245444574",
+    "project_id": "metaclient",
+    "storage_bucket": "metaclient.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:1087493296240:android:cf824cc1f6338ff8f464b5",
+        "mobilesdk_app_id": "1:355245444574:android:9e54131bf6b4083abc614f",
         "android_client_info": {
           "package_name": "com.kaytech.metaclient.metaclient"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "355245444574-q2d3si0sats6h5te7qkhs5v0t2dvis22.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
-          "current_key": "AIzaSyC8X7u62K6k--GQg1Tg5hmZcECIL2tRoC4"
+          "current_key": "AIzaSyAcr0vWxbMQ978D6_XOwlIeO6vW1vY7GD8"
         }
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "355245444574-q2d3si0sats6h5te7qkhs5v0t2dvis22.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }
