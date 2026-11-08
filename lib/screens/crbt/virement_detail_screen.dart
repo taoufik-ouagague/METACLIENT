@@ -8,6 +8,7 @@ import '../../theme/app_theme.dart';
 import '../../widgets/info_rows_card.dart';
 import '../../widgets/carte_liste.dart';
 import '../../widgets/scroll_reveal.dart';
+import '../../widgets/vagues_background.dart';
 
 class VirementDetailScreen extends StatefulWidget {
   final VirementCrbtModel virement;
@@ -40,9 +41,11 @@ class _VirementDetailScreenState extends State<VirementDetailScreen> {
     // Meme mise en page que le detail d'expedition : bandeau degrade, cartes
     // posees dessus.
     return Scaffold(
-      backgroundColor: const Color(0xFFEFF3F8),
+      backgroundColor: const Color(0xFFF7FAFD),
       body: Stack(
+        fit: StackFit.expand,
         children: [
+          const VaguesBackground(),
           Column(
             children: [
               // Bandeau et carte de synthese fixes : la liste defile dessous
