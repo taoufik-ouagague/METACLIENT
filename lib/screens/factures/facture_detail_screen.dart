@@ -8,6 +8,7 @@ import '../../models/facture_model.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/info_rows_card.dart';
 import '../../widgets/carte_liste.dart';
+import '../../widgets/glass_container.dart';
 import '../../widgets/scroll_reveal.dart';
 import '../../widgets/vagues_background.dart';
 
@@ -62,12 +63,12 @@ class _FactureDetailScreenState extends State<FactureDetailScreen> {
           SafeArea(
             bottom: false,
             child: SingleChildScrollView(
-              padding: const EdgeInsets.fromLTRB(18, 116, 18, 28),
+              padding: const EdgeInsets.fromLTRB(18, 104, 18, 28),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // ─── HERO INVOICE CARD ──────────────────────────────────────────
-                  CarteListe(
+                  GlassContainer(
                     borderRadius: 24,
                     padding: const EdgeInsets.all(20),
                     child: Column(
@@ -168,16 +169,18 @@ class _FactureDetailScreenState extends State<FactureDetailScreen> {
                     final detail = _controller.selectedDetail.value;
                     final avoirs = detail?.avoirs ?? [];
                     final reglements = detail?.reglements ?? [];
+                    final isCurrentEmpty = (_volet == 0 && avoirs.isEmpty) ||
+                        (_volet == 1 && reglements.isEmpty);
 
                     return Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         _selecteurVolet(avoirs.length, reglements.length),
                         const SizedBox(height: 12),
-                        SizedBox(
-                          // Hauteur fixe : un PageView ne peut pas se dimensionner
-                          // sur son contenu. Chaque volet defile a l'interieur.
-                          height: 300,
+                        AnimatedContainer(
+                          duration: const Duration(milliseconds: 250),
+                          curve: Curves.easeInOut,
+                          height: isCurrentEmpty ? 120 : 300,
                           child: PageView(
                             controller: _voletController,
                             onPageChanged: (i) => setState(() => _volet = i),
@@ -552,16 +555,30 @@ class _FactureDetailScreenState extends State<FactureDetailScreen> {
     );
   }
 
-  /// Etat vide d'un volet : il dit qu'il est vide plutot que de disparaitre.
   Widget _voletVide(String message) {
-    return CarteListe(
+    return GlassContainer(
       borderRadius: 18,
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
       child: Center(
-        child: Text(
-          message,
-          textAlign: TextAlign.center,
-          style: const TextStyle(color: Color(0xFF64748B), fontSize: 13),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              LucideIcons.inbox,
+              size: 26,
+              color: const Color(0xFF94A3B8).withValues(alpha: 0.65),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              message,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                color: Color(0xFF64748B),
+                fontSize: 12.5,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
         ),
       ),
     );
