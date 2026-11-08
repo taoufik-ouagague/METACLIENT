@@ -8,9 +8,11 @@ import 'controllers/agence_controller.dart';
 import 'controllers/dashboard_controller.dart';
 import 'controllers/expedition_controller.dart';
 import 'controllers/facture_controller.dart';
+import 'controllers/notification_controller.dart';
 import 'controllers/retour_fond_controller.dart';
 import 'screens/home/home_screen.dart';
 import 'screens/login_screen.dart';
+import 'screens/notifications/notifications_screen.dart';
 import 'screens/splash_screen.dart';
 import 'services/api_service.dart';
 import 'services/fcm_service.dart';
@@ -43,6 +45,7 @@ class MetaClientApp extends StatelessWidget {
     Get.put(CrbtController(), permanent: true);
     Get.put(PrepayeController(), permanent: true);
     Get.put(AgenceController(), permanent: true);
+    Get.put(NotificationController(), permanent: true);
 
     return GetMaterialApp(
       title: 'Meta Client',
@@ -70,6 +73,11 @@ class MetaClientApp extends StatelessWidget {
           name: '/home',
           page: () => const HomeScreen(),
           transition: Transition.fadeIn,
+        ),
+        GetPage(
+          name: '/notifications',
+          page: () => const NotificationsScreen(),
+          transition: Transition.cupertino,
         ),
       ],
     );

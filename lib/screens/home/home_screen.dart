@@ -7,6 +7,7 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../../controllers/auth_controller.dart';
+import '../../controllers/notification_controller.dart';
 import '../notifications/notifications_screen.dart';
 import '../expeditions/tracking_screen.dart';
 import '../../theme/app_theme.dart';
@@ -286,14 +287,22 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         const SizedBox(width: 8),
         // Bouton Notifications
-        _appBarGlassButton(
-          icon: LucideIcons.bell,
-          onTap: () => Get.to<void>(
-            () => const NotificationsScreen(),
-            transition: Transition.cupertino,
-            duration: const Duration(milliseconds: 360),
-          ),
-        ),
+        Obx(() {
+          final notifCtrl = Get.isRegistered<NotificationController>()
+              ? Get.find<NotificationController>()
+              : null;
+          final hasUnread = (notifCtrl?.unreadCount ?? 0) > 0;
+
+          return _appBarGlassButton(
+            icon: LucideIcons.bell,
+            hasBadge: hasUnread,
+            onTap: () => Get.to<void>(
+              () => const NotificationsScreen(),
+              transition: Transition.cupertino,
+              duration: const Duration(milliseconds: 360),
+            ),
+          );
+        }),
         const SizedBox(width: 8),
         // Bouton Profil
         _boutonProfil(),

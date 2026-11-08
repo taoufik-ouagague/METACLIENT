@@ -10,6 +10,7 @@ import 'crbt_controller.dart';
 import 'dashboard_controller.dart';
 import 'expedition_controller.dart';
 import 'facture_controller.dart';
+import 'notification_controller.dart';
 import 'prepaye_controller.dart';
 import 'retour_fond_controller.dart';
 
@@ -105,6 +106,9 @@ class AuthController extends GetxController {
       }
       if (Get.isRegistered<AgenceController>()) {
         Get.find<AgenceController>().fetchAgences();
+      }
+      if (Get.isRegistered<NotificationController>()) {
+        Get.find<NotificationController>().fetchNotifications();
       }
 
       // Récupérer et associer le token FCM à la session connectée

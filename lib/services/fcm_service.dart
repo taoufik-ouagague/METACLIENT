@@ -7,6 +7,8 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:logger/logger.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../controllers/notification_controller.dart';
+import '../screens/expeditions/expedition_detail_screen.dart';
 import '../firebase_options.dart';
 
 /// Top-level background message handler requis par Firebase Messaging
@@ -248,6 +250,9 @@ class AppChannel {
   void _handleForegroundNotification(RemoteMessage message) {
     final notification = message.notification;
     if (notification != null) {
+      if (Get.isRegistered<NotificationController>()) {
+        Get.find<NotificationController>().fetchNotifications(showLoading: false);
+      }
       Get.snackbar(
         notification.title ?? 'Nouvelle notification',
         notification.body ?? '',
@@ -298,6 +303,7 @@ class AppChannel {
             fontSize: 12,
           ),
         ),
+        onTap: (_) => _handleNotificationClick(message),
       );
     }
   }
@@ -306,6 +312,25 @@ class AppChannel {
   void _handleNotificationClick(RemoteMessage message) {
     final data = message.data;
     _logger.i('👉 Clic notification avec données : $data');
+
+    if (Get.isRegistered<NotificationController>()) {
+      Get.find<NotificationController>().fetchNotifications(showLoading: false);
+    }
+
+    final root = (data['root'] ?? '').toString().trim();
+    if (root.toLowerCase().contains('/expedition/')) {
+      final parts = root.split('/');
+      final idStr = parts.lastWhere((p) => p.isNotEmpty, orElse: () => '');
+      final expId = int.tryParse(idStr);
+      if (expId != null) {
+        Get.to<void>(
+          () => ExpeditionDetailScreen(idExpedition: expId),
+          transition: Transition.cupertino,
+        );
+        return;
+      }
+    }
+    Get.toNamed('/notifications');
   }
 }
 

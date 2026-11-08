@@ -1,28 +1,36 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 
+import '../../controllers/notification_controller.dart';
+import '../../models/notification_model.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/carte_liste.dart';
 import '../../widgets/scroll_reveal.dart';
 
-/// Les notifications du client.
-///
-/// L'API n'en expose pas encore : l'ecran existe pour que le point d'entree
-/// soit en place et affiche un etat vide plutot que rien.
 class NotificationsScreen extends StatelessWidget {
   const NotificationsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    // Meme mise en page que les autres ecrans : bandeau degrade, contenu pose
-    // dessous.
+    final controller = Get.find<NotificationController>();
+
+    // Rafraîchir à l'ouverture de l'écran
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      controller.fetchNotifications(showLoading: controller.notifications.isEmpty);
+    });
+
+    final topPadding = MediaQuery.paddingOf(context).top;
+
     return Scaffold(
       backgroundColor: const Color(0xFFEFF3F8),
       body: Stack(
         children: [
+          // ─── BANDEAU SUPÉRIEUR DÉGRADÉ (STYLE METACLIENT) ────────────────
           Container(
-            height: MediaQuery.paddingOf(context).top + 60,
+            height: topPadding + 115,
             decoration: const BoxDecoration(
               gradient: LinearGradient(
                 begin: Alignment.topLeft,
@@ -37,88 +45,550 @@ class NotificationsScreen extends StatelessWidget {
             ),
             child: SafeArea(
               bottom: false,
-              child: const Padding(
-                padding: EdgeInsets.fromLTRB(6, 0, 18, 0),
-                child: Row(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(14, 4, 14, 0),
+                child: Column(
                   children: [
-                    // Place reservee au bouton de retour, pose au-dessus.
-                    SizedBox(width: 48, height: 48),
-                    Expanded(
-                      child: Text(
-                        'Notifications',
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 19,
-                          fontWeight: FontWeight.w800,
-                          letterSpacing: 0.2,
+                    // Barre de navigation (Retour, Titre, Action Tout marquer lu)
+                    Row(
+                      children: [
+                        _buildNavButton(
+                          icon: LucideIcons.arrowLeft,
+                          onTap: () => Get.back<void>(),
                         ),
-                      ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Row(
+                            children: [
+                              Text(
+                                'Notifications',
+                                style: GoogleFonts.poppins(
+                                  color: Colors.white,
+                                  fontSize: 18.5,
+                                  fontWeight: FontWeight.w800,
+                                  letterSpacing: 0.2,
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              Obx(() {
+                                final unread = controller.unreadCount;
+                                if (unread == 0) return const SizedBox.shrink();
+                                return Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 8,
+                                    vertical: 2,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(12),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withValues(alpha: 0.12),
+                                        blurRadius: 4,
+                                        offset: const Offset(0, 1),
+                                      ),
+                                    ],
+                                  ),
+                                  child: Text(
+                                    '$unread',
+                                    style: GoogleFonts.poppins(
+                                      color: AppTheme.primary,
+                                      fontSize: 11.5,
+                                      fontWeight: FontWeight.w800,
+                                    ),
+                                  ),
+                                );
+                              }),
+                            ],
+                          ),
+                        ),
+                        // Bouton marquer tout comme lu
+                        Obx(() {
+                          if (controller.unreadCount == 0) {
+                            return const SizedBox.shrink();
+                          }
+                          return controller.isMarkingAll.value
+                              ? const SizedBox(
+                                  width: 36,
+                                  height: 36,
+                                  child: Center(
+                                    child: SizedBox(
+                                      width: 18,
+                                      height: 18,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ),
+                                )
+                              : _buildNavButton(
+                                  icon: LucideIcons.checkCheck,
+                                  tooltip: 'Tout marquer comme lu',
+                                  onTap: () => controller.markAllAsRead(),
+                                );
+                        }),
+                      ],
                     ),
+                    const SizedBox(height: 10),
+                    // Filtres : Toutes / Non lues
+                    _buildFilterTabs(controller),
                   ],
                 ),
               ),
             ),
           ),
-          SafeArea(
-            bottom: false,
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(18, 78, 18, 24),
-              child: Center(
-                child: ScrollReveal.grille(
-                  index: 0,
-                  child: CarteListe(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 20,
-                      vertical: 32,
-                    ),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          LucideIcons.bellOff,
-                          size: 34,
-                          color: AppTheme.primary.withValues(alpha: 0.45),
-                        ),
-                        const SizedBox(height: 12),
-                        const Text(
-                          'Aucune notification',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            color: Color(0xFF64748B),
-                            fontSize: 13.5,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ],
-                    ),
+
+          // ─── LISTE DES NOTIFICATIONS ──────────────────────────────────────
+          Padding(
+            padding: EdgeInsets.only(top: topPadding + 120),
+            child: Obx(() {
+              if (controller.isLoading.value && controller.notifications.isEmpty) {
+                return const Center(
+                  child: CircularProgressIndicator(color: AppTheme.primary),
+                );
+              }
+
+              final list = controller.listeAffichee;
+
+              if (list.isEmpty) {
+                return _buildEmptyState(controller);
+              }
+
+              return RefreshIndicator(
+                color: AppTheme.primary,
+                backgroundColor: Colors.white,
+                onRefresh: () => controller.fetchNotifications(showLoading: false),
+                child: ListView.separated(
+                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
+                  physics: const AlwaysScrollableScrollPhysics(
+                    parent: BouncingScrollPhysics(),
                   ),
+                  itemCount: list.length,
+                  separatorBuilder: (ctx, idx) => const SizedBox(height: 10),
+                  itemBuilder: (context, index) {
+                    final item = list[index];
+                    return ScrollReveal(
+                      index: index,
+                      child: _buildNotificationCard(context, controller, item),
+                    );
+                  },
                 ),
+              );
+            }),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ─── BOUTON DE NAVIGATION TRANSPARENT BLUR ─────────────────────────────────
+  Widget _buildNavButton({
+    required IconData icon,
+    required VoidCallback onTap,
+    String? tooltip,
+  }) {
+    final btn = Container(
+      width: 38,
+      height: 38,
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.20),
+        shape: BoxShape.circle,
+        border: Border.all(
+          color: Colors.white.withValues(alpha: 0.45),
+          width: 1.1,
+        ),
+      ),
+      child: Material(
+        color: Colors.transparent,
+        shape: const CircleBorder(),
+        child: InkWell(
+          customBorder: const CircleBorder(),
+          onTap: onTap,
+          child: Icon(icon, color: Colors.white, size: 17),
+        ),
+      ),
+    );
+
+    return tooltip != null
+        ? Tooltip(message: tooltip, child: btn)
+        : btn;
+  }
+
+  // ─── ONGLETS DE FILTRE (TOUTES / NON LUES) ──────────────────────────────────
+  Widget _buildFilterTabs(NotificationController controller) {
+    return Obx(() {
+      final nonLues = controller.nonLuesSeulement.value;
+      final total = controller.notifications.length;
+      final unread = controller.unreadCount;
+
+      return Container(
+        height: 38,
+        padding: const EdgeInsets.all(3),
+        decoration: BoxDecoration(
+          color: Colors.black.withValues(alpha: 0.14),
+          borderRadius: BorderRadius.circular(19),
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              child: _buildFilterTabItem(
+                label: 'Toutes ($total)',
+                isActive: !nonLues,
+                onTap: () => controller.nonLuesSeulement.value = false,
               ),
             ),
+            const SizedBox(width: 4),
+            Expanded(
+              child: _buildFilterTabItem(
+                label: 'Non lues ($unread)',
+                isActive: nonLues,
+                badgeCount: unread,
+                onTap: () => controller.nonLuesSeulement.value = true,
+              ),
+            ),
+          ],
+        ),
+      );
+    });
+  }
+
+  Widget _buildFilterTabItem({
+    required String label,
+    required bool isActive,
+    required VoidCallback onTap,
+    int? badgeCount,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 220),
+        curve: Curves.easeOutCubic,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          color: isActive ? Colors.white : Colors.transparent,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: isActive
+              ? [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.08),
+                    blurRadius: 6,
+                    offset: const Offset(0, 2),
+                  ),
+                ]
+              : null,
+        ),
+        child: Text(
+          label,
+          style: GoogleFonts.poppins(
+            color: isActive ? AppTheme.primary : Colors.white.withValues(alpha: 0.90),
+            fontSize: 12.5,
+            fontWeight: isActive ? FontWeight.w700 : FontWeight.w500,
           ),
-          SafeArea(
-            bottom: false,
-            child: Padding(
-              padding: const EdgeInsets.only(left: 6),
-              child: SizedBox(
-                height: 60,
-                child: Align(
-                  alignment: Alignment.centerLeft,
-                  child: IconButton(
-                    icon: const Icon(
-                      LucideIcons.arrowLeft,
-                      color: Colors.white,
+        ),
+      ),
+    );
+  }
+
+  // ─── CARTE DE NOTIFICATION ─────────────────────────────────────────────────
+  Widget _buildNotificationCard(
+    BuildContext context,
+    NotificationController controller,
+    NotificationModel item,
+  ) {
+    final isUnread = !item.isRead;
+    final iconData = _resolveIcon(item);
+    final accentColor = _resolveAccentColor(item);
+    final hasRoot = item.root.trim().isNotEmpty;
+
+    return CarteListe(
+      borderRadius: 18,
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+      onTap: () => controller.handleNotificationClick(item),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Icône stylisée avec halo doux
+          Container(
+            width: 42,
+            height: 42,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  accentColor.withValues(alpha: isUnread ? 0.20 : 0.10),
+                  accentColor.withValues(alpha: isUnread ? 0.10 : 0.04),
+                ],
+              ),
+              shape: BoxShape.circle,
+              border: Border.all(
+                color: accentColor.withValues(alpha: isUnread ? 0.40 : 0.20),
+                width: 1.2,
+              ),
+            ),
+            child: Icon(
+              iconData,
+              color: accentColor,
+              size: 20,
+            ),
+          ),
+          const SizedBox(width: 12),
+
+          // Contenu texte (Titre, Message, Date, Badge)
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Titre + Indicateur de statut
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: Text(
+                        item.title.isNotEmpty ? item.title : 'Notification',
+                        style: GoogleFonts.poppins(
+                          color: const Color(0xFF0F172A),
+                          fontSize: 14,
+                          fontWeight: isUnread ? FontWeight.w700 : FontWeight.w600,
+                        ),
+                      ),
                     ),
-                    onPressed: () => Get.back<void>(),
+                    const SizedBox(width: 6),
+                    if (isUnread)
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 7,
+                          vertical: 2,
+                        ),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF29B7D9).withValues(alpha: 0.14),
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(
+                            color: const Color(0xFF29B7D9).withValues(alpha: 0.35),
+                            width: 0.8,
+                          ),
+                        ),
+                        child: Text(
+                          'Non vue',
+                          style: GoogleFonts.poppins(
+                            color: const Color(0xFF0284C7),
+                            fontSize: 10,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      )
+                    else
+                      Icon(
+                        LucideIcons.check,
+                        size: 14,
+                        color: Colors.grey.shade400,
+                      ),
+                  ],
+                ),
+                const SizedBox(height: 5),
+
+                // Corps du message
+                Text(
+                  item.message,
+                  style: GoogleFonts.poppins(
+                    color: isUnread ? const Color(0xFF334155) : const Color(0xFF64748B),
+                    fontSize: 12.5,
+                    height: 1.42,
+                    fontWeight: isUnread ? FontWeight.w500 : FontWeight.w400,
                   ),
                 ),
-              ),
+
+                const SizedBox(height: 8),
+
+                // Ligne du bas : Date & Lien d'accès
+                Row(
+                  children: [
+                    if (item.date != null) ...[
+                      Icon(
+                        LucideIcons.clock,
+                        size: 11,
+                        color: Colors.grey.shade400,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        _formatDate(item.date!),
+                        style: GoogleFonts.poppins(
+                          color: const Color(0xFF94A3B8),
+                          fontSize: 11,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      const Spacer(),
+                    ] else
+                      const Spacer(),
+
+                    if (hasRoot)
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            'Consulter',
+                            style: GoogleFonts.poppins(
+                              color: AppTheme.primary,
+                              fontSize: 11.5,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                          const SizedBox(width: 2),
+                          const Icon(
+                            LucideIcons.chevronRight,
+                            size: 13,
+                            color: AppTheme.primary,
+                          ),
+                        ],
+                      ),
+                  ],
+                ),
+              ],
             ),
           ),
         ],
       ),
     );
+  }
+
+  // ─── ÉTAT VIDE ─────────────────────────────────────────────────────────────
+  Widget _buildEmptyState(NotificationController controller) {
+    final nonLues = controller.nonLuesSeulement.value;
+
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 24),
+        child: CarteListe(
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 38),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 68,
+                height: 68,
+                decoration: BoxDecoration(
+                  color: AppTheme.primary.withValues(alpha: 0.10),
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: AppTheme.primary.withValues(alpha: 0.25),
+                    width: 1.5,
+                  ),
+                ),
+                child: Icon(
+                  LucideIcons.bellOff,
+                  size: 32,
+                  color: AppTheme.primary.withValues(alpha: 0.70),
+                ),
+              ),
+              const SizedBox(height: 18),
+              Text(
+                nonLues ? 'Aucune notification non lue' : 'Aucune notification',
+                textAlign: TextAlign.center,
+                style: GoogleFonts.poppins(
+                  color: const Color(0xFF1E293B),
+                  fontSize: 16,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                nonLues
+                    ? 'Vous êtes à jour ! Toutes vos notifications ont déjà été consultées.'
+                    : 'Vos alertes d\'expédition, livraisons et actualités apparaîtront ici dès leur réception.',
+                textAlign: TextAlign.center,
+                style: GoogleFonts.poppins(
+                  color: const Color(0xFF64748B),
+                  fontSize: 12.5,
+                  height: 1.45,
+                ),
+              ),
+              const SizedBox(height: 18),
+              OutlinedButton.icon(
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: AppTheme.primary,
+                  side: const BorderSide(color: AppTheme.primary, width: 1.2),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 10,
+                  ),
+                ),
+                icon: const Icon(LucideIcons.refreshCw, size: 14),
+                label: Text(
+                  'Actualiser',
+                  style: GoogleFonts.poppins(
+                    fontSize: 12.5,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                onPressed: () => controller.fetchNotifications(showLoading: true),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  // ─── UTILS DE STYLING DES NOTIFICATIONS ────────────────────────────────────
+  IconData _resolveIcon(NotificationModel item) {
+    final title = item.title.toLowerCase();
+    final body = item.message.toLowerCase();
+    final root = item.root.toLowerCase();
+
+    if (root.contains('/expedition') ||
+        title.contains('livraison') ||
+        body.contains('livrée') ||
+        body.contains('expédition')) {
+      return LucideIcons.package;
+    }
+    if (title.contains('facture') || body.contains('facture')) {
+      return LucideIcons.receipt;
+    }
+    if (title.contains('crbt') ||
+        title.contains('paiement') ||
+        title.contains('virement') ||
+        title.contains('chèque')) {
+      return LucideIcons.banknote;
+    }
+    return LucideIcons.bell;
+  }
+
+  Color _resolveAccentColor(NotificationModel item) {
+    final title = item.title.toLowerCase();
+    final body = item.message.toLowerCase();
+    final root = item.root.toLowerCase();
+
+    if (root.contains('/expedition') ||
+        title.contains('livraison') ||
+        body.contains('expédition')) {
+      return const Color(0xFF0284C7); // Cyan / Sky Blue
+    }
+    if (title.contains('facture')) {
+      return const Color(0xFF6366F1); // Indigo
+    }
+    if (title.contains('crbt') || title.contains('paiement')) {
+      return const Color(0xFF10B981); // Emerald
+    }
+    return const Color(0xFFF59E0B); // Amber / Orange
+  }
+
+  String _formatDate(DateTime dt) {
+    final now = DateTime.now();
+    final diff = now.difference(dt);
+
+    if (diff.inMinutes < 1) return 'À l\'instant';
+    if (diff.inMinutes < 60) return 'Il y a ${diff.inMinutes} min';
+    if (diff.inHours < 24 && dt.day == now.day) {
+      return 'Aujourd\'hui à ${DateFormat('HH:mm').format(dt)}';
+    }
+    if (diff.inDays == 1 || (diff.inHours < 48 && dt.day == now.day - 1)) {
+      return 'Hier à ${DateFormat('HH:mm').format(dt)}';
+    }
+    return DateFormat('dd/MM/yyyy HH:mm').format(dt);
   }
 }

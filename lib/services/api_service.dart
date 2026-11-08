@@ -448,6 +448,25 @@ class ApiService {
     return _handleResponse(response);
   }
 
+  // ─── NOTIFICATIONS CLIENT ──────────────────────────────────────────────────
+  // API Get : /api/clientmobile/notifications
+  static Future<Map<String, dynamic>> getNotifications() async {
+    final url = Uri.parse('$baseUrl/api/clientmobile/notifications');
+    final response = await http.get(url, headers: _buildHeaders());
+    return _handleResponse(response);
+  }
+
+  // API Get : /api/clientmobile/notificationsVu?id=...
+  static Future<Map<String, dynamic>> markNotificationAsRead(
+    int idNotification,
+  ) async {
+    final url = Uri.parse(
+      '$baseUrl/api/clientmobile/notificationsVu?id=$idNotification',
+    );
+    final response = await http.get(url, headers: _buildHeaders());
+    return _handleResponse(response);
+  }
+
   // Helper response handler
   static Map<String, dynamic> _handleResponse(http.Response response) {
     final bodyString = utf8.decode(response.bodyBytes);
