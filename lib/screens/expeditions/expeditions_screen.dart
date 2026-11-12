@@ -21,14 +21,6 @@ class ExpeditionsScreen extends StatelessWidget {
     return '${formatter.format(amount)} DH';
   }
 
-  String _buildNatureAndFond(ExpeditionModel item) {
-    final nature = (item.nature != null &&
-            item.nature!.trim().isNotEmpty &&
-            item.nature != 'null')
-        ? item.nature!.trim()
-        : ((item.fond ?? 0) > 0 ? 'Fond' : 'Nature');
-    return '$nature : ${_formatCurrency(item.fond)}';
-  }
 
   void _showFilterDialog(BuildContext context, ExpeditionController ctrl) {
     final duCtrl = TextEditingController(text: ctrl.filterDu.value);
@@ -662,15 +654,30 @@ class ExpeditionsScreen extends StatelessWidget {
                     left: w * 0.635,
                     right: w * 0.05,
                     top: h * 0.81,
-                    child: Text(
-                      _buildNatureAndFond(item),
+                    child: Text.rich(
+                      TextSpan(
+                        children: [
+                          TextSpan(
+                            text:
+                                '${(item.nature != null && item.nature!.trim().isNotEmpty && item.nature != 'null') ? item.nature!.trim() : ((item.fond ?? 0) > 0 ? 'Fond' : 'Nature')} : ',
+                            style: TextStyle(
+                              color: const Color(0xFF0284C7),
+                              fontSize: h * 0.080,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                          TextSpan(
+                            text: _formatCurrency(item.fond),
+                            style: TextStyle(
+                              color: const Color(0xFF059669),
+                              fontSize: h * 0.080,
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
+                        ],
+                      ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        color: const Color(0xFF0284C7),
-                        fontSize: h * 0.080,
-                        fontWeight: FontWeight.w700,
-                      ),
                     ),
                   ),
                 ],

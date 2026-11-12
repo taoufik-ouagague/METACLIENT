@@ -3,12 +3,14 @@ class UserModel {
   final String libelle;
   final List<String> roles;
   final String token;
+  final bool connexionOtp;
 
   UserModel({
     required this.code,
     required this.libelle,
     required this.roles,
     required this.token,
+    this.connexionOtp = false,
   });
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
@@ -23,11 +25,19 @@ class UserModel {
       }
     }
 
+    final rawOtp = json['connexionOtp'];
+    final isOtp =
+        rawOtp == true ||
+        rawOtp?.toString().toLowerCase() == 'true' ||
+        rawOtp == 1 ||
+        rawOtp?.toString() == '1';
+
     return UserModel(
       code: json['code']?.toString() ?? '',
       libelle: json['libelle']?.toString() ?? '',
       roles: parsedRoles,
       token: json['token']?.toString() ?? '',
+      connexionOtp: isOtp,
     );
   }
 
@@ -36,5 +46,6 @@ class UserModel {
     'libelle': libelle,
     'roles': roles.map((r) => {'droit': r}).toList(),
     'token': token,
+    'connexionOtp': connexionOtp,
   };
 }

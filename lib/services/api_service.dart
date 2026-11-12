@@ -25,10 +25,11 @@ class ApiService {
     printer: PrettyPrinter(methodCount: 0, dateTimeFormat: DateTimeFormat.none),
   );
 
-  /// Masque mot de passe et jeton avant toute trace.
+  /// Masque mot de passe, jeton et code OTP avant toute trace.
   static String _sansSecrets(String texte) => texte
       .replaceAll(RegExp(r'"pwd"\s*:\s*"[^"]*"'), '"pwd":"***"')
-      .replaceAll(RegExp(r'"token"\s*:\s*"[^"]*"'), '"token":"***"');
+      .replaceAll(RegExp(r'"token"\s*:\s*"[^"]*"'), '"token":"***"')
+      .replaceAll(RegExp(r'"codeOtp"\s*:\s*"[^"]*"'), '"codeOtp":"***"');
 
   static const String defaultDevUrl =
       'https://metaphore.kaytechnology.com:6799/CLIENTMOBILE';
@@ -36,6 +37,16 @@ class ApiService {
       'https://metaphore.kaytechnology.com:6799/CLIENTMOBILE';
 
   static String baseUrl = _resolveDefaultUrl();
+
+  /// Jeton temporaire utilise uniquement pendant la verification OTP, avant
+  /// que la session ne soit persistee dans StorageService.
+  static String? _pendingOtpToken;
+
+  static void setPendingOtpToken(String? token) {
+    _pendingOtpToken = (token != null && token.trim().isNotEmpty)
+        ? token.trim()
+        : null;
+  }
 
   static String _resolveDefaultUrl() {
     if (kIsWeb) return defaultDevUrl;
@@ -68,7 +79,9 @@ class ApiService {
       'Content-Type': 'application/json',
       'Accept': 'application/json',
     };
-    final token = StorageService.getToken();
+    final token = (_pendingOtpToken != null && _pendingOtpToken!.isNotEmpty)
+        ? _pendingOtpToken
+        : StorageService.getToken();
     if (token != null && token.isNotEmpty) {
       headers['token'] = token;
     }
@@ -102,6 +115,36 @@ class ApiService {
       headers: {'Content-Type': 'application/json'},
       body: body,
     );
+    return _handleResponse(response);
+  }
+
+  // ─── VÉRIFICATION CODE OTP ───────────────────────────────────────────────────
+  // API Post : /api/clientmobile/CheckOtpMobile
+  static Future<Map<String, dynamic>> checkOtpMobile(String codeOtp) async {
+    final url = Uri.parse('$baseUrl/api/clientmobile/CheckOtpMobile');
+    final body = jsonEncode({'codeOtp': codeOtp.trim()});
+
+    _logger.i('POST $url\nBody: ${_sansSecrets(body)}');
+    final response = await http.post(
+      url,
+      headers: _buildHeaders(),
+      body: body,
+    );
+    return _handleResponse(response);
+  }
+
+  // ─── RENVOI DU CODE OTP ──────────────────────────────────────────────────────
+  // API : /api/clientmobile/sendOtpMobile
+  static Future<Map<String, dynamic>> sendOtpMobile() async {
+    final url = Uri.parse('$baseUrl/api/clientmobile/sendOtpMobile');
+    final headers = _buildHeaders();
+
+    _logger.i('GET $url');
+    var response = await http.get(url, headers: headers);
+    if (response.statusCode == 405) {
+      _logger.i('POST $url');
+      response = await http.post(url, headers: headers);
+    }
     return _handleResponse(response);
   }
 
@@ -181,9 +224,9 @@ class ApiService {
     String? regle, // null = Tous, "en cours", "cloture"
   }) async {
     final url = Uri.parse(
-      '$baseUrl/api/clientmobile/factures?page=$page&pageSize=$pageSize',
+      '$baseUrl/api/clientmobile/ factures?page=$page&pageSize=$pageSize',
     );
-    final body = jsonEncode({'regle': regle});
+    final body = jsonEncode({'livre': regle});
     final response = await http.post(url, headers: _buildHeaders(), body: body);
     return _handleResponse(response);
   }
@@ -302,6 +345,18 @@ class ApiService {
       'remis': (remis != null && remis.trim().isNotEmpty) ? remis.trim() : null,
     });
     final response = await http.post(url, headers: _buildHeaders(), body: body);
+    return _handleResponse(response);
+  }
+
+  // ─── DÉTAIL D'UN BORDEREAU ───────────────────────────────────────────────────
+  // API Get : /api/clientmobile/detailBordereau?idBordereau=49
+  static Future<Map<String, dynamic>> getDetailBordereau(
+    dynamic idBordereau,
+  ) async {
+    final url = Uri.parse(
+      '$baseUrl/api/clientmobile/detailBordereau?idBordereau=$idBordereau',
+    );
+    final response = await http.get(url, headers: _buildHeaders());
     return _handleResponse(response);
   }
 

@@ -15,6 +15,8 @@ class FactureModel {
   final num? mntHt;
   final num? mntTtc;
   final String? statut;
+  final String? couleur;
+  final num? delaiReglement;
 
   FactureModel({
     this.idFacture,
@@ -33,6 +35,8 @@ class FactureModel {
     this.mntHt,
     this.mntTtc,
     this.statut,
+    this.couleur,
+    this.delaiReglement,
   });
 
   factory FactureModel.fromJson(Map<String, dynamic> json) {
@@ -41,7 +45,8 @@ class FactureModel {
       numFacture: json['num_facture']?.toString() ?? '',
       code: json['code']?.toString(),
       dateFacture: json['date_facture']?.toString(),
-      dateEcheance: json['date_echeance']?.toString(),
+      dateEcheance:
+          (json['date_echeance'] ?? json['dateEcheance'])?.toString(),
       dateRemise: json['date_remise']?.toString(),
       libelle: json['libelle']?.toString(),
       mntRegle: json['mnt_regle'] as num?,
@@ -52,11 +57,50 @@ class FactureModel {
       solde: json['solde'] as num?,
       mntHt: json['mnt_ht'] as num?,
       mntTtc: (json['mnt_ttc'] ?? json['mnt_Ʃc']) as num?,
-      statut: json['statut']?.toString(),
+      statut: json['statut']?.toString() ?? json['status']?.toString(),
+      couleur: json['couleur']?.toString() ?? json['color']?.toString(),
+      delaiReglement:
+          (json['delai_reglement'] ?? json['delaiReglement']) as num?,
     );
   }
 
   bool get isPayee =>
-      (solde == null || solde == 0) &&
-      (statut != null && statut!.toLowerCase().contains('cloture'));
+      couleur?.toLowerCase() == 'green' ||
+      ((solde == null || solde == 0) &&
+          (statut != null && statut!.toLowerCase().contains('cloture')));
+
+  bool get isEnCours => couleur?.toLowerCase() == 'orange';
+
+  bool get isEnRetard =>
+      couleur?.toLowerCase() == 'red' ||
+      (couleur == null && solde != null && solde! > 0);
+
+  FactureModel mergeWith(FactureModel other) {
+    return FactureModel(
+      idFacture: idFacture ?? other.idFacture,
+      numFacture: numFacture.isNotEmpty ? numFacture : other.numFacture,
+      code: (code != null && code!.isNotEmpty) ? code : other.code,
+      dateFacture: (dateFacture != null && dateFacture!.isNotEmpty)
+          ? dateFacture
+          : other.dateFacture,
+      dateEcheance: (dateEcheance != null && dateEcheance!.isNotEmpty)
+          ? dateEcheance
+          : other.dateEcheance,
+      dateRemise: dateRemise ?? other.dateRemise,
+      libelle:
+          (libelle != null && libelle!.isNotEmpty) ? libelle : other.libelle,
+      mntRegle: mntRegle ?? other.mntRegle,
+      remise: remise ?? other.remise,
+      tauxRemise: tauxRemise ?? other.tauxRemise,
+      mntAvoir: mntAvoir ?? other.mntAvoir,
+      mntTva: mntTva ?? other.mntTva,
+      solde: solde ?? other.solde,
+      mntHt: mntHt ?? other.mntHt,
+      mntTtc: mntTtc ?? other.mntTtc,
+      statut: (statut != null && statut!.isNotEmpty) ? statut : other.statut,
+      couleur:
+          (couleur != null && couleur!.isNotEmpty) ? couleur : other.couleur,
+      delaiReglement: delaiReglement ?? other.delaiReglement,
+    );
+  }
 }

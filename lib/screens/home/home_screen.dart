@@ -12,6 +12,7 @@ import '../notifications/notifications_screen.dart';
 import '../expeditions/tracking_screen.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/ambient_background.dart';
+import '../../widgets/vagues_background.dart';
 import '../crbt/crbt_screen.dart';
 import '../expeditions/expeditions_screen.dart';
 import '../factures/factures_screen.dart';
@@ -1160,6 +1161,12 @@ class _FondCorps extends StatelessWidget {
             child: halo(
               l * 0.9,
               const Color(0xFFBFEDF8).withValues(alpha: 0.22),
+            ),
+          ),
+          // Vagues organiques identiques a celles du detail d'expedition.
+          const Positioned.fill(
+            child: IgnorePointer(
+              child: CustomPaint(painter: VaguesMockupPainter()),
             ),
           ),
         ],

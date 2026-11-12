@@ -14,6 +14,10 @@ class RetourFondController extends GetxController {
   /// Retour sélectionné pour afficher le détail à la place de la liste
   final Rxn<RetourFondModel> selectedRetour = Rxn<RetourFondModel>();
 
+  final RxBool isLoadingDetail = false.obs;
+  final RxList<BordereauDetailItem> selectedBordereauDetails =
+      <BordereauDetailItem>[].obs;
+
   final RxList<RetourFondModel> retoursCCCT = <RetourFondModel>[].obs;
   final RxList<RetourFondModel> retoursBL = <RetourFondModel>[].obs;
 
@@ -222,6 +226,31 @@ class RetourFondController extends GetxController {
       await fetchRetoursCCCT(ajout: true);
     } else {
       await fetchRetoursBL(ajout: true);
+    }
+  }
+
+  Future<void> fetchDetailBordereau(dynamic idBordereau) async {
+    if (idBordereau == null) return;
+    try {
+      isLoadingDetail.value = true;
+      selectedBordereauDetails.clear();
+      final res = await ApiService.getDetailBordereau(idBordereau);
+      final list = (res['data'] as List? ?? [])
+          .map(
+            (e) => BordereauDetailItem.fromJson(Map<String, dynamic>.from(e)),
+          )
+          .toList();
+      selectedBordereauDetails.value = list;
+    } catch (e) {
+      Get.snackbar(
+        'Détail indisponible',
+        e.toString().replaceAll('ApiException', '').trim(),
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: const Color(0xFFEF4444).withValues(alpha: 0.8),
+        colorText: Colors.white,
+      );
+    } finally {
+      isLoadingDetail.value = false;
     }
   }
 }

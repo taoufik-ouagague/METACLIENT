@@ -13,6 +13,7 @@ import 'controllers/retour_fond_controller.dart';
 import 'screens/home/home_screen.dart';
 import 'screens/login_screen.dart';
 import 'screens/notifications/notifications_screen.dart';
+import 'screens/otp_screen.dart';
 import 'screens/splash_screen.dart';
 import 'services/api_service.dart';
 import 'services/fcm_service.dart';
@@ -68,6 +69,12 @@ class MetaClientApp extends StatelessWidget {
           transition: Transition.fadeIn,
           transitionDuration: const Duration(milliseconds: 650),
           curve: Curves.easeOutCubic,
+        ),
+        GetPage(
+          name: '/otp',
+          page: () => const OtpScreen(),
+          transition: Transition.cupertino,
+          transitionDuration: const Duration(milliseconds: 400),
         ),
         GetPage(
           name: '/home',

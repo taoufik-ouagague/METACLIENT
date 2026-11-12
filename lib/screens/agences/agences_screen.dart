@@ -5,6 +5,7 @@ import '../../controllers/agence_controller.dart';
 import '../../models/agence_model.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/carte_accent.dart';
+import '../../widgets/carte_gps.dart';
 import '../../widgets/etat_vide.dart';
 import '../../widgets/scroll_reveal.dart';
 
@@ -289,18 +290,18 @@ class AgencesScreen extends StatelessWidget {
                       agence.telephoneBrut,
                       const Color(0xFF059669),
                     ),
-                    _ligneInfo(
-                      LucideIcons.hash,
-                      'CPK',
-                      agence.cpk?.toString(),
-                      const Color(0xFF7C3AED),
-                    ),
-                    _ligneInfo(
-                      LucideIcons.navigation,
-                      'Coordonnées',
-                      '${agence.latitude ?? 0} , ${agence.longitude ?? 0}',
-                      const Color(0xFFD97706),
-                    ),
+                    if (agence.estLocalisee) ...[
+                      const SizedBox(height: 12),
+                      CarteGps(
+                        latitude: agence.latitude!.toDouble(),
+                        longitude: agence.longitude!.toDouble(),
+                        titre: 'Position GPS',
+                        geofence: agence.code,
+                      ),
+                    ] else ...[
+                      const SizedBox(height: 10),
+                      _buildEmptyGps(),
+                    ],
                   ],
                 ),
               ),
@@ -364,6 +365,33 @@ class AgencesScreen extends StatelessWidget {
                   fontWeight: FontWeight.w700,
                   height: 1.35,
                 ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildEmptyGps() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF8FAFC),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
+      ),
+      child: const Row(
+        children: [
+          Icon(LucideIcons.mapPinOff, size: 16, color: Color(0xFF94A3B8)),
+          SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              'Coordonnées GPS non disponibles',
+              style: TextStyle(
+                color: Color(0xFF64748B),
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
               ),
             ),
           ),

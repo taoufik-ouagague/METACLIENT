@@ -8,6 +8,7 @@ import '../../models/facture_model.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/info_rows_card.dart';
 import '../../widgets/carte_liste.dart';
+import '../../widgets/glass_container.dart';
 import '../../widgets/scroll_reveal.dart';
 import '../../widgets/vagues_background.dart';
 
@@ -37,7 +38,10 @@ class _FactureDetailScreenState extends State<FactureDetailScreen> {
   void initState() {
     super.initState();
     if (widget.facture.idFacture != null) {
-      _controller.fetchDetail(widget.facture.idFacture!);
+      _controller.fetchDetail(
+        widget.facture.idFacture!,
+        base: widget.facture,
+      );
     }
   }
 
@@ -49,14 +53,13 @@ class _FactureDetailScreenState extends State<FactureDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final f = widget.facture;
-
     return Scaffold(
       backgroundColor: const Color(0xFFF7FAFD),
       body: Stack(
         children: [
           const Positioned.fill(child: VaguesBackground()),
           Obx(() {
+            final f = _controller.selectedFacture.value ?? widget.facture;
             final detail = _controller.selectedDetail.value;
             final avoirs = detail?.avoirs ?? [];
             final reglements = detail?.reglements ?? [];
@@ -70,7 +73,7 @@ class _FactureDetailScreenState extends State<FactureDetailScreen> {
                     Padding(
                       padding: EdgeInsets.fromLTRB(
                         18,
-                        MediaQuery.paddingOf(context).top + 134 - 30,
+                        MediaQuery.paddingOf(context).top + 102,
                         18,
                         0,
                       ),
@@ -78,9 +81,14 @@ class _FactureDetailScreenState extends State<FactureDetailScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           // ─── HERO INVOICE CARD ──────────────────────────────────────────
-                          CarteListe(
-                            borderRadius: 22,
-                            padding: const EdgeInsets.all(18),
+                          GlassContainer(
+                            borderRadius: 20,
+                            blur: 12,
+                            color: Colors.white.withValues(alpha: 0.76),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 15,
+                              vertical: 12,
+                            ),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
@@ -103,15 +111,16 @@ class _FactureDetailScreenState extends State<FactureDetailScreen> {
                                     ),
                                   ],
                                 ),
-                                const SizedBox(height: 12),
+                                const SizedBox(height: 9),
                                 const Divider(
                                   color: Color(0xFFEDF2F7),
                                   height: 1,
                                 ),
-                                const SizedBox(height: 12),
+                                const SizedBox(height: 9),
                                 Row(
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
+                                  crossAxisAlignment: CrossAxisAlignment.end,
                                   children: [
                                     _buildAmountCol(
                                       'Montant réglé',
@@ -119,54 +128,47 @@ class _FactureDetailScreenState extends State<FactureDetailScreen> {
                                     ),
                                     Column(
                                       crossAxisAlignment:
-                                          CrossAxisAlignment.end,
+                                          CrossAxisAlignment.start,
                                       children: [
                                         const Text(
-                                          'Échéance :',
+                                          'Échéance',
                                           style: TextStyle(
                                             color: Color(0xFF64748B),
-                                            fontSize: 11.5,
+                                            fontSize: 10.5,
                                           ),
                                         ),
                                         const SizedBox(height: 2),
                                         Text(
                                           f.dateEcheance ?? '—',
                                           style: const TextStyle(
-                                            color: Color(0xFF0F172A),
-                                            fontSize: 13,
-                                            fontWeight: FontWeight.w600,
+                                            color: Color(0xFFEA580C),
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w700,
                                           ),
                                         ),
                                       ],
                                     ),
-                                  ],
-                                ),
-                                const SizedBox(height: 10),
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
                                     Column(
                                       crossAxisAlignment:
-                                          CrossAxisAlignment.start,
+                                          CrossAxisAlignment.end,
                                       children: [
                                         const Text(
-                                          'Solde restant dû :',
+                                          'Solde restant dû',
                                           style: TextStyle(
                                             color: Color(0xFF64748B),
-                                            fontSize: 12,
+                                            fontSize: 10.5,
                                           ),
                                         ),
                                         const SizedBox(height: 2),
                                         Text(
                                           _formatCurrency(f.solde),
                                           style: TextStyle(
-                                            color:
-                                                (f.solde != null &&
-                                                        f.solde! > 0)
-                                                    ? AppTheme.statusDanger
-                                                    : AppTheme.statusSuccess,
-                                            fontSize: 18.5,
+                                            color: f.isPayee
+                                                ? AppTheme.statusSuccess
+                                                : (f.isEnCours
+                                                    ? const Color(0xFFEA580C)
+                                                    : AppTheme.statusDanger),
+                                            fontSize: 14.5,
                                             fontWeight: FontWeight.w800,
                                           ),
                                         ),
@@ -177,7 +179,7 @@ class _FactureDetailScreenState extends State<FactureDetailScreen> {
                               ],
                             ),
                           ),
-                          const SizedBox(height: 12),
+                          const SizedBox(height: 10),
                           // ─── SELECTEUR VOLET (Avoirs / Reglements) ───
                           _selecteurVolet(avoirs.length, reglements.length),
                         ],
@@ -185,7 +187,7 @@ class _FactureDetailScreenState extends State<FactureDetailScreen> {
                     ),
                   ],
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 6),
                 // ─── AVOIRS & RÈGLEMENTS (remplit le reste de l'écran avec vagues visibles au fond) ───
                 Expanded(
                   child: PageView(
@@ -209,14 +211,15 @@ class _FactureDetailScreenState extends State<FactureDetailScreen> {
               child: Padding(
                 padding: const EdgeInsets.only(left: 6),
                 child: SizedBox(
-                  width: 48,
-                  height: 48,
+                  width: 44,
+                  height: 44,
                   child: Align(
                     alignment: Alignment.centerLeft,
                     child: IconButton(
                       icon: const Icon(
                         LucideIcons.arrowLeft,
                         color: Colors.white,
+                        size: 20,
                       ),
                       onPressed: () => Get.back<void>(),
                     ),
@@ -232,14 +235,14 @@ class _FactureDetailScreenState extends State<FactureDetailScreen> {
 
   Widget _entete(FactureModel f) {
     return Container(
-      height: MediaQuery.paddingOf(context).top + 134,
+      height: MediaQuery.paddingOf(context).top + 152,
       decoration: const BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [Color(0xFF1B7A94), AppTheme.primary, Color(0xFF3FC1D8)],
         ),
-        borderRadius: BorderRadius.vertical(bottom: Radius.circular(30)),
+        borderRadius: BorderRadius.vertical(bottom: Radius.circular(26)),
       ),
       child: SafeArea(
         bottom: false,
@@ -251,28 +254,28 @@ class _FactureDetailScreenState extends State<FactureDetailScreen> {
               const Row(
                 children: [
                   // Place reservee au bouton de retour, pour aligner le titre.
-                  SizedBox(width: 48, height: 48),
+                  SizedBox(width: 44, height: 42),
                   Text(
                     'Détail Facture',
                     style: TextStyle(
                       color: Colors.white,
-                      fontSize: 16.5,
+                      fontSize: 15,
                       fontWeight: FontWeight.w700,
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: 4),
+              const SizedBox(height: 2),
               Padding(
                 padding: const EdgeInsets.only(left: 12),
                 child: Row(
                   children: [
                     Container(
-                      width: 44,
-                      height: 44,
+                      width: 36,
+                      height: 36,
                       decoration: BoxDecoration(
                         color: Colors.white.withValues(alpha: 0.18),
-                        borderRadius: BorderRadius.circular(14),
+                        borderRadius: BorderRadius.circular(11),
                         border: Border.all(
                           color: Colors.white.withValues(alpha: 0.35),
                         ),
@@ -280,10 +283,10 @@ class _FactureDetailScreenState extends State<FactureDetailScreen> {
                       child: const Icon(
                         LucideIcons.fileText,
                         color: Colors.white,
-                        size: 21,
+                        size: 18,
                       ),
                     ),
-                    const SizedBox(width: 12),
+                    const SizedBox(width: 10),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -294,19 +297,19 @@ class _FactureDetailScreenState extends State<FactureDetailScreen> {
                             overflow: TextOverflow.ellipsis,
                             style: const TextStyle(
                               color: Colors.white,
-                              fontSize: 21,
+                              fontSize: 16.5,
                               fontWeight: FontWeight.w800,
-                              letterSpacing: 0.3,
+                              letterSpacing: 0.2,
                             ),
                           ),
-                          const SizedBox(height: 2),
+                          const SizedBox(height: 1),
                           Text(
-                            'Date ${f.dateFacture ?? "—"}',
+                            'Date facture : ${f.dateFacture ?? "—"}',
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(
-                              color: Colors.white.withValues(alpha: 0.80),
-                              fontSize: 12.5,
+                              color: Colors.white.withValues(alpha: 0.85),
+                              fontSize: 11,
                             ),
                           ),
                         ],
@@ -315,21 +318,25 @@ class _FactureDetailScreenState extends State<FactureDetailScreen> {
                     const SizedBox(width: 8),
                     Container(
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 11,
-                        vertical: 5,
+                        horizontal: 9,
+                        vertical: 4,
                       ),
                       decoration: BoxDecoration(
                         color: Colors.white.withValues(alpha: 0.18),
-                        borderRadius: BorderRadius.circular(9),
+                        borderRadius: BorderRadius.circular(8),
                         border: Border.all(
                           color: Colors.white.withValues(alpha: 0.35),
                         ),
                       ),
                       child: Text(
-                        f.statut ?? (f.isPayee ? 'Payée' : 'En cours'),
+                        f.isPayee
+                            ? 'Payée'
+                            : (f.isEnCours
+                                ? 'En cours'
+                                : (f.statut ?? 'En retard')),
                         style: const TextStyle(
                           color: Colors.white,
-                          fontSize: 11.5,
+                          fontSize: 10.5,
                           fontWeight: FontWeight.w700,
                         ),
                       ),
@@ -350,7 +357,7 @@ class _FactureDetailScreenState extends State<FactureDetailScreen> {
     }
 
     return ListView.builder(
-      padding: EdgeInsets.zero,
+      padding: const EdgeInsets.fromLTRB(18, 2, 18, 20),
       itemCount: avoirs.length,
       itemBuilder: (context, i) {
         final av = avoirs[i];
@@ -358,9 +365,9 @@ class _FactureDetailScreenState extends State<FactureDetailScreen> {
         return ScrollReveal(
           index: i,
           child: CarteListe(
-            margin: const EdgeInsets.only(bottom: 10),
-            borderRadius: 16,
-            padding: const EdgeInsets.all(14),
+            margin: const EdgeInsets.only(bottom: 8),
+            borderRadius: 14,
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -372,7 +379,7 @@ class _FactureDetailScreenState extends State<FactureDetailScreen> {
                         'Avoir N° ${av.numAvoir}',
                         style: const TextStyle(
                           color: Color(0xFF0F172A),
-                          fontSize: 13.5,
+                          fontSize: 12.5,
                           fontWeight: FontWeight.w700,
                         ),
                       ),
@@ -381,7 +388,7 @@ class _FactureDetailScreenState extends State<FactureDetailScreen> {
                         'Créé le : ${av.dateCreation ?? "—"}',
                         style: const TextStyle(
                           color: Color(0xFF64748B),
-                          fontSize: 11.5,
+                          fontSize: 11,
                         ),
                       ),
                       if (valeurRenseignee(av.remarque)) ...[
@@ -390,7 +397,7 @@ class _FactureDetailScreenState extends State<FactureDetailScreen> {
                           av.remarque!,
                           style: const TextStyle(
                             color: Color(0xFF475569),
-                            fontSize: 11.5,
+                            fontSize: 11,
                             fontStyle: FontStyle.italic,
                           ),
                         ),
@@ -403,7 +410,7 @@ class _FactureDetailScreenState extends State<FactureDetailScreen> {
                   '- ${_formatCurrency(av.montant)}',
                   style: const TextStyle(
                     color: AppTheme.statusWarning,
-                    fontSize: 14,
+                    fontSize: 13,
                     fontWeight: FontWeight.w700,
                   ),
                 ),
@@ -426,7 +433,7 @@ class _FactureDetailScreenState extends State<FactureDetailScreen> {
     }
 
     return ListView.builder(
-      padding: EdgeInsets.zero,
+      padding: const EdgeInsets.fromLTRB(18, 2, 18, 20),
       itemCount: reglements.length,
       itemBuilder: (context, i) {
         final reg = reglements[i];
@@ -434,9 +441,9 @@ class _FactureDetailScreenState extends State<FactureDetailScreen> {
         return ScrollReveal(
           index: i,
           child: CarteListe(
-            margin: const EdgeInsets.only(bottom: 10),
-            borderRadius: 16,
-            padding: const EdgeInsets.all(15),
+            margin: const EdgeInsets.only(bottom: 8),
+            borderRadius: 14,
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -444,18 +451,18 @@ class _FactureDetailScreenState extends State<FactureDetailScreen> {
                   child: Row(
                     children: [
                       Container(
-                        padding: const EdgeInsets.all(8),
+                        padding: const EdgeInsets.all(6),
                         decoration: BoxDecoration(
                           color: AppTheme.statusSuccess.withValues(alpha: 0.12),
-                          borderRadius: BorderRadius.circular(10),
+                          borderRadius: BorderRadius.circular(8),
                         ),
                         child: const Icon(
                           LucideIcons.badgeCheck,
                           color: AppTheme.statusSuccess,
-                          size: 20,
+                          size: 16,
                         ),
                       ),
-                      const SizedBox(width: 12),
+                      const SizedBox(width: 10),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -464,7 +471,7 @@ class _FactureDetailScreenState extends State<FactureDetailScreen> {
                               reg.modeReglement,
                               style: const TextStyle(
                                 color: Color(0xFF0F172A),
-                                fontSize: 14,
+                                fontSize: 12.5,
                                 fontWeight: FontWeight.w700,
                               ),
                             ),
@@ -475,7 +482,7 @@ class _FactureDetailScreenState extends State<FactureDetailScreen> {
                               overflow: TextOverflow.ellipsis,
                               style: const TextStyle(
                                 color: Color(0xFF64748B),
-                                fontSize: 11.5,
+                                fontSize: 11,
                               ),
                             ),
                           ],
@@ -489,7 +496,7 @@ class _FactureDetailScreenState extends State<FactureDetailScreen> {
                   _formatCurrency(reg.montant),
                   style: const TextStyle(
                     color: AppTheme.statusSuccess,
-                    fontSize: 14.5,
+                    fontSize: 13,
                     fontWeight: FontWeight.w800,
                   ),
                 ),
@@ -504,10 +511,10 @@ class _FactureDetailScreenState extends State<FactureDetailScreen> {
   /// Bascule entre les deux volets, du meme dessin que l'onglet du profil.
   Widget _selecteurVolet(int nbAvoirs, int nbReglements) {
     return Container(
-      padding: const EdgeInsets.all(4),
+      padding: const EdgeInsets.all(3.5),
       decoration: BoxDecoration(
         color: Colors.white.withValues(alpha: 0.70),
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(14),
         border: Border.all(color: Colors.white, width: 1.5),
         boxShadow: [
           BoxShadow(
@@ -537,17 +544,17 @@ class _FactureDetailScreenState extends State<FactureDetailScreen> {
       ),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 250),
-        padding: const EdgeInsets.symmetric(vertical: 9),
+        padding: const EdgeInsets.symmetric(vertical: 7),
         decoration: BoxDecoration(
           gradient: actif ? AppTheme.primaryGradient : null,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(10),
         ),
         child: Center(
           child: Text(
             '$libelle ($nombre)',
             style: TextStyle(
               color: actif ? Colors.white : const Color(0xFF64748B),
-              fontSize: 13,
+              fontSize: 12,
               fontWeight: FontWeight.w700,
             ),
           ),
@@ -564,25 +571,25 @@ class _FactureDetailScreenState extends State<FactureDetailScreen> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
-              width: 52,
-              height: 52,
+              width: 44,
+              height: 44,
               decoration: BoxDecoration(
                 color: AppTheme.primary.withValues(alpha: 0.08),
                 shape: BoxShape.circle,
               ),
               child: const Icon(
                 LucideIcons.inbox,
-                size: 26,
+                size: 22,
                 color: AppTheme.primary,
               ),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 10),
             Text(
               message,
               textAlign: TextAlign.center,
               style: const TextStyle(
                 color: Color(0xFF64748B),
-                fontSize: 13.5,
+                fontSize: 12.5,
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -598,15 +605,15 @@ class _FactureDetailScreenState extends State<FactureDetailScreen> {
       children: [
         Text(
           label,
-          style: const TextStyle(color: Color(0xFF64748B), fontSize: 11.5),
+          style: const TextStyle(color: Color(0xFF64748B), fontSize: 10.5),
         ),
-        const SizedBox(height: 3),
+        const SizedBox(height: 2),
         Text(
           value,
           style: TextStyle(
             color: isBold ? const Color(0xFF0F172A) : const Color(0xFF334155),
             fontWeight: isBold ? FontWeight.w800 : FontWeight.w600,
-            fontSize: isBold ? 14.5 : 13.5,
+            fontSize: isBold ? 13 : 12,
           ),
         ),
       ],

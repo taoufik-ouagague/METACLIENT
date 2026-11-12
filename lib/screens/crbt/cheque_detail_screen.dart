@@ -215,7 +215,7 @@ class _ChequeDetailScreenState extends State<ChequeDetailScreen> {
                           Text(
                             _formatCurrency(c.montant),
                             style: const TextStyle(
-                              color: AppTheme.primary,
+                              color: Color(0xFF059669),
                               fontSize: 18.5,
                               fontWeight: FontWeight.w800,
                             ),
@@ -445,7 +445,7 @@ class _ChequeDetailScreenState extends State<ChequeDetailScreen> {
                           Text(
                             _formatCurrency(item.montant),
                             style: const TextStyle(
-                              color: AppTheme.primary,
+                              color: Color(0xFF059669),
                               fontWeight: FontWeight.w700,
                               fontSize: 14,
                             ),

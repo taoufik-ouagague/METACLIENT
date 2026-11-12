@@ -16,6 +16,7 @@ class FactureController extends GetxController {
   final RxList<FactureModel> facturesInstances = <FactureModel>[].obs;
   final RxList<FactureModel> allFactures = <FactureModel>[].obs;
   final Rxn<FactureDetailModel> selectedDetail = Rxn<FactureDetailModel>();
+  final Rxn<FactureModel> selectedFacture = Rxn<FactureModel>();
 
   // Filtering & Pagination
   final RxInt currentPage = 1.obs;
@@ -36,19 +37,67 @@ class FactureController extends GetxController {
     }
   }
 
-  /// Echeance d'une facture.
-  ///
-  /// L'API des factures en instance ne la renvoie pas, celle de la liste
-  /// complete si : on la reprend de la, par identifiant. Null si la facture
-  /// n'est pas dans la page chargee.
-  String? echeanceDe(FactureModel f) {
-    if ((f.dateEcheance ?? '').trim().isNotEmpty) return f.dateEcheance;
-    for (final autre in allFactures) {
-      if (autre.idFacture == f.idFacture &&
-          (autre.dateEcheance ?? '').trim().isNotEmpty) {
-        return autre.dateEcheance;
+  /// Cherche une facture dans allFactures par id ou numero
+  FactureModel? trouverFactureComplete(int? idFacture, String? numFacture) {
+    if (allFactures.isEmpty) return null;
+    for (final a in allFactures) {
+      if ((idFacture != null && a.idFacture == idFacture) ||
+          (numFacture != null &&
+              numFacture.isNotEmpty &&
+              a.numFacture == numFacture)) {
+        return a;
       }
     }
+    return null;
+  }
+
+  /// Enrichit les facturesInstances avec les informations completes (mntHt, tva, dateEcheance, couleur)
+  void enrichirFacturesInstances() {
+    if (allFactures.isEmpty || facturesInstances.isEmpty) return;
+    final maj = facturesInstances.map((item) {
+      final comp = trouverFactureComplete(item.idFacture, item.numFacture);
+      return comp != null ? item.mergeWith(comp) : item;
+    }).toList();
+    facturesInstances.value = maj;
+  }
+
+  /// Recupere la facture complete depuis l'API /api/clientmobile/factures
+  Future<FactureModel?> recupererFactureComplete(
+    int? idFacture,
+    String? numFacture,
+  ) async {
+    var found = trouverFactureComplete(idFacture, numFacture);
+    if (found != null && found.mntHt != null && found.dateEcheance != null) {
+      return found;
+    }
+
+    try {
+      final res = await ApiService.getFactures(page: 1, pageSize: 100);
+      final list = (res['data'] as List? ?? [])
+          .map((e) => FactureModel.fromJson(Map<String, dynamic>.from(e)))
+          .toList();
+
+      for (final f in list) {
+        final idx = allFactures.indexWhere((x) => x.idFacture == f.idFacture);
+        if (idx >= 0) {
+          allFactures[idx] = f;
+        } else {
+          allFactures.add(f);
+        }
+      }
+
+      enrichirFacturesInstances();
+      return trouverFactureComplete(idFacture, numFacture);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  /// Echeance d'une facture.
+  String? echeanceDe(FactureModel f) {
+    if ((f.dateEcheance ?? '').trim().isNotEmpty) return f.dateEcheance;
+    final comp = trouverFactureComplete(f.idFacture, f.numFacture);
+    if ((comp?.dateEcheance ?? '').trim().isNotEmpty) return comp!.dateEcheance;
     return null;
   }
 
@@ -67,6 +116,7 @@ class FactureController extends GetxController {
             .toList();
       }
       facturesInstances.value = list;
+      enrichirFacturesInstances();
     } catch (_) {
     } finally {
       isLoading.value = false;
@@ -107,6 +157,7 @@ class FactureController extends GetxController {
       } else {
         allFactures.value = list;
       }
+      enrichirFacturesInstances();
       final tp = (res['totalPages'] ?? res['total_pages']) as num?;
       final te =
           (res['totalElements'] ?? res['total_elements'] ?? res['total']) as num?;
@@ -136,10 +187,22 @@ class FactureController extends GetxController {
     }
   }
 
-  Future<void> fetchDetail(int idFacture) async {
+  Future<void> fetchDetail(int idFacture, {FactureModel? base}) async {
     try {
       isLoadingDetail.value = true;
       selectedDetail.value = null;
+
+      // Initialiser selectedFacture
+      FactureModel fInit = base ??
+          trouverFactureComplete(idFacture, null) ??
+          FactureModel(numFacture: '', idFacture: idFacture);
+      final cache = trouverFactureComplete(idFacture, fInit.numFacture);
+      if (cache != null) {
+        fInit = fInit.mergeWith(cache);
+      }
+      selectedFacture.value = fInit;
+
+      // 1. Charger reglements et avoirs
       final res = await ApiService.getFactureReglements(idFacture);
       final data = (res['data'] as List? ?? []).isNotEmpty
           ? res['data'][0]
@@ -147,6 +210,20 @@ class FactureController extends GetxController {
       selectedDetail.value = FactureDetailModel.fromJson(
         Map<String, dynamic>.from(data),
       );
+
+      // 2. Si des informations manquent (mntHt, dateEcheance, mntTva),
+      // les charger depuis l'API de liste des factures
+      if (selectedFacture.value?.mntHt == null ||
+          selectedFacture.value?.dateEcheance == null ||
+          selectedFacture.value?.mntTva == null) {
+        final comp = await recupererFactureComplete(
+          idFacture,
+          selectedFacture.value?.numFacture,
+        );
+        if (comp != null) {
+          selectedFacture.value = selectedFacture.value!.mergeWith(comp);
+        }
+      }
     } catch (e) {
       Get.snackbar(
         'Détail indisponible',

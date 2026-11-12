@@ -37,6 +37,7 @@ class ChequeCrbtModel {
 }
 
 class ChequeCrbtDetailItem {
+  final int? idExpedition;
   final String? refReglement;
   final String? modeReglement;
   final String numDeclaration;
@@ -48,6 +49,7 @@ class ChequeCrbtDetailItem {
   final String? typeRemboursement;
 
   ChequeCrbtDetailItem({
+    this.idExpedition,
     this.refReglement,
     this.modeReglement,
     required this.numDeclaration,
@@ -60,7 +62,11 @@ class ChequeCrbtDetailItem {
   });
 
   factory ChequeCrbtDetailItem.fromJson(Map<String, dynamic> json) {
+    final rawExp = json['id_expedition'] ?? json['idExpedition'];
     return ChequeCrbtDetailItem(
+      idExpedition: rawExp is num
+          ? rawExp.toInt()
+          : int.tryParse(rawExp?.toString() ?? ''),
       refReglement: json['ref_reglement']?.toString(),
       modeReglement: json['mode_reglement']?.toString(),
       numDeclaration: json['num_declaration']?.toString() ?? '',
@@ -119,6 +125,7 @@ class VirementCrbtModel {
 }
 
 class VirementCrbtDetailItem {
+  final int? idExpedition;
   final String? refReglement;
   final String? modeReglement;
   final String numDeclaration;
@@ -129,6 +136,7 @@ class VirementCrbtDetailItem {
   final String? dateEmission;
 
   VirementCrbtDetailItem({
+    this.idExpedition,
     this.refReglement,
     this.modeReglement,
     required this.numDeclaration,
@@ -140,7 +148,11 @@ class VirementCrbtDetailItem {
   });
 
   factory VirementCrbtDetailItem.fromJson(Map<String, dynamic> json) {
+    final rawExp = json['id_expedition'] ?? json['idExpedition'];
     return VirementCrbtDetailItem(
+      idExpedition: rawExp is num
+          ? rawExp.toInt()
+          : int.tryParse(rawExp?.toString() ?? ''),
       refReglement: json['ref_reglement']?.toString(),
       modeReglement: json['mode_reglement']?.toString(),
       numDeclaration: json['num_declaration']?.toString() ?? '',
